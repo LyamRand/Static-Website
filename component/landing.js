@@ -6,9 +6,9 @@ export default {
         
         <img src="style/img/logo.svg" alt="Splitz logo" class="bg-grey-500 h-10 sm:h-20 w-auto object-contain">
 
-        <button class="bg-mauve text-white text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:opacity-90 transition shadow-sm">
+        <router-link to="/auth" class="bg-mauve text-white text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:opacity-90 transition shadow-sm">
           Connexion
-        </button>
+        </router-link>
         
       </div>
     </nav>
@@ -24,9 +24,9 @@ export default {
           Gérez vos comptes entre amis sans stress.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-          <button class="font-titre w-full sm:w-auto bg-mauve text-white px-6 py-3 rounded-[10px] transition">
+          <router-link to="/auth" class="block font-titre w-full sm:w-auto bg-mauve text-white px-6 py-3 rounded-[10px] transition text-center">
             Commencer gratuitement
-          </button>
+          </router-link>
           <button class="font-titre w-full sm:w-auto border-2 border-gray-300 hover:border-indigo-500 px-6 py-3 rounded-[10px] transition">
             Splitz, c'est quoi ?
           </button>

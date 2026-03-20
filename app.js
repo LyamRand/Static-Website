@@ -1,6 +1,18 @@
 import LandingPage from './component/landing.js'
+import Auth from './component/auth.js'
 
 const { createApp, ref } = Vue
+const { createRouter, createWebHashHistory } = VueRouter
+
+const routes = [
+    { path: '/', component: LandingPage },
+    { path: '/auth', component: Auth }
+]
+
+const router = createRouter({
+    history: createWebHashHistory(),
+    routes,
+})
 
 const app = createApp({
     setup() {
@@ -30,5 +42,6 @@ const app = createApp({
         return { features, footerCols }
     },
 })
-app.component('landing-page', LandingPage)
+
+app.use(router)
 app.mount('#app')

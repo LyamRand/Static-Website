@@ -6,16 +6,18 @@
     <title>Mon Projet - Accueil</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         'mauve': '#6155F5',
+                        "surface": "#F3F4F6",
                     },
                     fontFamily: {
-                        'titre': ['"Fira Sans"', 'sans-serif'],
-                        'sans': ['Jost', 'Futura', 'sans-serif'],
+                        "sans": ["Fira Sans", "sans-serif"],
+                        "logo": ["Pacifico", "cursive"]
                     }
                 }
             }
@@ -31,7 +33,7 @@
 <body class="bg-gray-50">
 
     <div id="app">
-        <landing-page :features="features" :footer-cols="footerCols"></landing-page>
+        <router-view :features="features" :footer-cols="footerCols"></router-view>
     </div>
 
     <script type="module" src="app.js"></script>
