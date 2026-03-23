@@ -6,9 +6,64 @@ export default {
     const status = reactive({ message: '', error: false });
     const form = reactive({ email: '', password: '', nom: '' });
     
-    const handleAuth = () => {
-      status.message = "Authentification en construction...";
+    const handleAuth = async () => {
+      status.message = "Chargement...";
       status.error = false;
+
+      if (activeTab.value === 'register') {
+        try {
+          const res = await fetch('api/inscription.php', {
+            method: 'POST',
+            body: JSON.stringify({
+              nom: form.nom,
+              email: form.email,
+              password: form.password
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            status.message = "Inscription réussie ! Vous pouvez vous connecter.";
+            status.error = false;
+            activeTab.value = 'login';
+            form.password = '';
+            form.nom = '';
+          } else {
+            status.message = data.error || "Erreur lors de l'inscription.";
+            status.error = true;
+          }
+        } catch (e) {
+          status.message = "Erreur de connexion au serveur.";
+          status.error = true;
+        }
+      } else if (activeTab.value === 'login') {
+        try {
+          const res = await fetch('api/connexion.php', {
+            method: 'POST',
+            body: JSON.stringify({
+              email: form.email,
+              password: form.password
+            })
+          });
+          const data = await res.json();
+          
+          if (data.success) {
+            status.message = "Connexion réussie ! Redirection en cours...";
+            status.error = false;
+            
+            // Redirection vers la page d'accueil (landing page)
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 800);
+            
+          } else {
+            status.message = data.error || "Identifiants incorrects.";
+            status.error = true;
+          }
+        } catch (e) {
+          status.message = "Erreur de connexion au serveur.";
+          status.error = true;
+        }
+      }
     };
 
     return { activeTab, status, form, handleAuth };
