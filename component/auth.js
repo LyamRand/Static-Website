@@ -52,7 +52,7 @@ export default {
             
             // Redirection vers la page d'accueil (landing page)
             setTimeout(() => {
-              window.location.href = 'index.html';
+              window.location.href = '#/';
             }, 800);
             
           } else {

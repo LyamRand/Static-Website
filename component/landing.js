@@ -1,12 +1,46 @@
+const { ref, onMounted } = Vue;
+
 export default {
-  props: ['features', 'footerCols'],
-  template: `
+    props: ['features', 'footerCols'],
+    setup() {
+        const user = ref(null);
+
+        onMounted(async () => {
+            try {
+                const res = await fetch('api/check_session.php');
+                const data = await res.json();
+                if (data.connected) {
+                    user.value = data.user;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        const logout = async () => {
+            try {
+                await fetch('api/deconnexion.php');
+                user.value = null;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        return { user, logout };
+    },
+    template: `
     <nav class="bg-white border-b border-gray-200">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-16 py-4 flex items-center justify-between">
         
-        <img src="style/img/logo.svg" alt="Splitz logo" class="bg-grey-500 h-10 sm:h-20 w-auto object-contain">
+        <img src="style/img/logo.svg" alt="Splitz logo" class="bg-grey-500 h-10 sm:h-12 w-auto object-contain">
 
-        <router-link to="/auth" class="bg-mauve text-white text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:opacity-90 transition shadow-sm">
+        <div v-if="user" class="flex gap-4 items-center">
+            <span class="text-sm font-bold text-slate-700 hidden sm:block">Salut, {{ user.name }}</span>
+            <button @click="logout" class="bg-red-50 text-red-600 border border-red-200 text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:bg-red-100 transition shadow-sm">
+              Déconnexion
+            </button>
+        </div>
+        <router-link v-else to="/auth" class="bg-mauve text-white text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:opacity-90 transition shadow-sm">
           Connexion
         </router-link>
         
