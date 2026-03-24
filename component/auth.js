@@ -5,7 +5,7 @@ export default {
     const activeTab = ref('login');
     const status = reactive({ message: '', error: false });
     const form = reactive({ email: '', password: '', nom: '' });
-    
+
     const handleAuth = async () => {
       status.message = "Chargement...";
       status.error = false;
@@ -45,16 +45,16 @@ export default {
             })
           });
           const data = await res.json();
-          
+
           if (data.success) {
             status.message = "Connexion réussie ! Redirection en cours...";
             status.error = false;
-            
+
             // Redirection vers la page d'accueil (landing page)
             setTimeout(() => {
               window.location.href = '#/';
             }, 800);
-            
+
           } else {
             status.message = data.error || "Identifiants incorrects.";
             status.error = true;
