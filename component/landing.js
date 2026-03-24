@@ -28,6 +28,9 @@ export default {
 
         <div v-if="user" class="flex gap-4 items-center">
             <span class="text-sm font-bold text-slate-700 hidden sm:block">Salut, {{ user.name }}</span>
+            <router-link to="/dashboard" class="bg-black text-white text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:bg-gray-800 transition shadow-sm">
+              Tableau de bord
+            </router-link>
             <button @click="logout" class="bg-red-50 text-red-600 border border-red-200 text-sm sm:text-base font-semibold px-4 sm:px-6 py-2 rounded-full hover:bg-red-100 transition shadow-sm">
               Déconnexion
             </button>

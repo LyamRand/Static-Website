@@ -1,12 +1,14 @@
 import LandingPage from './component/landing.js'
 import Auth from './component/auth.js'
+import TableauBord from './component/tableauBord.js'
 
 const { createApp, ref } = Vue
 const { createRouter, createWebHashHistory } = VueRouter
 
 const routes = [
     { path: '/', component: LandingPage },
-    { path: '/auth', component: Auth }
+    { path: '/auth', component: Auth },
+    { path: '/dashboard', component: TableauBord }
 ]
 
 const router = createRouter({
