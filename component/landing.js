@@ -5,25 +5,17 @@ export default {
     setup() {
         const user = ref(null);
 
-        onMounted(async () => {
-            try {
-                const res = await fetch('api/check_session.php');
-                const data = await res.json();
-                if (data.connected) {
-                    user.value = data.user;
-                }
-            } catch (e) {
-                console.error(e);
-            }
+        onMounted(() => {
+            fetch('api/check_session.php')
+                .then(res => res.json())
+                .then(data => user.value = data.connected ? data.user : null)
+                .catch(console.error);
         });
 
-        const logout = async () => {
-            try {
-                await fetch('api/deconnexion.php');
-                user.value = null;
-            } catch (e) {
-                console.error(e);
-            }
+        const logout = () => {
+            fetch('api/deconnexion.php')
+                .then(() => user.value = null)
+                .catch(console.error);
         };
 
         return { user, logout };
@@ -32,7 +24,7 @@ export default {
     <nav class="bg-white border-b border-gray-200">
       <div class="w-full mx-auto px-4 sm:px-6 lg:px-16 py-4 flex items-center justify-between">
         
-        <img src="style/img/logo.svg" alt="Splitz logo" class="bg-grey-500 h-10 sm:h-12 w-auto object-contain">
+        <router-link to="/" class="font-logo text-2xl sm:text-3xl font-black italic text-gray-900 tracking-tight">Splitz</router-link>
 
         <div v-if="user" class="flex gap-4 items-center">
             <span class="text-sm font-bold text-slate-700 hidden sm:block">Salut, {{ user.name }}</span>

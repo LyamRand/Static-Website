@@ -21,9 +21,10 @@ try {
     // 1. Vérifier si l'email existe déjà dans la base
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
     $stmt->execute(['email' => $data->email]);
-    if ($stmt->fetch()) {
-        echo json_encode(["success" => false, "error" => "Cet email est déjà utilisé par un autre compte."]);
-        exit;
+    if ($stmt->rowCount() > 0) {
+    http_response_code(400);
+    echo "Adresse e-mail déjà existante.";
+    exit;
     }
 
     // 2. Hasher le mot de passe pour la sécurité
