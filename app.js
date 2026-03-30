@@ -1,48 +1,53 @@
-const { createApp, ref } = Vue;
-const { createRouter, createWebHistory } = VueRouter;
+const { createApp, ref, onMounted } = Vue;
 
-// Composant Landing (Accueil)
-const Landing = {
-    template: '#landing-template',
-    props: {
-        features: {
-            type: Array,
-            required: true
-        },
-        footerCols: {
-            type: Array,
-            required: true
-        }
-    },
-    setup() {
-        // Simuler l'état de l'utilisateur (null si non connecté, ou un objet avec 'name' si connecté)
-        // Par exemple: const user = ref({ name: 'Lyam' });
-        const user = ref(null); 
-
-        const logout = () => {
-            user.value = null;
-            console.log('Déconnexion réussie');
-        };
-
-        return { user, logout };
-    }
-};
-
-// Configuration du routeur Vue
-const routes = [
-    { path: '/', component: Landing },
-    // Les autres routes (auth, dashboard) pourront être rajoutées ici
-];
-
-const router = createRouter({
-    history: createWebHistory(),
-    routes
-});
-
-// Création de l'application Vue principale
 const app = createApp({
     setup() {
-        // Données pour la section "Pourquoi choisir Splitz ?"
+        // État de l'utilisateur (null si déconnecté)
+        const user = ref(null);
+
+        // Vérification de la session côté PHP
+        const checkAuth = async () => {
+            try {
+                const response = await fetch('./api/check_session.php', {
+    method: 'GET',
+    credentials: 'same-origin' // INDISPENSABLE : Dit au navigateur d'envoyer le cookie de session à PHP
+});
+                const data = await response.json();
+
+                if (data.isLoggedIn) {
+                    user.value = data.user;
+                }
+            } catch (error) {
+                console.error("Erreur lors de la vérification de session :", error);
+            }
+        };
+
+        // Fonction pour se déconnecter
+// Fonction pour se déconnecter
+        const handleLogout = async () => {
+            try {
+                // 1. On appelle le fichier PHP pour détruire la session et le cookie
+                // Remplacez './chemin_vers_le_dossier/deconnexion.php' par votre vrai chemin !
+                await fetch('./api/deconnexion.php', {
+                    method: 'POST', // ou GET, selon comment vous avez l'habitude de faire
+                    credentials: 'same-origin' // Indispensable pour que PHP sache quelle session détruire
+                });
+                
+                // 2. On met l'utilisateur à null pour mettre à jour l'interface HTML
+                // (Le bouton "Tableau de bord" va disparaître, "Connexion" va revenir)
+                user.value = null; 
+                
+            } catch (error) {
+                console.error("Erreur lors de la déconnexion :", error);
+            }
+        };
+
+        // Se lance au démarrage
+        onMounted(() => {
+            checkAuth();
+        });
+
+        // Données d'affichage
         const features = ref([
             {
                 icon: "💰",
@@ -61,29 +66,19 @@ const app = createApp({
             }
         ]);
 
-        // Données pour le Footer (pied de page)
         const footerCols = ref([
-            {
-                title: "PRODUIT",
-                links: ["Fonctionnalités", "Sécurité", "Prix", "Avis clients"]
-            },
-            {
-                title: "RESSOURCES",
-                links: ["Centre d'aide", "Guides & Tutoriels", "Blog", "API"]
-            },
-            {
-                title: "SOCIÉTÉ",
-                links: ["À propos", "Carrières", "Contact", "Mentions légales"]
-            }
+            { title: "PRODUIT", links: ["Fonctionnalités", "Sécurité", "Prix", "Avis clients"] },
+            { title: "RESSOURCES", links: ["Centre d'aide", "Guides & Tutoriels", "Blog", "API"] },
+            { title: "SOCIÉTÉ", links: ["À propos", "Carrières", "Contact", "Mentions légales"] }
         ]);
 
         return {
+            user,
             features,
-            footerCols
+            footerCols,
+            handleLogout
         };
     }
 });
 
-// Intégration du routeur et montage sur la div #app
-app.use(router);
 app.mount('#app');

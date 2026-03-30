@@ -74,13 +74,13 @@
             </div>
 
             <div class="min-h-[400px] w-full">
-                <form id="form-login" class="space-y-6 block">
+                <form action="../api/connexion.php" method="POST" id="form-login" class="space-y-6 block">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-                            <input type="email" placeholder="exemple@mail.com"
+                            <input type="email" id="mail" name="mail" placeholder="exemple@mail.com"
                                 class="w-full pl-10 pr-4 py-3 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>
@@ -94,7 +94,7 @@
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
-                            <input type="password" placeholder="••••••••••••"
+                            <input type="password" id="mdp" name="mdp" placeholder="••••••••••••"
                                 class="w-full pl-10 pr-4 py-3 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>

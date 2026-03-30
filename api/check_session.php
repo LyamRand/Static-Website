@@ -1,18 +1,26 @@
 <?php
+// check_auth.php
 header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-
 session_start();
 
-if (isset($_SESSION['user_id'])) {
+// On vérifie si l'utilisateur a une session active
+if (isset($_SESSION['idClient']) && isset($_SESSION['user_name'])) {
+    // L'utilisateur est connecté, on renvoie ses infos
     echo json_encode([
-        "connected" => true,
+        "isLoggedIn" => true,
         "user" => [
-            "id" => $_SESSION['user_id'],
-            "name" => $_SESSION['user_name'],
-            "email" => $_SESSION['user_email']
+            "id" => $_SESSION['idClient'],
+            "name" => $_SESSION['user_name']
         ]
     ]);
 } else {
-    echo json_encode(["connected" => false]);
+    // Optionnel : Ici vous pourriez aussi vérifier si le cookie $_COOKIE['remember_user'] existe
+    // pour reconnecter l'utilisateur automatiquement et recréer la session.
+    
+    // L'utilisateur n'est pas connecté
+    echo json_encode([
+        "isLoggedIn" => false,
+        "user" => null
+    ]);
 }
+?>
