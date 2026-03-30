@@ -7,6 +7,7 @@
     <title>Splitz - Tableau de bord</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script src="app.js"></script>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800;900&family=Pacifico&display=swap"
@@ -90,7 +91,7 @@
 
                 <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
                     <div class="text-right">
-                        <p class="text-sm font-bold text-slate-900">Merwan Abzar</p>
+                        <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
                         <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte personnel</p>
                     </div>
                     <div class="w-11 h-11 rounded-full bg-slate-200 overflow-hidden border border-slate-200">
@@ -104,7 +105,7 @@
 
             <div class="mb-10">
                 <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900 mb-1 flex items-center gap-3">
-                    Salut, Merwan <span class="text-[35px]">👋</span>
+                    Salut, {{ user.name }} <span class="text-[35px]">👋</span>
                 </h2>
                 <p class="text-slate-500 text-lg font-medium">Voici le récapitulatif de tes comptes partagés ce mois-ci.
                 </p>
