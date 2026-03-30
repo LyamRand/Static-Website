@@ -1,10 +1,26 @@
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, onMounted, computed } = Vue;
 
 const app = createApp({
     setup() {
 
         // Stocke les informations de l'utilisateur connecté (null par défaut s'il est déconnecté)
         const user = ref(null);
+
+        // ==========================================
+        // GESTION DES GROUPES (NOUVEAU)
+        // ==========================================
+        // ⚠️ Pour tester l'affichage "Aucun groupe", remplace par : const groupes = ref([]);
+        const groupes = ref([
+            { id: 1, nom: "Vacances Ski", participants: 4, solde: 45.00, icone: "⛷️" },
+            { id: 2, nom: "Voyage Sud", participants: 12, solde: -22.50, icone: "☀️" }
+        ]);
+
+        // Calculs automatiques (se mettent à jour tous seuls si 'groupes' change)
+        const soldeTotal = computed(() => groupes.value.reduce((total, groupe) => total + groupe.solde, 0));
+        const onTeDoit = computed(() => groupes.value.filter(g => g.solde > 0).reduce((total, groupe) => total + groupe.solde, 0));
+        const tuDois = computed(() => groupes.value.filter(g => g.solde < 0).reduce((total, groupe) => total + Math.abs(groupe.solde), 0));
+
+        // ==========================================
 
         // Données d'affichage : Liste des fonctionnalités affichées sur la page d'accueil
         const features = ref([
@@ -106,7 +122,11 @@ const app = createApp({
             footerCols,
             handleLogout,
             isAddGroupModalOpen,
-            selectedGroupIcon
+            selectedGroupIcon,
+            groupes, // Nouvelles variables exportées
+            soldeTotal,
+            onTeDoit,
+            tuDois
             // Note : checkAuth n'est pas retourné car il n'est utilisé que dans le setup() 
             // et n'a pas besoin d'être appelé depuis un bouton sur la page HTML.
         };
