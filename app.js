@@ -1,47 +1,25 @@
-const { createApp, ref, onMounted, computed } = Vue;
+const { createApp, ref, computed, onMounted } = Vue;
 
 const app = createApp({
     setup() {
-
-        // Stocke les informations de l'utilisateur connecté (null par défaut s'il est déconnecté)
+        // Stocke les informations de l'utilisateur connecté
         const user = ref(null);
 
-        // ==========================================
-        // GESTION DES GROUPES (NOUVEAU)
-        // ==========================================
-        // ⚠️ Pour tester l'affichage "Aucun groupe", remplace par : const groupes = ref([]);
-        const groupes = ref([
-            { id: 1, nom: "Vacances Ski", participants: 4, solde: 45.00, icone: "⛷️" },
-            { id: 2, nom: "Voyage Sud", participants: 12, solde: -22.50, icone: "☀️" }
-        ]);
+        // 1. ON COMMENCE AVEC UN TABLEAU VIDE (Plus de fausses données !)
+        const groupes = ref([]);
 
-        // Calculs automatiques (se mettent à jour tous seuls si 'groupes' change)
+        // Calculs automatiques des soldes basés sur les vrais groupes
         const soldeTotal = computed(() => groupes.value.reduce((total, groupe) => total + groupe.solde, 0));
         const onTeDoit = computed(() => groupes.value.filter(g => g.solde > 0).reduce((total, groupe) => total + groupe.solde, 0));
         const tuDois = computed(() => groupes.value.filter(g => g.solde < 0).reduce((total, groupe) => total + Math.abs(groupe.solde), 0));
 
-        // ==========================================
-
-        // Données d'affichage : Liste des fonctionnalités affichées sur la page d'accueil
+        // Données d'affichage statiques (Accueil & Footer)
         const features = ref([
-            {
-                icon: "💰",
-                title: "Suivi des dépenses",
-                desc: "Ajoutez vos dépenses en quelques clics et gardez une trace de chaque transaction en toute simplicité."
-            },
-            {
-                icon: "🔄",
-                title: "Équilibre automatique",
-                desc: "Splitz calcule instantanément qui doit combien à qui, en minimisant le nombre de transferts nécessaires."
-            },
-            {
-                icon: "👥",
-                title: "Gestion de groupes illimités",
-                desc: "Créez des groupes pour vos voyages, colocations ou événements entre amis, sans aucune limite."
-            }
+            { icon: "💰", title: "Suivi des dépenses", desc: "Ajoutez vos dépenses en quelques clics et gardez une trace de chaque transaction en toute simplicité." },
+            { icon: "🔄", title: "Équilibre automatique", desc: "Splitz calcule instantanément qui doit combien à qui, en minimisant le nombre de transferts nécessaires." },
+            { icon: "👥", title: "Gestion de groupes illimités", desc: "Créez des groupes pour vos voyages, colocations ou événements entre amis, sans aucune limite." }
         ]);
 
-        // Données d'affichage : Liens affichés dans le pied de page (footer)
         const footerCols = ref([
             { title: "PRODUIT", links: ["Fonctionnalités", "Sécurité", "Prix", "Avis clients"] },
             { title: "RESSOURCES", links: ["Centre d'aide", "Guides & Tutoriels", "Blog", "API"] },
@@ -53,26 +31,42 @@ const app = createApp({
         const selectedGroupIcon = ref('home');
 
         // ==========================================
-        // 2. MÉTHODES ET ACTIONS
+        // MÉTHODES ET ACTIONS (API)
         // ==========================================
 
         /**
-         * Vérifie auprès du serveur (PHP) si une session utilisateur est active.
-         * Met à jour la variable `user` si l'utilisateur est connecté.
+         * NOUVEAU : Va chercher les VRAIS groupes de l'utilisateur dans la base de données
+         */
+        const fetchGroupes = async () => {
+            try {
+                const apiPath = window.location.pathname.includes('/page/') ? '../api' : './api';
+                const response = await fetch(`${apiPath}/get_groupes.php`, { credentials: 'same-origin' });
+                const data = await response.json();
+
+                if (data.success) {
+                    groupes.value = data.groupes; // On remplit le tableau avec les données de la BDD !
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération des groupes :", error);
+            }
+        };
+
+        /**
+         * Vérifie si une session est active
          */
         const checkAuth = async () => {
             try {
-                // Determine le bon chemin vers l'API selon le dossier actuel
                 const apiPath = window.location.pathname.includes('/page/') ? '../api' : './api';
-
                 const response = await fetch(`${apiPath}/check_session.php`, {
                     method: 'GET',
-                    credentials: 'same-origin' // INDISPENSABLE : Envoie le cookie de session à PHP
+                    credentials: 'same-origin'
                 });
                 const data = await response.json();
 
                 if (data.isLoggedIn) {
                     user.value = data.user;
+                    // Si l'utilisateur est connecté, on déclenche la recherche de ses groupes
+                    fetchGroupes();
                 }
             } catch (error) {
                 console.error("Erreur lors de la vérification de la session :", error);
@@ -80,42 +74,38 @@ const app = createApp({
         };
 
         /**
-         * Gère la déconnexion de l'utilisateur.
-         * Détruit la session côté PHP et réinitialise l'état utilisateur côté Vue.js.
+         * Gère la déconnexion
          */
         const handleLogout = async () => {
             try {
                 const apiPath = window.location.pathname.includes('/page/') ? '../api' : './api';
-
-                // Appel à l'API PHP pour détruire la session et le cookie
                 await fetch(`${apiPath}/deconnexion.php`, {
                     method: 'POST',
-                    credentials: 'same-origin' // INDISPENSABLE : Indique à PHP quelle session détruire
+                    credentials: 'same-origin'
                 });
 
-                // On remet l'utilisateur à null pour mettre à jour l'interface HTML
-                // (ex: Le bouton "Tableau de bord" va disparaître, "Connexion" va revenir)
                 user.value = null;
+                groupes.value = []; // On vide les groupes à la déconnexion
 
+                // Redirection
+                if (window.location.pathname.includes('/page/')) {
+                    window.location.href = '../index.html';
+                }
             } catch (error) {
                 console.error("Erreur lors de la déconnexion :", error);
             }
         };
 
         // ==========================================
-        // 3. CYCLE DE VIE (Lifecycle hooks)
+        // CYCLE DE VIE
         // ==========================================
-
-        // S'exécute automatiquement une fois que l'application est "montée" (chargée)
         onMounted(() => {
-            checkAuth(); // Vérifie si l'utilisateur est connecté dès le chargement de la page
+            checkAuth();
         });
 
         // ==========================================
-        // 4. EXPORT DES VARIABLES ET FONCTIONS
+        // EXPORT
         // ==========================================
-
-        // Tout ce qui est retourné ici sera accessible dans le HTML (le template)
         return {
             user,
             features,
@@ -123,15 +113,12 @@ const app = createApp({
             handleLogout,
             isAddGroupModalOpen,
             selectedGroupIcon,
-            groupes, // Nouvelles variables exportées
+            groupes,
             soldeTotal,
             onTeDoit,
             tuDois
-            // Note : checkAuth n'est pas retourné car il n'est utilisé que dans le setup() 
-            // et n'a pas besoin d'être appelé depuis un bouton sur la page HTML.
         };
     }
 });
 
-// Monte l'application Vue.js sur l'élément de la page HTML qui a l'ID `#app`
 app.mount('#app');
