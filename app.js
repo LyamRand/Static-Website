@@ -1,49 +1,89 @@
-import LandingPage from './component/landing.js'
-import Auth from './component/auth.js'
-import TableauBord from './component/tableauBord.js'
+const { createApp, ref } = Vue;
+const { createRouter, createWebHistory } = VueRouter;
 
-const { createApp, ref } = Vue
-const { createRouter, createWebHashHistory } = VueRouter
+// Composant Landing (Accueil)
+const Landing = {
+    template: '#landing-template',
+    props: {
+        features: {
+            type: Array,
+            required: true
+        },
+        footerCols: {
+            type: Array,
+            required: true
+        }
+    },
+    setup() {
+        // Simuler l'état de l'utilisateur (null si non connecté, ou un objet avec 'name' si connecté)
+        // Par exemple: const user = ref({ name: 'Lyam' });
+        const user = ref(null); 
 
+        const logout = () => {
+            user.value = null;
+            console.log('Déconnexion réussie');
+        };
+
+        return { user, logout };
+    }
+};
+
+// Configuration du routeur Vue
 const routes = [
-    { path: '/', component: LandingPage },
-    { path: '/auth', component: Auth },
-    { path: '/dashboard', component: TableauBord }
-]
+    { path: '/', component: Landing },
+    // Les autres routes (auth, dashboard) pourront être rajoutées ici
+];
 
 const router = createRouter({
-    history: createWebHashHistory(),
-    routes,
-})
+    history: createWebHistory(),
+    routes
+});
 
+// Création de l'application Vue principale
 const app = createApp({
     setup() {
+        // Données pour la section "Pourquoi choisir Splitz ?"
         const features = ref([
             {
-                icon: '👥',
-                title: 'Gestion de groupe',
-                desc: "Créez des groupes illimités pour chaque occasion : coloc, vacances, ou simples sorties entre amis."
+                icon: "💰",
+                title: "Suivi des dépenses",
+                desc: "Ajoutez vos dépenses en quelques clics et gardez une trace de chaque transaction en toute simplicité."
             },
             {
-                icon: '📊',
-                title: 'Suivi des dépenses',
-                desc: "Visualisez qui doit quoi en un coup d'œil avec des graphiques clairs et des historiques détaillés."
+                icon: "🔄",
+                title: "Équilibre automatique",
+                desc: "Splitz calcule instantanément qui doit combien à qui, en minimisant le nombre de transferts nécessaires."
             },
             {
-                icon: '⚡',
-                title: 'Paiements instantanés',
-                desc: "Réglez vos dettes en un clic via nos intégrations de paiement sécurisées et directes."
+                icon: "👥",
+                title: "Gestion de groupes illimités",
+                desc: "Créez des groupes pour vos voyages, colocations ou événements entre amis, sans aucune limite."
             }
-        ])
+        ]);
+
+        // Données pour le Footer (pied de page)
         const footerCols = ref([
-            { title: 'TITRE COLONNE', links: ['Page', 'Page', 'Page'] },
-            { title: 'TITRE COLONNE', links: ['Page', 'Page', 'Page'] },
-            { title: 'TITRE COLONNE', links: ['Page', 'Page', 'Page'] },
-        ])
+            {
+                title: "PRODUIT",
+                links: ["Fonctionnalités", "Sécurité", "Prix", "Avis clients"]
+            },
+            {
+                title: "RESSOURCES",
+                links: ["Centre d'aide", "Guides & Tutoriels", "Blog", "API"]
+            },
+            {
+                title: "SOCIÉTÉ",
+                links: ["À propos", "Carrières", "Contact", "Mentions légales"]
+            }
+        ]);
 
-        return { features, footerCols }
-    },
-})
+        return {
+            features,
+            footerCols
+        };
+    }
+});
 
-app.use(router)
-app.mount('#app')
+// Intégration du routeur et montage sur la div #app
+app.use(router);
+app.mount('#app');
