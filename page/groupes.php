@@ -44,7 +44,7 @@
         </div>
 
         <nav class="flex-1 px-4 space-y-3">
-            <a href="tableau-bord.html"
+            <a href="tableau-bord.php"
                 class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all">
                 <span class="material-symbols-outlined text-[26px]">grid_view</span>
                 <span class="text-[15px]">Tableau de bord</span>
@@ -112,7 +112,7 @@
                 </div>
 
                 <button>
-                    <a href="ajouter-groupe.html"
+                    <a href="newgroup.php"
                         class="bg-primary hover:bg-[#5044e6] text-white px-7 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
                         <span class="material-symbols-outlined">add_circle</span>
                         Ajouter un groupe
