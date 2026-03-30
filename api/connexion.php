@@ -47,7 +47,7 @@ if ($data && password_verify($mp, $data['pwd_hash'])) {
         $cookie_expire, 
         "/",          // Chemin sur le serveur où le cookie sera disponible
         "",           // Domaine (laissez vide pour le domaine actuel)
-        true,         // Secure : true = transmis uniquement en HTTPS
+        false,        // Secure : mis à false pour fonctionner sur localhost HTTP
         true          // HttpOnly : true = inaccessible via JavaScript (sécurité contre les failles XSS)
     );
 

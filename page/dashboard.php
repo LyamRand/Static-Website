@@ -7,7 +7,7 @@
     <title>Splitz - Tableau de bord</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    <script src="app.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800;900&family=Pacifico&display=swap"
@@ -37,7 +37,7 @@
 </head>
 
 <body class="font-sans bg-[#F9FAFB] text-slate-900 flex min-h-screen">
-
+  <div id="app" class="flex min-h-screen w-full">
     <aside class="w-72 bg-white flex flex-col fixed h-full border-r border-slate-100">
 
         <div class="p-8 pb-12">
@@ -89,7 +89,7 @@
                         class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
                 </button>
 
-                <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+                <div v-if="user" class="flex items-center gap-3 pl-4 border-l border-slate-200">
                     <div class="text-right">
                         <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
                         <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte personnel</p>
@@ -103,7 +103,7 @@
 
         <div class="p-10 max-w-[1400px]">
 
-            <div class="mb-10">
+            <div v-if="user" class="mb-10">
                 <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900 mb-1 flex items-center gap-3">
                     Salut, {{ user.name }} <span class="text-[35px]">👋</span>
                 </h2>
@@ -197,7 +197,7 @@
                             </div>
                         </div>
 
-                        <button
+                        <button @click="isAddGroupModalOpen = true"
                             class="bg-transparent rounded-[32px] p-6 border-2 border-dashed border-slate-300 hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center justify-center h-[220px] text-slate-400 hover:text-primary">
                             <span class="material-symbols-outlined text-[28px] mb-2">add_circle</span>
                             <span class="text-[13px] font-black tracking-wide">CRÉER UN GROUPE</span>
@@ -221,7 +221,70 @@
             </div>
 
         </div>
+
+        <!-- Pop-up Ajouter un groupe -->
+        <div v-if="isAddGroupModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+            <div class="bg-white w-full max-w-[600px] rounded-[32px] shadow-2xl overflow-hidden flex flex-col p-8 md:p-10">
+                <h2 class="text-3xl font-extrabold text-slate-900 mb-6">Nouveau groupe</h2>
+                <hr class="border-slate-100 mb-8" />
+
+                <form action="../api/newgroup.php" method="POST" class="space-y-6">
+                    <!-- Nom du groupe -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Nom du groupe</label>
+                        <input type="text" id="name" name="name" placeholder="Comment s'appelle le groupe ?"
+                            class="w-full px-5 py-4 bg-surface border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-semibold placeholder-slate-400" />
+                    </div>
+
+                    <!-- Description du groupe -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Description <span class="text-slate-400 font-normal">(optionnel)</span></label>
+                        <textarea id="description" name="description" placeholder="Un petit mot sur l'objectif de ce groupe..." rows="3"
+                            class="w-full px-5 py-4 bg-surface border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-semibold placeholder-slate-400 resize-none"></textarea>
+                    </div>
+
+                    <!-- Icône du groupe -->
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-3">Icône du groupe</label>
+                        <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            <label v-for="icon in ['home', 'flight', 'landscape', 'sports_bar']" :key="icon" class="cursor-pointer flex-shrink-0">
+                                <input type="radio" :value="icon" v-model="selectedGroupIcon" name="group_icon" class="peer hidden">
+                                <div class="flex items-center justify-center min-w-[75px] h-[75px] rounded-2xl transition-all bg-surface border-2 border-transparent text-slate-600 hover:bg-slate-200 peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary">
+                                    <span class="material-symbols-outlined text-[32px]">{{ icon }}</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="relative flex items-center py-4">
+                        <div class="flex-grow border-t border-slate-200"></div>
+                        <span class="flex-shrink-0 mx-4 w-10 h-10 flex items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-500">OU</span>
+                        <div class="flex-grow border-t border-slate-200"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Rejoindre un groupe</label>
+                        <input type="text" placeholder="Saisir le code unique pour rejoindre"
+                            class="w-full px-5 py-4 bg-surface border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-semibold placeholder-slate-400" />
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4 mt-auto">
+                        <button type="submit"
+                            class="flex-[2] py-4 rounded-xl bg-primary hover:bg-[#5044e6] text-white font-bold text-base transition-all shadow-lg shadow-primary/30">
+                            C'est parti !
+                        </button>
+                        <button type="button" @click="isAddGroupModalOpen = false"
+                            class="flex-[1] py-4 rounded-xl bg-surface hover:bg-slate-200 text-slate-600 font-bold text-base transition-all">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </main>
+  </div>
+  <script src="../app.js"></script>
 </body>
 
 </html>
