@@ -6,11 +6,10 @@ const app = createApp({
         const user = ref(null);
 
         // ==========================================
-        // GESTION DU PROFIL (NOUVEAUTÉ)
+        // GESTION DU PROFIL ET MENU DÉROULANT
         // ==========================================
-        const isProfileMenuOpen = ref(false); // État du menu déroulant (ouvert/fermé)
+        const isProfileMenuOpen = ref(false);
 
-        // Calcul automatique des initiales (ex: Merwan Abzar -> MA)
         const userInitials = computed(() => {
             if (!user.value || !user.value.name) return '';
             const names = user.value.name.trim().split(' ');
@@ -23,11 +22,47 @@ const app = createApp({
         });
 
         // ==========================================
+        // GESTION DES PARAMÈTRES (NOUVEAUTÉ)
+        // ==========================================
+        const activeSettingsTab = ref('profil'); // 'profil', 'paiements', 'securite'
+
+        // Données des formulaires de paramètres
+        const profileForm = ref({ name: '', email: '' });
+        const bankForm = ref({ iban: '' });
+        const securityForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' });
+
+        // Messages de notification
+        const settingsMessage = ref({ text: '', type: '' }); // type: 'success' ou 'error'
+
+        const showMessage = (text, type = 'success') => {
+            settingsMessage.value = { text, type };
+            setTimeout(() => settingsMessage.value = { text: '', type: '' }, 3000);
+        };
+
+        const saveProfile = () => {
+            // Plus tard, on fera un vrai fetch vers update_profile.php ici
+            showMessage("Profil mis à jour avec succès !");
+            user.value.name = profileForm.value.name; // Met à jour le nom visuellement partout
+        };
+
+        const saveBank = () => {
+            showMessage("Coordonnées bancaires enregistrées !");
+        };
+
+        const saveSecurity = () => {
+            if (securityForm.value.newPassword !== securityForm.value.confirmPassword) {
+                showMessage("Les nouveaux mots de passe ne correspondent pas.", "error");
+                return;
+            }
+            showMessage("Mot de passe modifié avec succès !");
+            securityForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }; // On vide les champs
+        };
+
+        // ==========================================
         // GESTION DES GROUPES
         // ==========================================
         const groupes = ref([]);
 
-        // Calculs automatiques des soldes basés sur les vrais groupes
         const soldeTotal = computed(() => groupes.value.reduce((total, groupe) => total + groupe.solde, 0));
         const onTeDoit = computed(() => groupes.value.filter(g => g.solde > 0).reduce((total, groupe) => total + groupe.solde, 0));
         const tuDois = computed(() => groupes.value.filter(g => g.solde < 0).reduce((total, groupe) => total + Math.abs(groupe.solde), 0));
@@ -45,7 +80,6 @@ const app = createApp({
             { title: "SOCIÉTÉ", links: ["À propos", "Carrières", "Contact", "Mentions légales"] }
         ]);
 
-        // État de la modale "Ajouter un groupe"
         const isAddGroupModalOpen = ref(false);
         const selectedGroupIcon = ref('home');
 
@@ -78,6 +112,8 @@ const app = createApp({
 
                 if (data.isLoggedIn) {
                     user.value = data.user;
+                    // On pré-remplit le formulaire avec le nom actuel !
+                    profileForm.value.name = data.user.name;
                     fetchGroupes();
                 }
             } catch (error) {
@@ -109,6 +145,13 @@ const app = createApp({
         // ==========================================
         onMounted(() => {
             checkAuth();
+
+            // Si on arrive sur la page avec un paramètre d'URL (ex: parametres.php?tab=securite)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam && ['profil', 'paiements', 'securite'].includes(tabParam)) {
+                activeSettingsTab.value = tabParam;
+            }
         });
 
         // ==========================================
@@ -126,7 +169,16 @@ const app = createApp({
             groupes,
             soldeTotal,
             onTeDoit,
-            tuDois
+            tuDois,
+            // Nouveaux exports pour les paramètres
+            activeSettingsTab,
+            profileForm,
+            bankForm,
+            securityForm,
+            saveProfile,
+            saveBank,
+            saveSecurity,
+            settingsMessage
         };
     }
 });

@@ -55,20 +55,13 @@
                     <span class="material-symbols-outlined text-[26px]">group</span>
                     <span class="text-[15px]">Mes groupes</span>
                 </a>
-                <a href="#"
+                <a href="#.php"
                     class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all">
                     <span class="material-symbols-outlined text-[26px]">history</span>
                     <span class="text-[15px]">Activité</span>
                 </a>
             </nav>
 
-            <div class="p-4 mb-4">
-                <a href="#"
-                    class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all">
-                    <span class="material-symbols-outlined text-[26px]">settings</span>
-                    <span class="text-[15px]">Paramètres</span>
-                </a>
-            </div>
         </aside>
 
         <main class="flex-1 ml-72 flex flex-col min-h-screen">
@@ -120,12 +113,12 @@
                                 <p class="text-xs font-medium text-slate-400 mt-0.5">Membre de Splitz</p>
                             </div>
                             <div class="p-2">
-                                <a href="#"
+                                <a href="settings.php"
                                     class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
                                     <span class="material-symbols-outlined text-[22px]">person</span>
                                     Mon profil
                                 </a>
-                                <a href="#"
+                                <a href="settings.php"
                                     class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
                                     <span class="material-symbols-outlined text-[22px]">settings</span>
                                     Paramètres
