@@ -5,7 +5,26 @@ const app = createApp({
         // Stocke les informations de l'utilisateur connecté
         const user = ref(null);
 
-        // 1. ON COMMENCE AVEC UN TABLEAU VIDE (Plus de fausses données !)
+        // ==========================================
+        // GESTION DU PROFIL (NOUVEAUTÉ)
+        // ==========================================
+        const isProfileMenuOpen = ref(false); // État du menu déroulant (ouvert/fermé)
+
+        // Calcul automatique des initiales (ex: Merwan Abzar -> MA)
+        const userInitials = computed(() => {
+            if (!user.value || !user.value.name) return '';
+            const names = user.value.name.trim().split(' ');
+            if (names.length >= 2) {
+                return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+            } else if (names.length === 1) {
+                return names[0].substring(0, 2).toUpperCase();
+            }
+            return '';
+        });
+
+        // ==========================================
+        // GESTION DES GROUPES
+        // ==========================================
         const groupes = ref([]);
 
         // Calculs automatiques des soldes basés sur les vrais groupes
@@ -34,9 +53,6 @@ const app = createApp({
         // MÉTHODES ET ACTIONS (API)
         // ==========================================
 
-        /**
-         * NOUVEAU : Va chercher les VRAIS groupes de l'utilisateur dans la base de données
-         */
         const fetchGroupes = async () => {
             try {
                 const apiPath = window.location.pathname.includes('/page/') ? '../api' : './api';
@@ -44,16 +60,13 @@ const app = createApp({
                 const data = await response.json();
 
                 if (data.success) {
-                    groupes.value = data.groupes; // On remplit le tableau avec les données de la BDD !
+                    groupes.value = data.groupes;
                 }
             } catch (error) {
                 console.error("Erreur lors de la récupération des groupes :", error);
             }
         };
 
-        /**
-         * Vérifie si une session est active
-         */
         const checkAuth = async () => {
             try {
                 const apiPath = window.location.pathname.includes('/page/') ? '../api' : './api';
@@ -65,7 +78,6 @@ const app = createApp({
 
                 if (data.isLoggedIn) {
                     user.value = data.user;
-                    // Si l'utilisateur est connecté, on déclenche la recherche de ses groupes
                     fetchGroupes();
                 }
             } catch (error) {
@@ -73,9 +85,6 @@ const app = createApp({
             }
         };
 
-        /**
-         * Gère la déconnexion
-         */
         const handleLogout = async () => {
             try {
                 const apiPath = window.location.pathname.includes('/page/') ? '../api' : './api';
@@ -85,9 +94,8 @@ const app = createApp({
                 });
 
                 user.value = null;
-                groupes.value = []; // On vide les groupes à la déconnexion
+                groupes.value = [];
 
-                // Redirection
                 if (window.location.pathname.includes('/page/')) {
                     window.location.href = '../index.html';
                 }
@@ -108,6 +116,8 @@ const app = createApp({
         // ==========================================
         return {
             user,
+            isProfileMenuOpen,
+            userInitials,
             features,
             footerCols,
             handleLogout,

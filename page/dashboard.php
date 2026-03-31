@@ -21,8 +21,8 @@
                 extend: {
                     colors: {
                         "primary": "#6155F5",
-                        "surface": "#F3F4F6", // background
-                        "surface-dark": "#E5E7EB", // boutons inactifs
+                        "surface": "#F3F4F6",
+                        "surface-dark": "#E5E7EB",
                         "green-success": "#22C55E",
                         "red-danger": "#EF4444",
                     },
@@ -38,8 +38,8 @@
 
 <body class="font-sans bg-[#F9FAFB] text-slate-900 flex min-h-screen">
     <div id="app" class="flex min-h-screen w-full">
-        <aside class="w-72 bg-white flex flex-col fixed h-full border-r border-slate-100">
 
+        <aside class="w-72 bg-white flex flex-col fixed h-full border-r border-slate-100 z-20">
             <div class="p-8 pb-12">
                 <h1 class="text-5xl font-logo text-black tracking-wider">Splitz</h1>
             </div>
@@ -89,32 +89,71 @@
                             class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
                     </button>
 
-                    <div v-if="user" class="flex items-center gap-3 pl-4 border-l border-slate-200">
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
-                            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte personnel
-                            </p>
+                    <div v-if="user" class="relative pl-4 border-l border-slate-200">
+
+                        <button @click="isProfileMenuOpen = !isProfileMenuOpen"
+                            class="flex items-center gap-3 text-left hover:bg-slate-50 p-2 rounded-xl transition-all outline-none">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
+                                <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte
+                                    personnel</p>
+                            </div>
+
+                            <div
+                                class="w-11 h-11 rounded-full bg-primary/10 text-primary font-black flex items-center justify-center overflow-hidden border border-primary/20">
+                                <img v-if="user.photo" :src="user.photo" alt="Avatar"
+                                    class="w-full h-full object-cover">
+                                <span v-else class="text-[16px]">{{ userInitials }}</span>
+                            </div>
+
+                            <span
+                                class="material-symbols-outlined text-slate-400 text-[20px] transition-transform duration-300"
+                                :class="{'rotate-180': isProfileMenuOpen}">
+                                expand_more
+                            </span>
+                        </button>
+
+                        <div v-if="isProfileMenuOpen"
+                            class="absolute right-0 top-full mt-2 w-64 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                            <div class="p-5 border-b border-slate-50 bg-slate-50/50">
+                                <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
+                                <p class="text-xs font-medium text-slate-400 mt-0.5">Membre de Splitz</p>
+                            </div>
+                            <div class="p-2">
+                                <a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">person</span>
+                                    Mon profil
+                                </a>
+                                <a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">settings</span>
+                                    Paramètres
+                                </a>
+                            </div>
+                            <div class="p-2 border-t border-slate-50">
+                                <button @click="handleLogout"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-danger hover:bg-red-50 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">logout</span>
+                                    Déconnexion
+                                </button>
+                            </div>
                         </div>
-                        <div class="w-11 h-11 rounded-full bg-slate-200 overflow-hidden border border-slate-200">
-                            <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="w-full h-full object-cover">
-                        </div>
+
                     </div>
                 </div>
             </header>
 
-            <div class="p-10 max-w-[1400px]">
-
+            <div class="p-10 max-w-[1400px]" @click="isProfileMenuOpen = false">
                 <div v-if="user" class="mb-10">
                     <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900 mb-1 flex items-center gap-3">
                         Salut, {{ user.name }} <span class="text-[35px]">👋</span>
                     </h2>
                     <p class="text-slate-500 text-lg font-medium">Voici le récapitulatif de tes comptes partagés ce
-                        mois-ci.
-                    </p>
+                        mois-ci.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-
                     <div
                         class="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-center h-[160px]">
                         <div class="flex items-center gap-3 mb-3">
@@ -123,9 +162,8 @@
                             </div>
                             <span class="text-sm font-bold text-slate-500">Solde total</span>
                         </div>
-                        <p class="text-[34px] font-black text-slate-900">
-                            {{ soldeTotal > 0 ? '+' : '' }}{{ soldeTotal.toFixed(2).replace('.', ',') }} €
-                        </p>
+                        <p class="text-[34px] font-black text-slate-900">{{ soldeTotal > 0 ? '+' : '' }}{{
+                            soldeTotal.toFixed(2).replace('.', ',') }} €</p>
                     </div>
 
                     <div
@@ -153,11 +191,9 @@
                         <p class="text-[34px] font-black text-red-danger">{{ tuDois.toFixed(2).replace('.', ',') }} €
                         </p>
                     </div>
-
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
                     <div>
                         <div class="flex items-center justify-between mb-6 pr-2">
                             <h3 class="text-2xl font-extrabold text-slate-900">Mes groupes</h3>
@@ -175,8 +211,7 @@
                                             {{ groupe.icone }}</div>
                                         <div>
                                             <h4 class="text-[19px] font-black text-slate-900 leading-tight mb-0.5">{{
-                                                groupe.nom }}
-                                            </h4>
+                                                groupe.nom }}</h4>
                                             <p class="text-xs font-medium text-slate-400">{{ groupe.participants }}
                                                 participants</p>
                                         </div>
@@ -199,7 +234,7 @@
                                 </div>
                             </template>
 
-                            <button @click="isAddGroupModalOpen = true"
+                            <button @click.stop="isAddGroupModalOpen = true"
                                 :class="['bg-transparent rounded-[32px] p-6 border-2 border-dashed border-slate-300 hover:border-primary hover:bg-primary/5 transition-all flex flex-col items-center justify-center h-[220px] text-slate-400 hover:text-primary', groupes.length === 0 ? 'col-span-1 sm:col-span-2 mt-4' : '']">
                                 <span class="material-symbols-outlined text-[28px] mb-2">add_circle</span>
                                 <span class="text-[13px] font-black tracking-wide">CRÉER UN GROUPE</span>
@@ -213,13 +248,11 @@
                             <h3 class="text-2xl font-extrabold text-slate-900">Activité récente</h3>
                             <a href="#" class="text-primary font-bold hover:underline">Voir tout</a>
                         </div>
-
                         <div
                             class="bg-white rounded-[32px] border border-slate-100 shadow-sm h-[220px] flex items-center justify-center">
                             <p class="text-sm font-bold text-slate-400">Aucune activité récente</p>
                         </div>
                     </div>
-
                 </div>
 
             </div>
@@ -276,13 +309,10 @@
 
                         <div class="flex flex-col sm:flex-row gap-4 pt-4 mt-auto">
                             <button type="submit"
-                                class="flex-[2] py-4 rounded-xl bg-primary hover:bg-[#5044e6] text-white font-bold text-base transition-all shadow-lg shadow-primary/30">
-                                C'est parti !
-                            </button>
+                                class="flex-[2] py-4 rounded-xl bg-primary hover:bg-[#5044e6] text-white font-bold text-base transition-all shadow-lg shadow-primary/30">C'est
+                                parti !</button>
                             <button type="button" @click="isAddGroupModalOpen = false"
-                                class="flex-[1] py-4 rounded-xl bg-surface hover:bg-slate-200 text-slate-600 font-bold text-base transition-all">
-                                Annuler
-                            </button>
+                                class="flex-[1] py-4 rounded-xl bg-surface hover:bg-slate-200 text-slate-600 font-bold text-base transition-all">Annuler</button>
                         </div>
                     </form>
                 </div>
