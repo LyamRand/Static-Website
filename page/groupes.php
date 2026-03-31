@@ -155,16 +155,18 @@
 
                 <div class="flex flex-col gap-6">
                     <template v-if="groupes.length > 0">
-                        <div v-for="groupe in groupes" :key="groupe.id"
-                            class="bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow cursor-pointer">
+                        <a v-for="groupe in groupes" :key="groupe.id"
+                            :href="'group_pages.php?id=' + groupe.id"
+                            class="bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md hover:border-primary transition-all cursor-pointer group">
                             <div class="flex items-center gap-5">
                                 <div
-                                    class="w-16 h-16 rounded-[20px] bg-slate-100 flex items-center justify-center text-[32px]">
+                                    class="w-16 h-16 rounded-[20px] bg-slate-100 flex items-center justify-center text-[32px] group-hover:bg-primary/10 transition-colors">
                                     {{ groupe.icone }}
                                 </div>
                                 <div>
-                                    <h4 class="text-[22px] font-black text-slate-900 leading-tight mb-1">{{ groupe.nom
-                                        }}</h4>
+                                    <h4 class="text-[22px] font-black text-slate-900 leading-tight mb-1 group-hover:text-primary transition-colors">
+                                        {{ groupe.nom }}
+                                    </h4>
                                     <p class="text-sm font-medium text-slate-400">{{ groupe.participants }} participants
                                     </p>
                                 </div>
@@ -176,7 +178,7 @@
                                     {{ groupe.solde > 0 ? '+' : '' }}{{ groupe.solde.toFixed(2).replace('.', ',') }} €
                                 </span>
                             </div>
-                        </div>
+                        </a>
                     </template>
 
                     <template v-else>
