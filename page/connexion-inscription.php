@@ -20,6 +20,7 @@
                     colors: {
                         "primary": "#6155F5",
                         "surface": "#F3F4F6",
+                        "red-danger": "#EF4444",
                     },
                     fontFamily: {
                         "sans": ["Fira Sans", "sans-serif"],
@@ -52,13 +53,14 @@
             </div>
 
             <div class="mt-12 w-full flex justify-center relative z-10">
-                <img src="img/1.png" alt="Aperçu de l'app"
-                    class="max-w-[80%] h-auto drop-shadow-2xl rounded-xl object-contain"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <img src="../style/img/header.png" alt="Aperçu de l'app"
+                    class="max-w-[80%] h-auto drop-shadow-2xl rounded-xl object-contain" />
             </div>
         </div>
 
         <div class="w-full md:w-1/2 p-8 md:p-14 flex flex-col justify-center bg-white relative">
+
+            <div id="alert-container"></div>
 
             <div class="flex bg-surface p-1 rounded-lg mb-8 w-full relative z-10">
                 <button id="btn-login" onclick="switchTab('login')"
@@ -74,13 +76,14 @@
             </div>
 
             <div class="min-h-[400px] w-full">
+
                 <form action="../api/connexion.php" method="POST" id="form-login" class="space-y-6 block">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-                            <input type="email" id="mail" name="mail" placeholder="exemple@mail.com"
+                            <input type="email" name="email" placeholder="exemple@mail.com"
                                 class="w-full pl-10 pr-4 py-3 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>
@@ -94,7 +97,7 @@
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
-                            <input type="password" id="mdp" name="mdp" placeholder="••••••••••••"
+                            <input type="password" name="password" placeholder="••••••••••••"
                                 class="w-full pl-10 pr-4 py-3 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>
@@ -114,13 +117,13 @@
                     </button>
                 </form>
 
-                <form id="form-register" class="space-y-4 hidden">
+                <form action="../api/inscription.php" method="POST" id="form-register" class="space-y-4 hidden">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-1">Nom complet</label>
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">badge</span>
-                            <input type="text" placeholder="Merwan Abzar"
+                            <input type="text" name="name" placeholder="Merwan Abzar"
                                 class="w-full pl-10 pr-4 py-2.5 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>
@@ -131,7 +134,7 @@
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
-                            <input type="email" placeholder="merwan@exemple.com"
+                            <input type="email" name="email" placeholder="merwan@exemple.com"
                                 class="w-full pl-10 pr-4 py-2.5 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>
@@ -143,7 +146,7 @@
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">account_balance</span>
-                            <input type="text" placeholder="BE32 1234..."
+                            <input type="text" name="iban" placeholder="BE32 1234..."
                                 class="w-full pl-10 pr-4 py-2.5 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400" />
                         </div>
                     </div>
@@ -153,7 +156,7 @@
                         <div class="relative">
                             <span
                                 class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
-                            <input type="password" placeholder="••••••••••••"
+                            <input type="password" name="password" placeholder="••••••••••••"
                                 class="w-full pl-10 pr-4 py-2.5 bg-surface border-none rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 placeholder-slate-400"
                                 required />
                         </div>
@@ -166,6 +169,7 @@
                     </button>
                 </form>
             </div>
+
             <p class="mt-4 text-center text-xs text-slate-400 leading-relaxed">
                 En continuant, vous acceptez nos <a href="#" class="text-primary font-bold hover:underline">Conditions
                     d'utilisation</a> et<br /> notre <a href="#"
@@ -184,39 +188,39 @@
             const title = document.getElementById('form-title');
             const subtitle = document.getElementById('form-subtitle');
 
-            // Classes actives et inactives pour les boutons
             const activeClass = "flex-1 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-slate-900 transition-all";
             const inactiveClass = "flex-1 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-all";
 
             if (tab === 'login') {
-                // Afficher la connexion
-                formLogin.classList.remove('hidden');
-                formLogin.classList.add('block');
-                formRegister.classList.remove('block');
-                formRegister.classList.add('hidden');
-
-                // Mettre à jour les boutons
-                btnLogin.className = activeClass;
-                btnRegister.className = inactiveClass;
-
-                // Mettre à jour le texte
-                title.innerText = "Bienvenue !";
-                subtitle.innerText = "Veuillez entrer vos informations pour continuer.";
+                formLogin.classList.remove('hidden'); formLogin.classList.add('block');
+                formRegister.classList.remove('block'); formRegister.classList.add('hidden');
+                btnLogin.className = activeClass; btnRegister.className = inactiveClass;
+                title.innerText = "Bienvenue !"; subtitle.innerText = "Veuillez entrer vos informations pour continuer.";
             } else {
-                // Afficher l'inscription
-                formRegister.classList.remove('hidden');
-                formRegister.classList.add('block');
-                formLogin.classList.remove('block');
-                formLogin.classList.add('hidden');
-
-                // Mettre à jour les boutons
-                btnRegister.className = activeClass;
-                btnLogin.className = inactiveClass;
-
-                // Mettre à jour le texte
-                title.innerText = "Rejoignez Splitz";
-                subtitle.innerText = "Créez votre compte pour commencer à partager.";
+                formRegister.classList.remove('hidden'); formRegister.classList.add('block');
+                formLogin.classList.remove('block'); formLogin.classList.add('hidden');
+                btnRegister.className = activeClass; btnLogin.className = inactiveClass;
+                title.innerText = "Rejoignez Splitz"; subtitle.innerText = "Créez votre compte pour commencer à partager.";
             }
+        }
+
+        // Script pour lire les erreurs dans l'URL et afficher l'alerte
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const tab = urlParams.get('tab');
+
+        if (tab === 'register') {
+            switchTab('register');
+        }
+
+        if (error) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = "mb-4 p-4 rounded-lg text-sm font-bold text-center bg-red-50 text-red-danger border border-red-200";
+            if (error === 'invalid') alertDiv.innerText = "Email ou mot de passe incorrect.";
+            else if (error === 'exists') alertDiv.innerText = "Cette adresse email est déjà utilisée.";
+            else if (error === 'empty') alertDiv.innerText = "Veuillez remplir tous les champs.";
+            else alertDiv.innerText = "Une erreur est survenue.";
+            document.getElementById('alert-container').appendChild(alertDiv);
         }
     </script>
 </body>
