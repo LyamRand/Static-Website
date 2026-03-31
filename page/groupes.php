@@ -113,12 +113,12 @@
                                 <p class="text-xs font-medium text-slate-400 mt-0.5">Membre de Splitz</p>
                             </div>
                             <div class="p-2">
-                                <a href="settings.php"
+                                <a href="account.php"
                                     class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
                                     <span class="material-symbols-outlined text-[22px]">person</span>
                                     Mon profil
                                 </a>
-                                <a href="settings.php"
+                                <a href="#.php"
                                     class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
                                     <span class="material-symbols-outlined text-[22px]">settings</span>
                                     Paramètres

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Splitz - Paramètres</title>
+    <title>Splitz - Profil</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -61,13 +61,6 @@
                 </a>
             </nav>
 
-            <div class="p-4 mb-4">
-                <a href="parametres.php"
-                    class="flex items-center gap-4 px-6 py-4 rounded-2xl bg-primary/20 text-primary font-bold transition-all shadow-sm">
-                    <span class="material-symbols-outlined text-[26px]">settings</span>
-                    <span class="text-[15px]">Paramètres</span>
-                </a>
-            </div>
         </aside>
 
         <main class="flex-1 ml-72 flex flex-col min-h-screen">
@@ -132,7 +125,7 @@
 
             <div class="p-10 max-w-[1000px] w-full mx-auto" @click="isProfileMenuOpen = false">
 
-                <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900 mb-8">Paramètres</h2>
+                <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900 mb-8">Profil</h2>
 
                 <div class="flex gap-2 border-b border-slate-200 mb-8">
                     <button @click="activeSettingsTab = 'profil'"
