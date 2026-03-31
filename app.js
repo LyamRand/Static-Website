@@ -2,6 +2,7 @@ const { createApp, ref, computed, onMounted } = Vue;
 
 const app = createApp({
     setup() {
+        // Stocke les informations de l'utilisateur connecté
         const user = ref(null);
 
         // ==========================================
@@ -50,9 +51,23 @@ const app = createApp({
         const selectedGroupIcon = ref('home');
 
         // ==========================================
+        // VARIABLES MANQUANTES POUR L'ACCUEIL (index.html)
+        // ==========================================
+        const features = ref([
+            { icon: "💰", title: "Suivi des dépenses", desc: "Ajoutez vos dépenses en quelques clics et gardez une trace de chaque transaction en toute simplicité." },
+            { icon: "🔄", title: "Équilibre automatique", desc: "Splitz calcule instantanément qui doit combien à qui, en minimisant le nombre de transferts nécessaires." },
+            { icon: "👥", title: "Gestion de groupes illimités", desc: "Créez des groupes pour vos voyages, colocations ou événements entre amis, sans aucune limite." }
+        ]);
+
+        const footerCols = ref([
+            { title: "PRODUIT", links: ["Fonctionnalités", "Sécurité", "Prix", "Avis clients"] },
+            { title: "RESSOURCES", links: ["Centre d'aide", "Guides & Tutoriels", "Blog", "API"] },
+            { title: "SOCIÉTÉ", links: ["À propos", "Carrières", "Contact", "Mentions légales"] }
+        ]);
+
+        // ==========================================
         // DONNÉES DYNAMIQUES POUR LA PAGE D'UN GROUPE (group_pages.php)
         // ==========================================
-        // On initialise à vide ou "chargement"
         const currentGroup = ref({ nom: 'Chargement...', icone: '⏳', participants: 0 });
         const currentGroupExpenses = ref([]);
         const currentGroupStats = ref({ total: 0, unbalanced: 0 });
@@ -70,7 +85,6 @@ const app = createApp({
             } catch (error) { console.error("Erreur groupes :", error); }
         };
 
-        // NOUVEAU : Récupère les données d'un groupe précis
         const fetchGroupDetails = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const groupId = urlParams.get('id');
@@ -139,13 +153,14 @@ const app = createApp({
             }
         });
 
+        // N'OUBLIE PAS DE TOUT EXPORTER ICI
         return {
             user, isProfileMenuOpen, userInitials,
             handleLogout, isAddGroupModalOpen, selectedGroupIcon, groupes,
             soldeTotal, onTeDoit, tuDois, activeSettingsTab, profileForm,
             bankForm, securityForm, saveProfile, saveBank, saveSecurity, settingsMessage,
-            // Exports pour la page du groupe
-            currentGroup, currentGroupExpenses, currentGroupStats
+            currentGroup, currentGroupExpenses, currentGroupStats,
+            features, footerCols // <-- Les revoilà, très important !
         };
     }
 });
