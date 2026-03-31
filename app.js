@@ -22,7 +22,7 @@ const app = createApp({
         });
 
         // ==========================================
-        // GESTION DES PARAMÈTRES (NOUVEAUTÉ)
+        // GESTION DES PARAMÈTRES
         // ==========================================
         const activeSettingsTab = ref('profil'); // 'profil', 'paiements', 'securite'
 
@@ -84,6 +84,23 @@ const app = createApp({
         const selectedGroupIcon = ref('home');
 
         // ==========================================
+        // DONNÉES TEMPORAIRES POUR LA PAGE D'UN GROUPE (group_pages.php)
+        // ==========================================
+        const currentGroup = ref({ nom: 'Vacances Ski', icone: '⛷️', participants: 4 });
+
+        const currentGroupExpenses = ref([
+            { id: 1, title: 'Restaurant', payer: 'Lucas', amount: 45.00, owed: -11.25, icon: 'restaurant', colorClass: 'bg-red-50 text-red-danger' },
+            { id: 2, title: 'Essence', payer: 'Camille', amount: 68.20, owed: -17.05, icon: 'local_gas_station', colorClass: 'bg-yellow-50 text-yellow-500' },
+            { id: 3, title: 'Location appartement', payer: 'Moi', amount: 1200.00, owed: 900.00, icon: 'home', colorClass: 'bg-orange-50 text-orange-500' },
+            { id: 4, title: 'Courses', payer: 'Marie', amount: 112.40, owed: -28.10, icon: 'shopping_cart', colorClass: 'bg-green-50 text-green-success' }
+        ]);
+
+        const currentGroupStats = ref({
+            total: 1425.60,
+            unbalanced: 843.60
+        });
+
+        // ==========================================
         // MÉTHODES ET ACTIONS (API)
         // ==========================================
 
@@ -112,8 +129,9 @@ const app = createApp({
 
                 if (data.isLoggedIn) {
                     user.value = data.user;
-                    // On pré-remplit le formulaire avec le nom actuel !
+                    // On pré-remplit le formulaire avec le nom actuel et l'email !
                     profileForm.value.name = data.user.name;
+                    profileForm.value.email = data.user.email;
                     fetchGroupes();
                 }
             } catch (error) {
@@ -146,7 +164,7 @@ const app = createApp({
         onMounted(() => {
             checkAuth();
 
-            // Si on arrive sur la page avec un paramètre d'URL (ex: parametres.php?tab=securite)
+            // Si on arrive sur la page avec un paramètre d'URL (ex: account.php?tab=securite)
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
             if (tabParam && ['profil', 'paiements', 'securite'].includes(tabParam)) {
@@ -170,7 +188,7 @@ const app = createApp({
             soldeTotal,
             onTeDoit,
             tuDois,
-            // Nouveaux exports pour les paramètres
+            // Exports pour les paramètres
             activeSettingsTab,
             profileForm,
             bankForm,
@@ -178,7 +196,11 @@ const app = createApp({
             saveProfile,
             saveBank,
             saveSecurity,
-            settingsMessage
+            settingsMessage,
+            // Exports des données temporaires pour la page d'un groupe
+            currentGroup,
+            currentGroupExpenses,
+            currentGroupStats
         };
     }
 });
