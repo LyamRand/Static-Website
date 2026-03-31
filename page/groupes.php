@@ -38,7 +38,7 @@
 <body class="font-sans bg-[#F9FAFB] text-slate-900 flex min-h-screen">
     <div id="app" class="flex min-h-screen w-full">
 
-        <aside class="w-72 bg-white flex flex-col fixed h-full border-r border-slate-100">
+        <aside class="w-72 bg-white flex flex-col fixed h-full border-r border-slate-100 z-20">
             <div class="p-8 pb-12">
                 <h1 class="text-5xl font-logo text-black tracking-wider">Splitz</h1>
             </div>
@@ -81,6 +81,7 @@
                     <input type="text" placeholder="Rechercher une dépense ou un groupe..."
                         class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
                 </div>
+
                 <div class="flex items-center gap-6">
                     <button class="relative text-slate-400 hover:text-slate-600 transition-colors">
                         <span class="material-symbols-outlined text-[28px]">notifications</span>
@@ -88,20 +89,62 @@
                             class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
                     </button>
 
-                    <div v-if="user" class="flex items-center gap-3 pl-4 border-l border-slate-200">
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
-                            <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte personnel
-                            </p>
+                    <div v-if="user" class="relative pl-4 border-l border-slate-200">
+
+                        <button @click="isProfileMenuOpen = !isProfileMenuOpen"
+                            class="flex items-center gap-3 text-left hover:bg-slate-50 p-2 rounded-xl transition-all outline-none">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
+                                <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte
+                                    personnel</p>
+                            </div>
+
+                            <div
+                                class="w-11 h-11 rounded-full bg-primary/10 text-primary font-black flex items-center justify-center overflow-hidden border border-primary/20">
+                                <img v-if="user.photo" :src="user.photo" alt="Avatar"
+                                    class="w-full h-full object-cover">
+                                <span v-else class="text-[16px]">{{ userInitials }}</span>
+                            </div>
+
+                            <span
+                                class="material-symbols-outlined text-slate-400 text-[20px] transition-transform duration-300"
+                                :class="{'rotate-180': isProfileMenuOpen}">
+                                expand_more
+                            </span>
+                        </button>
+
+                        <div v-if="isProfileMenuOpen"
+                            class="absolute right-0 top-full mt-2 w-64 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                            <div class="p-5 border-b border-slate-50 bg-slate-50/50">
+                                <p class="text-sm font-bold text-slate-900">{{ user.name }}</p>
+                                <p class="text-xs font-medium text-slate-400 mt-0.5">Membre de Splitz</p>
+                            </div>
+                            <div class="p-2">
+                                <a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">person</span>
+                                    Mon profil
+                                </a>
+                                <a href="#"
+                                    class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">settings</span>
+                                    Paramètres
+                                </a>
+                            </div>
+                            <div class="p-2 border-t border-slate-50">
+                                <button @click="handleLogout"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-danger hover:bg-red-50 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">logout</span>
+                                    Déconnexion
+                                </button>
+                            </div>
                         </div>
-                        <div class="w-11 h-11 rounded-full bg-slate-200 overflow-hidden border border-slate-200">
-                            <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="w-full h-full object-cover">
-                        </div>
+
                     </div>
                 </div>
             </header>
 
-            <div class="p-10 max-w-[1100px] w-full mx-auto">
+            <div class="p-10 max-w-[1100px] w-full mx-auto" @click="isProfileMenuOpen = false">
                 <div class="flex items-center justify-between mb-10">
                     <div class="flex items-center gap-5">
                         <div class="w-[75px] h-[75px] bg-surface-dark rounded-[24px] flex items-center justify-center">
@@ -110,7 +153,7 @@
                         <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900">Mes groupes</h2>
                     </div>
 
-                    <button @click="isAddGroupModalOpen = true"
+                    <button @click.stop="isAddGroupModalOpen = true"
                         class="bg-primary hover:bg-[#5044e6] text-white px-7 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
                         <span class="material-symbols-outlined">add_circle</span>
                         Ajouter un groupe
