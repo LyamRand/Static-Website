@@ -1,6 +1,11 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 require_once 'config.php';
+
+$input_data = json_decode(file_get_contents('php://input'), true);
+if (is_array($input_data))
+    $_POST = array_merge($_POST, $input_data);
 
 $name = trim($_POST['name'] ?? '');
 $email = trim($_POST['email'] ?? '');
@@ -9,7 +14,7 @@ $iban = trim($_POST['iban'] ?? '');
 
 // Vérifier que tout est rempli
 if (empty($name) || empty($email) || empty($password)) {
-    header("Location: ../page/connexion-inscription.php?error=empty&tab=register");
+    echo json_encode(['success' => false, 'error' => 'empty']);
     exit;
 }
 
@@ -18,8 +23,7 @@ try {
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
     $stmt->execute(['email' => $email]);
     if ($stmt->fetch()) {
-        // Redirection avec erreur email déjà pris, et on force l'onglet "inscription"
-        header("Location: ../page/connexion-inscription.php?error=exists&tab=register");
+        echo json_encode(['success' => false, 'error' => 'exists']);
         exit;
     }
 
@@ -40,10 +44,11 @@ try {
     $_SESSION['user_name'] = $name;
 
     // Rediriger vers le tableau de bord
-    header("Location: ../page/dashboard.php");
+    echo json_encode(['success' => true]);
     exit;
 
 } catch (PDOException $e) {
-    die("Erreur BDD : " . $e->getMessage());
+    echo json_encode(['success' => false, 'error' => 'database']);
+    exit;
 }
 ?>

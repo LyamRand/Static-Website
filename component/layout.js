@@ -1,0 +1,113 @@
+import { store, userInitials } from '../store.js';
+const { ref, onMounted } = Vue;
+const { useRouter } = VueRouter;
+
+export default {
+    setup() {
+        const router = useRouter();
+        const isProfileMenuOpen = ref(false);
+
+        const handleLogout = async () => {
+            await store.logout();
+            router.push('/');
+        };
+
+        const closeMenu = () => {
+            isProfileMenuOpen.value = false;
+        };
+
+        onMounted(() => {
+            if (!store.user) {
+                store.checkAuth().then(() => {
+                    if (!store.user) router.push('/auth');
+                });
+            }
+        });
+
+        return { store, userInitials, isProfileMenuOpen, handleLogout, closeMenu };
+    },
+    template: `
+    <div class="flex min-h-screen w-full bg-[#F9FAFB] text-slate-900 font-sans" @click="closeMenu">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-white flex flex-col fixed h-full border-r border-slate-100 z-20">
+            <div class="p-8 pb-12">
+                <h1 class="text-5xl font-logo text-black tracking-wider cursor-pointer" @click="$router.push('/dashboard')">Splitz</h1>
+            </div>
+            <nav class="flex-1 px-4 space-y-3">
+                <router-link to="/dashboard" custom v-slot="{ isActive, navigate }">
+                    <a @click="navigate" :class="isActive ? 'bg-primary/20 text-primary font-bold transition-all' : 'bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all'" class="flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer">
+                        <span class="material-symbols-outlined text-[26px]">grid_view</span>
+                        <span class="text-[15px]">Tableau de bord</span>
+                    </a>
+                </router-link>
+                <router-link to="/groupes" custom v-slot="{ isActive, navigate }">
+                    <a @click="navigate" :class="isActive ? 'bg-primary/20 text-primary font-bold transition-all' : 'bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all'" class="flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer">
+                        <span class="material-symbols-outlined text-[26px]">group</span>
+                        <span class="text-[15px]">Mes groupes</span>
+                    </a>
+                </router-link>
+            </nav>
+            <div class="p-4 mb-4">
+                <router-link to="/account" custom v-slot="{ isActive, navigate }">
+                    <a @click="navigate" :class="isActive ? 'bg-primary/20 text-primary font-bold transition-all' : 'bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all'" class="flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer">
+                        <span class="material-symbols-outlined text-[26px]">settings</span>
+                        <span class="text-[15px]">Paramètres</span>
+                    </a>
+                </router-link>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main class="flex-1 ml-72 flex flex-col min-h-screen">
+            <!-- Header -->
+            <header class="h-[90px] bg-[#F9FAFB] px-10 flex items-center justify-between border-b border-slate-200/60 z-10 sticky top-0">
+                <div class="flex items-center gap-3 bg-white px-5 py-3 rounded-full w-[450px] shadow-sm border border-slate-100">
+                    <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+                    <input type="text" placeholder="Rechercher..." class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
+                </div>
+                <div class="flex items-center gap-6">
+                    <button class="relative text-slate-400 hover:text-slate-600 transition-colors">
+                        <span class="material-symbols-outlined text-[28px]">notifications</span>
+                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
+                    </button>
+                    
+                    <div v-if="store.user" class="relative pl-4 border-l border-slate-200">
+                        <button @click.stop="isProfileMenuOpen = !isProfileMenuOpen" class="flex items-center gap-3 text-left hover:bg-slate-50 p-2 rounded-xl transition-all outline-none">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-bold text-slate-900">{{ store.user.name }}</p>
+                                <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte Personnel</p>
+                            </div>
+                            <div class="w-11 h-11 rounded-full bg-primary/10 text-primary font-black flex items-center justify-center overflow-hidden border border-primary/20">
+                                <img v-if="store.user.photo" :src="store.user.photo" alt="Avatar" class="w-full h-full object-cover">
+                                <span v-else class="text-[16px]">{{ userInitials }}</span>
+                            </div>
+                            <span class="material-symbols-outlined text-slate-400 text-[20px] transition-transform duration-300" :class="{'rotate-180': isProfileMenuOpen}">expand_more</span>
+                        </button>
+                        
+                        <!-- Dropdown -->
+                        <div v-if="isProfileMenuOpen" @click.stop class="absolute right-0 top-full mt-2 w-64 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                            <div class="p-5 border-b border-slate-50 bg-slate-50/50">
+                                <p class="text-sm font-bold text-slate-900">{{ store.user.name }}</p>
+                                <p class="text-xs font-medium text-slate-400 mt-0.5">Membre de Splitz</p>
+                            </div>
+                            <div class="p-2">
+                                <router-link to="/account" @click="closeMenu" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-600 hover:text-primary hover:bg-primary/5 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">person</span> Mon profil
+                                </router-link>
+                            </div>
+                            <div class="p-2 border-t border-slate-50">
+                                <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-danger hover:bg-red-50 rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined text-[22px]">logout</span> Déconnexion
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <router-view></router-view>
+        </main>
+    </div>
+    `
+};

@@ -1,6 +1,11 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 include('./config.php');
+
+$input_data = json_decode(file_get_contents('php://input'), true);
+if (is_array($input_data))
+    $_POST = array_merge($_POST, $input_data);
 
 $name = $_POST['name'] ?? '';
 $description = $_POST['description'] ?? '';
@@ -8,12 +13,13 @@ $icone = $_POST['group_icon'] ?? 'home'; // On récupère l'info du formulaire
 
 // Sécurité : vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['idClient'])) {
-    die("Erreur : Vous devez être connecté pour créer un groupe.");
+    echo json_encode(['success' => false, 'error' => 'not_logged_in']);
+    exit;
 }
 
 if (empty($name) || empty($icone)) {
-    echo "Veuillez vérifier que le nom et l'icône sont bien remplis.";
-    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'empty']);
+    exit;
 } else {
     try {
         // On utilise une transaction car on insère dans 2 tables à la suite
@@ -40,12 +46,13 @@ if (empty($name) || empty($icone)) {
         $pdo->commit();
 
         // Redirection vers le dashboard après succès
-        header("Location: ../page/dashboard.php?success=1");
+        echo json_encode(['success' => true, 'groupId' => $groupId]);
         exit();
 
     } catch (Exception $e) {
         $pdo->rollBack(); // Annule tout s'il y a une erreur
-        die("Erreur lors de la création du groupe : " . $e->getMessage());
+        echo json_encode(['success' => false, 'error' => 'database', 'details' => $e->getMessage()]);
+        exit;
     }
 }
 ?>

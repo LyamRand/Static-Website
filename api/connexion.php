@@ -1,13 +1,19 @@
 <?php
 session_start();
+header('Content-Type: application/json');
 require_once 'config.php';
+
+// Support du raw JSON depuis Vue Fetch API
+$input_data = json_decode(file_get_contents('php://input'), true);
+if (is_array($input_data))
+    $_POST = array_merge($_POST, $input_data);
 
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
 // Vérification des champs vides
 if (empty($email) || empty($password)) {
-    header("Location: ../page/connexion-inscription.php?error=empty");
+    echo json_encode(['success' => false, 'error' => 'empty']);
     exit;
 }
 
@@ -24,21 +30,22 @@ try {
         $_SESSION['user_name'] = $user['name'];
 
         // Si l'utilisateur a coché "Se souvenir de moi"
-        if (isset($_POST['remember'])) {
+        if (isset($_POST['remember']) && $_POST['remember']) {
             // Cookie valable 30 jours (86400 = 1 jour)
             setcookie("remember_user", $user['id'], time() + (86400 * 30), "/", "", false, true);
         }
 
-        // Redirection vers le tableau de bord
-        header("Location: ../page/dashboard.php");
+        // Succès
+        echo json_encode(['success' => true]);
         exit;
     } else {
         // Erreur de login
-        header("Location: ../page/connexion-inscription.php?error=invalid");
+        echo json_encode(['success' => false, 'error' => 'invalid']);
         exit;
     }
 
 } catch (PDOException $e) {
-    die("Erreur BDD : " . $e->getMessage());
+    echo json_encode(['success' => false, 'error' => 'database']);
+    exit;
 }
 ?>
