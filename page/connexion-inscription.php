@@ -104,7 +104,7 @@
                     </div>
 
                     <div class="flex items-center gap-2 pt-1">
-                        <input type="checkbox" id="remember"
+                        <input type="checkbox" id="remember" name="remember"
                             class="w-4 h-4 rounded text-primary border-slate-300 bg-surface focus:ring-primary cursor-pointer" />
                         <label for="remember" class="text-sm text-slate-500 font-medium cursor-pointer">Se souvenir de
                             moi</label>

@@ -23,6 +23,12 @@ try {
         $_SESSION['idClient'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
 
+        // Si l'utilisateur a coché "Se souvenir de moi"
+        if (isset($_POST['remember'])) {
+            // Cookie valable 30 jours (86400 = 1 jour)
+            setcookie("remember_user", $user['id'], time() + (86400 * 30), "/", "", false, true);
+        }
+
         // Redirection vers le tableau de bord
         header("Location: ../page/dashboard.php");
         exit;
