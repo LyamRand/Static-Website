@@ -6,6 +6,8 @@ export default {
     setup() {
         const router = useRouter();
         const isProfileMenuOpen = ref(false);
+        const showNotifications = ref(false);
+        const hasNewNotifications = ref(true);
 
         const handleLogout = async () => {
             await store.logout();
@@ -14,6 +16,7 @@ export default {
 
         const closeMenu = () => {
             isProfileMenuOpen.value = false;
+            showNotifications.value = false;
         };
 
         onMounted(() => {
@@ -24,7 +27,7 @@ export default {
             }
         });
 
-        return { store, userInitials, isProfileMenuOpen, handleLogout, closeMenu };
+        return { store, userInitials, isProfileMenuOpen, showNotifications, hasNewNotifications, handleLogout, closeMenu };
     },
     template: `
     <div class="flex min-h-screen w-full bg-[#F9FAFB] text-slate-900 font-sans" @click="closeMenu">
@@ -66,13 +69,24 @@ export default {
                     <input type="text" placeholder="Rechercher..." class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
                 </div>
                 <div class="flex items-center gap-6">
-                    <button class="relative text-slate-400 hover:text-slate-600 transition-colors">
-                        <span class="material-symbols-outlined text-[28px]">notifications</span>
-                        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
-                    </button>
+                    <div class="relative">
+                        <button @click.stop="showNotifications = !showNotifications; hasNewNotifications = false; isProfileMenuOpen = false" class="relative text-slate-400 hover:text-slate-600 transition-colors focus:outline-none">
+                            <span class="material-symbols-outlined text-[28px]">notifications</span>
+                            <span v-if="hasNewNotifications" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
+                        </button>
+                        
+                        <!-- Notifications Dropdown -->
+                        <div v-if="showNotifications" @click.stop class="absolute right-0 top-full mt-3 w-72 bg-white rounded-[24px] shadow-xl border border-slate-100 overflow-hidden z-50 p-6 text-center">
+                            <div class="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 text-slate-300">
+                                <span class="material-symbols-outlined text-[28px]">notifications_off</span>
+                            </div>
+                            <p class="text-[16px] font-black text-slate-900 mb-1">Aucune notification</p>
+                            <p class="text-[13px] font-medium text-slate-400">Vous êtes à jour !</p>
+                        </div>
+                    </div>
                     
                     <div v-if="store.user" class="relative pl-4 border-l border-slate-200">
-                        <button @click.stop="isProfileMenuOpen = !isProfileMenuOpen" class="flex items-center gap-3 text-left hover:bg-slate-50 p-2 rounded-xl transition-all outline-none">
+                        <button @click.stop="isProfileMenuOpen = !isProfileMenuOpen; showNotifications = false" class="flex items-center gap-3 text-left hover:bg-slate-50 p-2 rounded-xl transition-all outline-none">
                             <div class="text-right hidden sm:block">
                                 <p class="text-sm font-bold text-slate-900">{{ store.user.name }}</p>
                                 <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Compte Personnel</p>
