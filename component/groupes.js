@@ -56,22 +56,11 @@ export default {
             }
         };
 
-        const handleIconSelect = (icon) => {
-            if (icon === 'more_horiz') {
-                const emj = prompt("Tapez un Emoji pour ce groupe (Sur clavier : Win + . ou Cmd+Ctrl+Espace) :");
-                if (emj && emj.trim() !== '') {
-                    selectedGroupIcon.value = emj.trim();
-                }
-            } else {
-                selectedGroupIcon.value = icon;
-            }
-        };
-
         onMounted(() => {
             fetchGroupes();
         });
 
-        return { groupes, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm, handleIconSelect };
+        return { groupes, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm };
     },
     template: `
     <div class="p-10 max-w-[1100px] w-full mx-auto">
@@ -126,11 +115,10 @@ export default {
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-3">Icône du groupe</label>
                         <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            <label v-for="icon in ['home', 'flight', 'landscape', 'sports_bar', 'more_horiz']" :key="icon" class="cursor-pointer flex-shrink-0" @click.prevent="handleIconSelect(icon)">
-                                <input type="radio" :value="icon === 'more_horiz' ? '' : icon" :checked="selectedGroupIcon === icon || (icon === 'more_horiz' && !['home', 'flight', 'landscape', 'sports_bar'].includes(selectedGroupIcon))" class="peer hidden">
+                            <label v-for="icon in ['home', 'flight', 'landscape', 'sports_bar', 'more_horiz']" :key="icon" class="cursor-pointer flex-shrink-0">
+                                <input type="radio" :value="icon" v-model="selectedGroupIcon" class="peer hidden">
                                 <div class="flex items-center justify-center min-w-[65px] h-[65px] rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-900 hover:bg-slate-200 peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary">
-                                    <span v-if="icon === 'more_horiz' && !['home', 'flight', 'landscape', 'sports_bar'].includes(selectedGroupIcon)" class="text-[32px]">{{ selectedGroupIcon }}</span>
-                                    <span v-else class="material-symbols-outlined text-[32px]">{{ icon }}</span>
+                                    <span class="material-symbols-outlined text-[32px]">{{ icon }}</span>
                                 </div>
                             </label>
                         </div>
