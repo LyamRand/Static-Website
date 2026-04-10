@@ -1,3 +1,4 @@
+import { store } from '../store.js';
 const { ref, onMounted } = Vue;
 const { useRoute, useRouter } = VueRouter;
 
