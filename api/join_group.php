@@ -38,7 +38,7 @@ try {
     $userId = $_SESSION['idClient'];
 
     // 2. Vérifier si l'utilisateur est déjà dans le groupe
-    $stmtCheck = $pdo->prepare("SELECT id FROM group_users WHERE group_id = :group_id AND user_id = :user_id");
+    $stmtCheck = $pdo->prepare("SELECT group_id FROM group_users WHERE group_id = :group_id AND user_id = :user_id");
     $stmtCheck->execute([
         'group_id' => $groupId,
         'user_id' => $userId

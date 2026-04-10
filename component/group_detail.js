@@ -65,15 +65,6 @@ export default {
                         {{ currentGroup?.nom || 'Nom du groupe' }}
                     </h2>
                     <div class="flex items-center gap-4 mt-4">
-                        <div class="flex -space-x-2" v-if="currentGroup?.participantsInfo?.length">
-                            <div v-for="(p, idx) in currentGroup.participantsInfo" :key="p.id" 
-                                 class="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold"
-                                 :style="{ zIndex: 10 - idx }"
-                                 :class="['bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-yellow-100 text-yellow-600', 'bg-purple-100 text-purple-600', 'bg-pink-100 text-pink-600'][idx % 5]">
-                                {{ p.name.charAt(0).toUpperCase() }}
-                            </div>
-                        </div>
-                        
                         <span class="text-sm font-bold text-slate-700 ml-1">Code : <span class="text-[#6155F5] font-black">{{ currentGroup?.code || '...' }}</span></span>
 
                         <div class="w-[1px] h-4 bg-slate-200 mx-1"></div>
