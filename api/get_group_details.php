@@ -15,7 +15,7 @@ $groupId = $_GET['id'];
 try {
     // 1. Récupérer les infos du groupe (et vérifier que l'utilisateur en fait bien partie)
     $stmt = $pdo->prepare("
-        SELECT g.id, g.name AS nom, g.logo AS icone, 
+        SELECT g.id, g.name AS nom, g.logo AS icone, g.code,
                (SELECT COUNT(*) FROM group_users WHERE group_id = g.id) AS participants
         FROM groups g
         JOIN group_users gu ON g.id = gu.group_id
@@ -23,6 +23,17 @@ try {
     ");
     $stmt->execute(['group_id' => $groupId, 'user_id' => $userId]);
     $group = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Get the participants details
+    $stmtUsers = $pdo->prepare("
+        SELECT u.id, u.name 
+        FROM users u 
+        JOIN group_users gu ON u.id = gu.user_id
+        WHERE gu.group_id = :group_id
+        LIMIT 5
+    ");
+    $stmtUsers->execute(['group_id' => $groupId]);
+    $group['participantsInfo'] = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
 
     if (!$group) {
         echo json_encode(["success" => false, "error" => "Groupe introuvable ou accès refusé"]);

@@ -25,12 +25,19 @@ if (empty($name) || empty($icone)) {
         // On utilise une transaction car on insère dans 2 tables à la suite
         $pdo->beginTransaction();
 
-        // 1. On crée le groupe (attention, ta colonne s'appelle 'logo' dans ta BDD)
-        $sql = $pdo->prepare("INSERT INTO `groups` (name, description, logo) VALUES (:name, :description, :logo)");
+        $code = '';
+        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        for ($i = 0; $i < 6; $i++) {
+            $code .= $chars[mt_rand(0, strlen($chars) - 1)];
+        }
+
+        // 1. On crée le groupe avec le code
+        $sql = $pdo->prepare("INSERT INTO `groups` (name, description, logo, code) VALUES (:name, :description, :logo, :code)");
         $sql->execute([
             "name" => $name,
             "description" => $description,
-            "logo" => $icone
+            "logo" => $icone,
+            "code" => $code
         ]);
 
         // On récupère l'ID du groupe qu'on vient juste de créer
