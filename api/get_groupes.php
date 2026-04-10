@@ -18,7 +18,11 @@ try {
             g.id, 
             g.name AS nom, 
             g.logo AS icone, 
-            0.00 AS solde, -- On met 0 en attendant d'utiliser tes tables 'expenses' et 'splits' !
+            (
+                (SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = g.id AND payer_id = :user_id)
+                -
+                (SELECT COALESCE(SUM(s.amount), 0) FROM splits s JOIN expenses e ON s.expense_id = e.id WHERE e.group_id = g.id AND s.user_id = :user_id)
+            ) AS solde,
             (SELECT COUNT(*) FROM group_users WHERE group_id = g.id) AS participants
         FROM `groups` g
         JOIN `group_users` gu ON g.id = gu.group_id

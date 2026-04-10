@@ -9,6 +9,15 @@ export default {
         const showExpenseModal = ref(false);
         const currentGroupExpenses = ref([]);
         const currentGroupStats = ref({ total: 0, unbalanced: 0 });
+        
+        // Form state for expense
+        const expenseForm = ref({
+            montant: '',
+            description: '',
+            categorie: 'Repas',
+            payeur: null,
+            partageOption: 'equal' // 'equal' or 'custom'
+        });
 
         const fetchGroupDetails = async () => {
             const groupId = route.params.id;
@@ -48,16 +57,44 @@ export default {
             }
         };
 
-        const saveExpense = () => {
-            alert("Dépense ajoutée avec succès ! (Simulation)");
-            showExpenseModal.value = false;
+        const saveExpense = async () => {
+            if (!expenseForm.value.montant || !expenseForm.value.description || !expenseForm.value.payeur) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+            try {
+                const res = await fetch('./api/add_expense.php', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        group_id: route.params.id,
+                        montant: expenseForm.value.montant,
+                        description: expenseForm.value.description,
+                        categorie: expenseForm.value.categorie,
+                        payeur: expenseForm.value.payeur
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showExpenseModal.value = false;
+                    expenseForm.value.montant = '';
+                    expenseForm.value.description = '';
+                    fetchGroupDetails();
+                } else {
+                    alert(data.error);
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        const openExpenseModal = () => {
+            expenseForm.value.payeur = store.user?.id; // default to me
+            showExpenseModal.value = true;
         };
 
         onMounted(() => {
             fetchGroupDetails();
         });
 
-        return { currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, deleteGroup, saveExpense };
+        return { store, currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, expenseForm, saveExpense, deleteGroup, openExpenseModal };
     },
     template: `
     <div class="p-10 max-w-[1200px] w-full mx-auto">
@@ -86,7 +123,7 @@ export default {
                     </div>
                 </div>
             </div>
-            <button @click="showExpenseModal = true" class="bg-primary hover:bg-[#5044e6] text-white px-8 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
+            <button @click="openExpenseModal" class="bg-primary hover:bg-[#5044e6] text-white px-8 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
                 <span class="material-symbols-outlined">add_circle</span> Ajouter une dépense
             </button>
         </div>
@@ -127,63 +164,90 @@ export default {
                 <div class="bg-primary rounded-[32px] p-8 text-white shadow-xl shadow-primary/20 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                     <h3 class="text-sm font-bold text-primary-100 uppercase tracking-wider mb-2 opacity-90">Dépenses totales du mois</h3>
-                    <p class="text-5xl font-black mb-8">{{ currentGroupStats.total.toFixed(2).replace('.', ',') }} €</p>
-                    <div>
-                        <div class="flex justify-between text-xs font-bold mb-2">
-                            <span class="opacity-90">Reste à équilibrer</span>
-                            <span>{{ currentGroupStats.unbalanced.toFixed(2).replace('.', ',') }} €</span>
-                        </div>
-                        <div class="w-full bg-black/20 rounded-full h-2">
-                            <div class="bg-white rounded-full h-2" style="width: 75%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chart Box -->
-                <div class="bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm flex flex-col justify-center min-h-[250px]">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-8 rounded-full bg-indigo-50 text-primary flex items-center justify-center">
-                            <span class="material-symbols-outlined text-[18px]">bar_chart</span>
-                        </div>
-                        <h3 class="text-[17px] font-extrabold text-slate-900">Équilibres individuels</h3>
-                    </div>
-                    <div class="flex-1 flex items-center justify-center text-center">
-                        <p class="text-sm font-bold text-slate-400">Le graphique sera généré ici plus tard.</p>
-                    </div>
+                    <p class="text-5xl font-black mb-2">{{ currentGroupStats.total.toFixed(2).replace('.', ',') }} €</p>
                 </div>
             </div>
         </div>
 
         <!-- Modal Ajouter une dépense -->
         <div v-if="showExpenseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity">
-            <div class="bg-white rounded-[32px] p-8 max-w-lg w-full shadow-2xl relative border border-slate-100">
-                <button @click="showExpenseModal = false" class="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">close</span>
-                </button>
-                <h3 class="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">receipt_long</span> Nouvelle dépense
-                </h3>
+            <div class="bg-white rounded-[32px] p-8 max-w-[650px] w-full shadow-2xl relative border border-slate-100">
+                <h3 class="text-3xl font-extrabold text-slate-900 mb-6">Ajouter une dépense</h3>
+                <hr class="border-slate-100 mb-6" />
                 
-                <div class="space-y-5 text-left">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Titre de la dépense</label>
-                        <input type="text" placeholder="Ex: Courses, Restaurant..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                <div class="space-y-6 text-left">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Montant (€)</label>
+                            <input type="number" step="0.01" v-model="expenseForm.montant" placeholder="€ 200,00" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                            <input type="text" v-model="expenseForm.description" placeholder="Qu'avez-vous payé ?" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Montant (€)</label>
-                        <input type="number" step="0.01" placeholder="0.00" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                        <label class="block text-sm font-bold text-slate-700 mb-3">Catégorie</label>
+                        <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            <label v-for="(cat, idx) in [
+                                {id: 'Repas', icon: 'restaurant'},
+                                {id: 'Transport', icon: 'directions_car'},
+                                {id: 'Logement', icon: 'home'},
+                                {id: 'Courses', icon: 'shopping_cart'},
+                                {id: 'Autres', icon: 'more_horiz'}
+                            ]" :key="cat.id" class="cursor-pointer flex-shrink-0">
+                                <input type="radio" :value="cat.id" v-model="expenseForm.categorie" class="peer hidden">
+                                <div class="flex flex-col items-center justify-center w-[85px] h-[85px] gap-1 rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-500 hover:bg-slate-200 peer-checked:bg-[#6155F5]/20 peer-checked:border-[#6155F5] peer-checked:text-[#6155F5]">
+                                    <span class="material-symbols-outlined text-[28px]">{{ cat.icon }}</span>
+                                    <span class="text-xs font-bold">{{ cat.id }}</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Payé par</label>
-                        <select class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
-                            <option>Moi-même</option>
-                            <option>Autre membre...</option>
-                        </select>
+                        <label class="block text-sm font-bold text-slate-700 mb-3">Payé par</label>
+                        <div class="flex flex-wrap gap-3">
+                            <label v-for="(p, idx) in currentGroup.participantsInfo" :key="p.id" class="cursor-pointer">
+                                <input type="radio" :value="p.id" v-model="expenseForm.payeur" class="peer hidden">
+                                <div class="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 peer-checked:bg-[#6155F5]/20 peer-checked:border-[#6155F5] peer-checked:text-[#6155F5] transition-all">
+                                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] bg-slate-200 peer-checked:bg-[#6155F5] peer-checked:text-white"
+                                        :class="['bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-yellow-100 text-yellow-600', 'bg-red-100 text-red-600'][idx % 4]">
+                                        {{ p.name.charAt(0).toUpperCase() }}
+                                    </div>
+                                    {{ store.user && p.id === store.user.id ? 'Moi' : p.name }}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-3">Options de partage</label>
+                        <div class="flex rounded-2xl bg-slate-100 p-1.5">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" value="equal" v-model="expenseForm.partageOption" class="peer hidden">
+                                <div class="text-center py-3 rounded-xl font-bold text-sm text-slate-500 peer-checked:bg-white peer-checked:text-slate-900 peer-checked:shadow-sm transition-all">
+                                    Partager équitablement
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" value="custom" v-model="expenseForm.partageOption" class="peer hidden">
+                                <div class="text-center py-3 rounded-xl font-bold text-sm text-slate-500 peer-checked:bg-white peer-checked:text-slate-900 peer-checked:shadow-sm transition-all">
+                                    Montants personnalisés (%)
+                                </div>
+                            </label>
+                        </div>
                     </div>
                     
-                    <button @click="saveExpense" class="w-full bg-primary hover:bg-[#5044e6] text-white py-4 rounded-2xl font-bold text-lg mt-4 shadow-lg shadow-primary/30 transition-all">
-                        Enregistrer la dépense
-                    </button>
+                    <div class="flex gap-4 pt-4">
+                        <button @click="saveExpense" class="flex-[2] bg-[#6155F5] hover:bg-[#5044e6] text-white py-4 rounded-xl font-bold text-base shadow-sm transition-all">
+                            Enregistrer la dépense
+                        </button>
+                        <button @click="showExpenseModal = false" class="flex-[1] bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-xl font-bold text-base shadow-sm transition-all">
+                            Annuler
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

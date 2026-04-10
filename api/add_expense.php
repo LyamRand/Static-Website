@@ -1,0 +1,84 @@
+<?php
+session_start();
+header('Content-Type: application/json');
+require_once './config.php';
+
+$input_data = json_decode(file_get_contents('php://input'), true);
+if (is_array($input_data)) {
+    $_POST = array_merge($_POST, $input_data);
+}
+
+// Vérifications
+if (!isset($_SESSION['idClient'])) {
+    echo json_encode(['success' => false, 'error' => 'Non connecté']);
+    exit;
+}
+
+$groupId = $_POST['group_id'] ?? null;
+$amount = $_POST['montant'] ?? null;
+$description = $_POST['description'] ?? '';
+$category = $_POST['categorie'] ?? 'Autres';
+$payerId = $_POST['payeur'] ?? $_SESSION['idClient'];
+
+if (!$groupId || !$amount || !$description) {
+    echo json_encode(['success' => false, 'error' => 'Veuillez remplir tous les champs (montant et description).']);
+    exit;
+}
+
+try {
+    $pdo->beginTransaction();
+
+    // 1. Inserer la dépense dans "expenses"
+    // Vérifions d'abord si la table expenses a une colonne 'category' - on essaie de l'insérer avec ou sans
+    // Pour assurer la rétrocompatibilité si la DB n'a pas de category:
+    try {
+        $stmtExp = $pdo->prepare("INSERT INTO expenses (group_id, amount, description, payer_id, category) VALUES (:group_id, :amount, :description, :payer_id, :category)");
+        $stmtExp->execute([
+            'group_id' => $groupId,
+            'amount' => $amount,
+            'description' => $description,
+            'payer_id' => $payerId,
+            'category' => $category
+        ]);
+    } catch (PDOException $e) {
+        // Fallback si la colonne category n'existe pas
+        $stmtExp = $pdo->prepare("INSERT INTO expenses (group_id, amount, description, payer_id) VALUES (:group_id, :amount, :description, :payer_id)");
+        $stmtExp->execute([
+            'group_id' => $groupId,
+            'amount' => $amount,
+            'description' => $description,
+            'payer_id' => $payerId
+        ]);
+    }
+    
+    $expenseId = $pdo->lastInsertId();
+
+    // 2. Extraire tous les utilisateurs du groupe
+    $stmtUsers = $pdo->prepare("SELECT user_id FROM group_users WHERE group_id = :group_id");
+    $stmtUsers->execute(['group_id' => $groupId]);
+    $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($users) > 0) {
+        // Partage équitable
+        $splitAmount = $amount / count($users);
+        $stmtSplit = $pdo->prepare("INSERT INTO splits (expense_id, user_id, amount) VALUES (:expense_id, :user_id, :amount)");
+        
+        foreach ($users as $u) {
+            $stmtSplit->execute([
+                'expense_id' => $expenseId,
+                'user_id' => $u['user_id'],
+                'amount' => $splitAmount
+            ]);
+        }
+    }
+
+    $pdo->commit();
+    echo json_encode(['success' => true]);
+
+} catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    echo json_encode(['success' => false, 'error' => 'Erreur SQL : ' . $e->getMessage()]);
+}
+?>

@@ -10,6 +10,15 @@ export default {
         const isAddGroupModalOpen = ref(false);
         const selectedGroupIcon = ref('home');
         const newGroupForm = ref({ name: '', description: '', code: '' });
+        const recentesActivites = ref([]);
+
+        const fetchRecentActivity = async () => {
+            try {
+                const response = await fetch('./api/get_recent_activity.php');
+                const data = await response.json();
+                if (data.success) { recentesActivites.value = data.activities; }
+            } catch (error) { console.error("Erreur activité :", error); }
+        };
 
         const fetchGroupes = async () => {
             try {
@@ -62,9 +71,10 @@ export default {
 
         onMounted(() => {
             fetchGroupes();
+            fetchRecentActivity();
         });
 
-        return { store, groupes, soldeTotal, onTeDoit, tuDois, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm };
+        return { store, groupes, soldeTotal, onTeDoit, tuDois, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm, recentesActivites };
     },
     template: `
     <div class="p-10 max-w-[1400px]">
@@ -148,9 +158,28 @@ export default {
             <div>
                 <div class="flex items-center justify-between mb-6 pr-2">
                     <h3 class="text-2xl font-extrabold text-slate-900">Activité récente</h3>
-                    <a href="#" class="text-primary font-bold hover:underline">Voir tout</a>
                 </div>
-                <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm h-[220px] flex items-center justify-center">
+                
+                <div v-if="recentesActivites.length > 0" class="flex flex-col gap-4">
+                    <div v-for="act in recentesActivites" :key="act.id" class="bg-white rounded-[24px] p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center', act.colorClass]">
+                                <span class="material-symbols-outlined text-[24px]">{{ act.icon }}</span>
+                            </div>
+                            <div>
+                                <p class="text-[15px] font-black text-slate-900 mb-0.5">{{ act.title }}</p>
+                                <p class="text-[13px] font-bold text-slate-500">
+                                    {{ act.payer }} dans <span class="text-slate-800">{{ act.group_name }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[17px] font-black text-slate-900">{{ act.amount.toFixed(2).replace('.', ',') }} €</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else class="bg-white rounded-[32px] border border-slate-100 shadow-sm h-[220px] flex items-center justify-center">
                     <p class="text-sm font-bold text-slate-400">Aucune activité récente</p>
                 </div>
             </div>
