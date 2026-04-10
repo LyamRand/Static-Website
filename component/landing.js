@@ -14,7 +14,12 @@ export default {
             { title: "SOCIÉTÉ", links: ["À propos", "Carrières", "Contact", "Mentions légales"] }
         ];
 
-        return { store, userInitials, features, footerCols };
+        const scrollTo = (id) => {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        return { store, userInitials, features, footerCols, scrollTo };
     },
     template: `
     <div class="bg-white min-h-screen font-sans">
@@ -50,9 +55,9 @@ export default {
                     <router-link to="/auth" class="block w-full sm:w-auto bg-primary text-white px-6 py-3 rounded-[10px] transition text-center font-bold">
                         Commencer gratuitement
                     </router-link>
-                    <a href="#scroll-down" class="w-full sm:w-auto border-2 border-gray-300 hover:border-primary px-6 py-3 rounded-[10px] transition text-center text-slate-700 font-bold">
+                    <button @click="scrollTo('scroll-down')" class="w-full sm:w-auto border-2 border-gray-300 hover:border-primary px-6 py-3 rounded-[10px] transition text-center text-slate-700 font-bold">
                         Splitz, c'est quoi ?
-                    </a>
+                    </button>
                 </div>
             </div>
             <div class="flex-1 flex justify-center items-center w-full mt-10 md:mt-0">
