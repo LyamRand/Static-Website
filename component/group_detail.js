@@ -1,10 +1,12 @@
 const { ref, onMounted } = Vue;
-const { useRoute } = VueRouter;
+const { useRoute, useRouter } = VueRouter;
 
 export default {
     setup() {
         const route = useRoute();
+        const router = useRouter();
         const currentGroup = ref({ nom: 'Chargement...', icone: '⏳', participants: 0 });
+        const showExpenseModal = ref(false);
         const currentGroupExpenses = ref([]);
         const currentGroupStats = ref({ total: 0, unbalanced: 0 });
 
@@ -27,11 +29,23 @@ export default {
             }
         };
 
+        const deleteGroup = () => {
+            if(confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible.")) {
+                alert("Groupe supprimé avec succès ! (Simulation)");
+                router.push('/dashboard');
+            }
+        };
+
+        const saveExpense = () => {
+            alert("Dépense ajoutée avec succès ! (Simulation)");
+            showExpenseModal.value = false;
+        };
+
         onMounted(() => {
             fetchGroupDetails();
         });
 
-        return { currentGroup, currentGroupExpenses, currentGroupStats };
+        return { currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, deleteGroup, saveExpense };
     },
     template: `
     <div class="p-10 max-w-[1200px] w-full mx-auto">
@@ -50,19 +64,18 @@ export default {
                     <h2 class="text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight mb-2">
                         {{ currentGroup?.nom || 'Nom du groupe' }}
                     </h2>
-                    <div class="flex items-center gap-2">
-                        <div class="flex -space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-xs font-bold text-blue-600 z-30">M</div>
-                            <div class="w-8 h-8 rounded-full bg-green-100 border-2 border-white flex items-center justify-center text-xs font-bold text-green-600 z-20">L</div>
-                            <div class="w-8 h-8 rounded-full bg-yellow-100 border-2 border-white flex items-center justify-center text-xs font-bold text-yellow-600 z-10">C</div>
-                        </div>
-                        <button class="text-sm font-bold text-primary hover:underline ml-2 flex items-center gap-1">
+                    <div class="flex items-center gap-4 mt-3">
+                        <button class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
                             <span class="material-symbols-outlined text-[18px]">person_add</span> Inviter
+                        </button>
+                        <div class="w-[1px] h-4 bg-slate-200"></div>
+                        <button @click="deleteGroup" class="text-sm font-bold text-red-500 hover:text-red-700 hover:underline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[18px]">delete</span> Supprimer ce groupe
                         </button>
                     </div>
                 </div>
             </div>
-            <button class="bg-primary hover:bg-[#5044e6] text-white px-8 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
+            <button @click="showExpenseModal = true" class="bg-primary hover:bg-[#5044e6] text-white px-8 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
                 <span class="material-symbols-outlined">add_circle</span> Ajouter une dépense
             </button>
         </div>
@@ -126,6 +139,40 @@ export default {
                     <div class="flex-1 flex items-center justify-center text-center">
                         <p class="text-sm font-bold text-slate-400">Le graphique sera généré ici plus tard.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Ajouter une dépense -->
+        <div v-if="showExpenseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity">
+            <div class="bg-white rounded-[32px] p-8 max-w-lg w-full shadow-2xl relative border border-slate-100">
+                <button @click="showExpenseModal = false" class="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+                <h3 class="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">receipt_long</span> Nouvelle dépense
+                </h3>
+                
+                <div class="space-y-5 text-left">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Titre de la dépense</label>
+                        <input type="text" placeholder="Ex: Courses, Restaurant..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Montant (€)</label>
+                        <input type="number" step="0.01" placeholder="0.00" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 font-bold focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Payé par</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-900 font-medium focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+                            <option>Moi-même</option>
+                            <option>Autre membre...</option>
+                        </select>
+                    </div>
+                    
+                    <button @click="saveExpense" class="w-full bg-primary hover:bg-[#5044e6] text-white py-4 rounded-2xl font-bold text-lg mt-4 shadow-lg shadow-primary/30 transition-all">
+                        Enregistrer la dépense
+                    </button>
                 </div>
             </div>
         </div>
