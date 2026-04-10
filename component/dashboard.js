@@ -9,7 +9,7 @@ export default {
         const tuDois = computed(() => groupes.value.filter(g => g.solde < 0).reduce((total, groupe) => total + Math.abs(groupe.solde), 0));
         const isAddGroupModalOpen = ref(false);
         const selectedGroupIcon = ref('home');
-        const newGroupForm = ref({ name: '', description: '' });
+        const newGroupForm = ref({ name: '', description: '', code: '' });
 
         const fetchGroupes = async () => {
             try {
@@ -19,23 +19,44 @@ export default {
             } catch (error) { console.error("Erreur groupes :", error); }
         };
 
-        const createGroup = async () => {
-            try {
-                const res = await fetch('./api/newgroup.php', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        name: newGroupForm.value.name,
-                        description: newGroupForm.value.description,
-                        group_icon: selectedGroupIcon.value
-                    })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    isAddGroupModalOpen.value = false;
-                    fetchGroupes();
+        const submitForm = async () => {
+            if (newGroupForm.value.code && newGroupForm.value.code.trim() !== '') {
+                // Join logic
+                try {
+                    const res = await fetch('./api/join_group.php', {
+                        method: 'POST',
+                        body: JSON.stringify({ code: newGroupForm.value.code.toUpperCase() })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        isAddGroupModalOpen.value = false;
+                        newGroupForm.value = { name: '', description: '', code: '' };
+                        fetchGroupes();
+                    } else {
+                        alert(data.error);
+                    }
+                } catch(e) { console.error(e); }
+            } else {
+                // Create logic
+                if (!newGroupForm.value.name.trim()) return;
+                try {
+                    const res = await fetch('./api/newgroup.php', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            name: newGroupForm.value.name,
+                            description: newGroupForm.value.description,
+                            group_icon: selectedGroupIcon.value
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        isAddGroupModalOpen.value = false;
+                        newGroupForm.value = { name: '', description: '', code: '' };
+                        fetchGroupes();
+                    }
+                } catch (e) {
+                    console.error(e);
                 }
-            } catch (e) {
-                console.error(e);
             }
         };
 
@@ -43,7 +64,7 @@ export default {
             fetchGroupes();
         });
 
-        return { store, groupes, soldeTotal, onTeDoit, tuDois, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, createGroup };
+        return { store, groupes, soldeTotal, onTeDoit, tuDois, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm };
     },
     template: `
     <div class="p-10 max-w-[1400px]">
@@ -136,32 +157,41 @@ export default {
         </div>
 
         <div v-if="isAddGroupModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-            <div class="bg-white w-full max-w-[600px] rounded-[32px] shadow-2xl overflow-hidden flex flex-col p-8 md:p-10">
+            <div class="bg-white w-full max-w-[500px] rounded-[32px] shadow-2xl overflow-hidden flex flex-col p-8 md:p-10 relative">
                 <h2 class="text-3xl font-extrabold text-slate-900 mb-6">Nouveau groupe</h2>
-                <hr class="border-slate-100 mb-8" />
-                <form @submit.prevent="createGroup" class="space-y-6">
+                <hr class="border-slate-100 mb-6" />
+                <form @submit.prevent="submitForm" class="space-y-6">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Nom du groupe</label>
-                        <input type="text" v-model="newGroupForm.name" placeholder="Comment s'appelle le groupe ?" class="w-full px-5 py-4 bg-surface border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-semibold placeholder-slate-400" required />
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Nom un groupe</label>
+                        <input type="text" v-model="newGroupForm.name" placeholder="Comment s'appelle le groupe ?" class="w-full px-5 py-4 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-semibold placeholder-slate-400" />
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Description <span class="text-slate-400 font-normal">(optionnel)</span></label>
-                        <textarea v-model="newGroupForm.description" placeholder="Un petit mot sur l'objectif de ce groupe..." rows="3" class="w-full px-5 py-4 bg-surface border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-semibold placeholder-slate-400 resize-none"></textarea>
-                    </div>
+                    
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-3">Icône du groupe</label>
                         <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            <label v-for="icon in ['home', 'flight', 'landscape', 'sports_bar']" :key="icon" class="cursor-pointer flex-shrink-0">
+                            <label v-for="icon in ['home', 'flight', 'landscape', 'sports_bar', 'more_horiz']" :key="icon" class="cursor-pointer flex-shrink-0">
                                 <input type="radio" :value="icon" v-model="selectedGroupIcon" class="peer hidden">
-                                <div class="flex items-center justify-center min-w-[75px] h-[75px] rounded-2xl transition-all bg-surface border-2 border-transparent text-slate-600 hover:bg-slate-200 peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary">
+                                <div class="flex items-center justify-center min-w-[65px] h-[65px] rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-900 hover:bg-slate-200 peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary">
                                     <span class="material-symbols-outlined text-[32px]">{{ icon }}</span>
                                 </div>
                             </label>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-4 pt-4 mt-auto">
-                        <button type="submit" class="flex-[2] py-4 rounded-xl bg-primary hover:bg-[#5044e6] text-white font-bold text-base transition-all shadow-lg shadow-primary/30">C'est parti !</button>
-                        <button type="button" @click="isAddGroupModalOpen = false" class="flex-[1] py-4 rounded-xl bg-surface hover:bg-slate-200 text-slate-600 font-bold text-base transition-all">Annuler</button>
+
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-slate-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-slate-500 font-bold text-xs bg-white border border-slate-200 px-3 py-1 rounded-full">OU</span>
+                        <div class="flex-grow border-t border-slate-200"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Rejoindre un groupe</label>
+                        <input type="text" v-model="newGroupForm.code" placeholder="Saisir le code unique pour rejoindre" class="w-full px-5 py-4 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-bold placeholder-slate-400 uppercase" maxlength="6" />
+                    </div>
+
+                    <div class="flex gap-4 pt-4 mt-auto">
+                        <button type="submit" class="flex-[3] py-4 rounded-xl bg-[#6155F5] hover:bg-[#5044e6] text-white font-bold text-base transition-all shadow-sm">C'est parti !</button>
+                        <button type="button" @click="isAddGroupModalOpen = false" class="flex-[2] py-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base transition-all shadow-sm">Annuler</button>
                     </div>
                 </form>
             </div>

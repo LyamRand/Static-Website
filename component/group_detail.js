@@ -29,10 +29,22 @@ export default {
             }
         };
 
-        const deleteGroup = () => {
+        const deleteGroup = async () => {
             if(confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible.")) {
-                alert("Groupe supprimé avec succès ! (Simulation)");
-                router.push('/dashboard');
+                try {
+                    const res = await fetch('./api/delete_group.php', {
+                        method: 'POST',
+                        body: JSON.stringify({ group_id: route.params.id })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        router.push('/dashboard');
+                    } else {
+                        alert(data.error);
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
             }
         };
 
