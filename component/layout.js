@@ -66,7 +66,7 @@ export default {
                     <input type="text" placeholder="Rechercher..." class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
                 </div>
                 <div class="flex items-center gap-6">
-                    <button class="relative text-slate-400 hover:text-slate-600 transition-colors">
+                    <button @click="alert('Aucune notification récente !')" class="relative text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
                         <span class="material-symbols-outlined text-[28px]">notifications</span>
                         <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-danger rounded-full border-2 border-[#F9FAFB]"></span>
                     </button>
