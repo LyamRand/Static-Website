@@ -96,7 +96,7 @@ export default {
         <main class="flex-1 ml-72 flex flex-col min-h-screen">
             <!-- Header -->
             <header class="h-[90px] bg-[#F9FAFB] px-10 flex items-center justify-between border-b border-slate-200/60 z-10 sticky top-0">
-                <div class="relative w-[450px]">
+                <div class="relative w-[450px]" @click.stop>
                     <div class="flex items-center gap-3 bg-white px-5 py-3 rounded-full w-full shadow-sm border border-slate-100">
                         <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
                         <input type="text" v-model="searchQuery" @focus="handleSearchFocus" placeholder="Rechercher un de vos groupes..." class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
