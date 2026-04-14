@@ -65,24 +65,16 @@ try {
     $formatted = [];
     foreach ($activities as $act) {
         $category = $act['category'] ?? 'Autres';
-        $iconMap = [
-            'Repas' => 'bg-red-50 text-red-danger',
-            'Transport' => 'bg-yellow-50 text-yellow-500',
-            'Logement' => 'bg-orange-50 text-orange-500',
-            'Courses' => 'bg-green-50 text-green-success',
-            'Autres' => 'bg-slate-100 text-slate-500'
-        ];
         
-        $groupIconMap = [
-            'home' => '🏠',
-            'flight' => '✈️',
-            'landscape' => '⛰️',
-            'sports_bar' => '🍻',
-            'more_horiz' => '📁'
+        $categoryMap = [
+            'Repas' => ['icon' => 'restaurant', 'color' => 'bg-red-50 text-red-danger'],
+            'Transport' => ['icon' => 'directions_car', 'color' => 'bg-blue-50 text-blue-500'],
+            'Logement' => ['icon' => 'home', 'color' => 'bg-orange-50 text-orange-500'],
+            'Courses' => ['icon' => 'shopping_cart', 'color' => 'bg-green-50 text-green-success'],
+            'Autres' => ['icon' => 'more_horiz', 'color' => 'bg-slate-100 text-slate-500']
         ];
 
-        $colorClass = $iconMap[$category] ?? $iconMap['Autres'];
-        $groupLogo = $groupIconMap[$act['logo']] ?? '📁';
+        $style = $categoryMap[$category] ?? $categoryMap['Autres'];
 
         $formatted[] = [
             "id" => $act['id'],
@@ -90,8 +82,8 @@ try {
             "amount" => (float)$act['amount'],
             "group_name" => $act['group_name'],
             "payer" => $act['payer_id'] == $userId ? 'Vous' : ltrim($act['payer_name']),
-            "icon" => $groupLogo,
-            "colorClass" => $colorClass
+            "icon" => $style['icon'],
+            "colorClass" => $style['color']
         ];
     }
 

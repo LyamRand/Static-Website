@@ -164,7 +164,7 @@ export default {
                     <div v-for="act in recentesActivites" :key="act.id" class="bg-white rounded-[24px] p-5 border border-slate-100 shadow-sm flex items-center justify-between">
                         <div class="flex items-center gap-4">
                             <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center', act.colorClass]">
-                                <span class="text-[24px]">{{ act.icon }}</span>
+                                <span class="material-symbols-outlined text-[28px]">{{ act.icon }}</span>
                             </div>
                             <div>
                                 <p class="text-[15px] font-black text-slate-900 mb-0.5">{{ act.title }}</p>
