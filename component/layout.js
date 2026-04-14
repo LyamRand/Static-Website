@@ -8,6 +8,37 @@ export default {
         const isProfileMenuOpen = ref(false);
         const showNotifications = ref(false);
         const hasNewNotifications = ref(true);
+        
+        const searchQuery = ref('');
+        const searchFocused = ref(false);
+        const allGroups = ref([]);
+
+        const fetchGroups = async () => {
+            try {
+                const response = await fetch('./api/get_groupes.php');
+                const data = await response.json();
+                if (data.success) {
+                    allGroups.value = data.groupes;
+                }
+            } catch (error) { console.error("Erreur groupes :", error); }
+        };
+
+        const filteredGroups = Vue.computed(() => {
+            if (!searchQuery.value.trim()) return [];
+            const query = searchQuery.value.toLowerCase();
+            return allGroups.value.filter(g => g.nom.toLowerCase().includes(query));
+        });
+
+        const handleSearchFocus = () => {
+            searchFocused.value = true;
+            fetchGroups();
+        };
+
+        const goToGroup = (id) => {
+            router.push('/groupe/' + id);
+            searchQuery.value = '';
+            searchFocused.value = false;
+        };
 
         const handleLogout = async () => {
             await store.logout();
@@ -17,6 +48,7 @@ export default {
         const closeMenu = () => {
             isProfileMenuOpen.value = false;
             showNotifications.value = false;
+            setTimeout(() => { searchFocused.value = false; }, 150); // delay pour permettre le clic
         };
 
         onMounted(() => {
@@ -27,7 +59,7 @@ export default {
             }
         });
 
-        return { store, userInitials, isProfileMenuOpen, showNotifications, hasNewNotifications, handleLogout, closeMenu };
+        return { store, userInitials, isProfileMenuOpen, showNotifications, hasNewNotifications, handleLogout, closeMenu, searchQuery, searchFocused, filteredGroups, handleSearchFocus, goToGroup };
     },
     template: `
     <div class="flex min-h-screen w-full bg-[#F9FAFB] text-slate-900 font-sans" @click="closeMenu">
@@ -64,9 +96,27 @@ export default {
         <main class="flex-1 ml-72 flex flex-col min-h-screen">
             <!-- Header -->
             <header class="h-[90px] bg-[#F9FAFB] px-10 flex items-center justify-between border-b border-slate-200/60 z-10 sticky top-0">
-                <div class="flex items-center gap-3 bg-white px-5 py-3 rounded-full w-[450px] shadow-sm border border-slate-100">
-                    <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
-                    <input type="text" placeholder="Rechercher..." class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
+                <div class="relative w-[450px]">
+                    <div class="flex items-center gap-3 bg-white px-5 py-3 rounded-full w-full shadow-sm border border-slate-100">
+                        <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+                        <input type="text" v-model="searchQuery" @focus="handleSearchFocus" placeholder="Rechercher un de vos groupes..." class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 outline-none font-medium" />
+                    </div>
+                    
+                    <!-- Search Results Dropdown -->
+                    <div v-if="searchFocused && searchQuery.trim() !== ''" class="absolute left-0 top-full mt-2 w-full bg-white rounded-[24px] shadow-xl border border-slate-100 overflow-hidden z-50 p-2">
+                        <div v-if="filteredGroups.length === 0" class="p-4 text-center text-sm font-medium text-slate-400">
+                            Aucun groupe trouvé.
+                        </div>
+                        <div v-else>
+                            <div v-for="g in filteredGroups" :key="g.id" @click.stop="goToGroup(g.id)" class="flex items-center gap-3 cursor-pointer p-3 hover:bg-slate-50 rounded-2xl transition-all">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[18px]">{{ g.icone }}</div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-900">{{ g.nom }}</p>
+                                    <p class="text-[11px] font-medium text-slate-400">{{ g.participants }} participants</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex items-center gap-6">
                     <div class="relative">
