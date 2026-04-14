@@ -8,6 +8,7 @@ import Dashboard from './component/dashboard.js';
 import Groupes from './component/groupes.js';
 import GroupDetail from './component/group_detail.js';
 import Account from './component/account.js';
+import Settings from './component/settings.js';
 
 const { createApp, onMounted } = Vue;
 const { createRouter, createWebHashHistory } = VueRouter;
@@ -30,7 +31,8 @@ const routes = [
             { path: 'dashboard', component: Dashboard },
             { path: 'groupes', component: Groupes },
             { path: 'groupe/:id', component: GroupDetail },
-            { path: 'account', component: Account }
+            { path: 'account', component: Account },
+            { path: 'settings', component: Settings }
         ]
     }
 ];

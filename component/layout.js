@@ -51,7 +51,7 @@ export default {
                 </router-link>
             </nav>
             <div class="p-4 mb-4">
-                <router-link to="/account" custom v-slot="{ isActive, navigate }">
+                <router-link to="/settings" custom v-slot="{ isActive, navigate }">
                     <a @click="navigate" :class="isActive ? 'bg-primary/20 text-primary font-bold transition-all' : 'bg-surface-dark text-slate-700 font-bold hover:bg-slate-300 transition-all'" class="flex items-center gap-4 px-6 py-4 rounded-2xl cursor-pointer">
                         <span class="material-symbols-outlined text-[26px]">settings</span>
                         <span class="text-[15px]">Paramètres</span>
