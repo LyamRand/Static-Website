@@ -28,28 +28,21 @@ if (!$groupId || !$amount || !$description) {
 try {
     $pdo->beginTransaction();
 
-    // 1. Inserer la dépense dans "expenses"
-    // Vérifions d'abord si la table expenses a une colonne 'category' - on essaie de l'insérer avec ou sans
-    // Pour assurer la rétrocompatibilité si la DB n'a pas de category:
     try {
-        $stmtExp = $pdo->prepare("INSERT INTO expenses (group_id, amount, description, payer_id, category) VALUES (:group_id, :amount, :description, :payer_id, :category)");
-        $stmtExp->execute([
-            'group_id' => $groupId,
-            'amount' => $amount,
-            'description' => $description,
-            'payer_id' => $payerId,
-            'category' => $category
-        ]);
-    } catch (PDOException $e) {
-        // Fallback si la colonne category n'existe pas
-        $stmtExp = $pdo->prepare("INSERT INTO expenses (group_id, amount, description, payer_id) VALUES (:group_id, :amount, :description, :payer_id)");
-        $stmtExp->execute([
-            'group_id' => $groupId,
-            'amount' => $amount,
-            'description' => $description,
-            'payer_id' => $payerId
-        ]);
-    }
+        $stmtCheck = $pdo->query("SHOW COLUMNS FROM expenses LIKE 'category'");
+        if (!$stmtCheck->fetch()) {
+            $pdo->exec("ALTER TABLE expenses ADD COLUMN category VARCHAR(50) DEFAULT 'Autres'");
+        }
+    } catch (Exception $e) {}
+
+    $stmtExp = $pdo->prepare("INSERT INTO expenses (group_id, amount, description, payer_id, category) VALUES (:group_id, :amount, :description, :payer_id, :category)");
+    $stmtExp->execute([
+        'group_id' => $groupId,
+        'amount' => $amount,
+        'description' => $description,
+        'payer_id' => $payerId,
+        'category' => $category
+    ]);
     
     $expenseId = $pdo->lastInsertId();
 

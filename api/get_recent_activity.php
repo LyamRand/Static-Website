@@ -11,8 +11,14 @@ if (!isset($_SESSION['idClient'])) {
 $userId = $_SESSION['idClient'];
 
 try {
-    // Requires expenses to have 'category' although fallback to null if missing could be handled.
-    // For safety, we check if category exists, if not we ignore it by handling Exception
+    // Vérifier et ajouter la colonne category si elle n'existe pas
+    try {
+        $stmtCheck = $pdo->query("SHOW COLUMNS FROM expenses LIKE 'category'");
+        if (!$stmtCheck->fetch()) {
+            $pdo->exec("ALTER TABLE expenses ADD COLUMN category VARCHAR(50) DEFAULT 'Autres'");
+        }
+    } catch (Exception $e) {}
+
     $sql = "
         SELECT 
             e.id, 
@@ -21,7 +27,8 @@ try {
             g.name AS group_name, 
             g.logo AS logo,
             u.name AS payer_name, 
-            u.id AS payer_id
+            u.id AS payer_id,
+            e.category
         FROM expenses e
         JOIN `groups` g ON e.group_id = g.id
         JOIN users u ON e.payer_id = u.id
@@ -34,33 +41,6 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['user_id' => $userId]);
     $activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Try to get categories if the column exists
-    try {
-        $sqlCat = "
-            SELECT 
-                e.id, 
-                e.description AS title, 
-                e.amount, 
-                g.name AS group_name, 
-                g.logo AS logo,
-                u.name AS payer_name, 
-                u.id AS payer_id,
-                e.category
-            FROM expenses e
-            JOIN `groups` g ON e.group_id = g.id
-            JOIN users u ON e.payer_id = u.id
-            JOIN group_users gu ON g.id = gu.group_id
-            WHERE gu.user_id = :user_id
-            ORDER BY e.id DESC
-            LIMIT 5
-        ";
-        $stmtCat = $pdo->prepare($sqlCat);
-        $stmtCat->execute(['user_id' => $userId]);
-        $activities = $stmtCat->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        // Fallback already fetched
-    }
 
     $formatted = [];
     foreach ($activities as $act) {

@@ -44,28 +44,26 @@ try {
     $iconMap = ['home' => '🏠', 'flight' => '✈️', 'landscape' => '⛰️', 'sports_bar' => '🍻'];
     $group['icone'] = $iconMap[$group['icone']] ?? '📁';
 
-    // 2. Récupérer les dépenses de ce groupe
+    // Vérifier et ajouter la colonne category si elle n'existe pas
     try {
-        $stmtExp = $pdo->prepare("
-            SELECT e.id, e.description AS title, e.amount, e.payer_id, e.category, u.name AS payer_name
-            FROM expenses e
-            JOIN users u ON e.payer_id = u.id
-            WHERE e.group_id = :group_id
-            ORDER BY e.id DESC
-        ");
-        $stmtExp->execute(['group_id' => $groupId]);
-        $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $ex) {
-        $stmtExp = $pdo->prepare("
-            SELECT e.id, e.description AS title, e.amount, e.payer_id, u.name AS payer_name
-            FROM expenses e
-            JOIN users u ON e.payer_id = u.id
-            WHERE e.group_id = :group_id
-            ORDER BY e.id DESC
-        ");
-        $stmtExp->execute(['group_id' => $groupId]);
-        $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
+        $stmtCheck = $pdo->query("SHOW COLUMNS FROM expenses LIKE 'category'");
+        if (!$stmtCheck->fetch()) {
+            $pdo->exec("ALTER TABLE expenses ADD COLUMN category VARCHAR(50) DEFAULT 'Autres'");
+        }
+    } catch (Exception $e) {
+        // Ignorer silencieusement si la vérification échoue
     }
+
+    // 2. Récupérer les dépenses de ce groupe
+    $stmtExp = $pdo->prepare("
+        SELECT e.id, e.description AS title, e.amount, e.payer_id, e.category, u.name AS payer_name
+        FROM expenses e
+        JOIN users u ON e.payer_id = u.id
+        WHERE e.group_id = :group_id
+        ORDER BY e.id DESC
+    ");
+    $stmtExp->execute(['group_id' => $groupId]);
+    $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
 
     $expenses = [];
     $totalGroupExpenses = 0;
