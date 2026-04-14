@@ -45,41 +45,20 @@ try {
     $group['icone'] = $iconMap[$group['icone']] ?? '📁';
 
     // 2. Récupérer les dépenses de ce groupe
-    // On essaie d'abord avec category, sinon fallback
-    try {
-        $stmtExp = $pdo->prepare("
-            SELECT e.id, e.description AS title, e.amount, e.payer_id, u.name AS payer_name, e.category
-            FROM expenses e
-            JOIN users u ON e.payer_id = u.id
-            WHERE e.group_id = :group_id
-            ORDER BY e.id DESC
-        ");
-        $stmtExp->execute(['group_id' => $groupId]);
-        $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        $stmtExp = $pdo->prepare("
-            SELECT e.id, e.description AS title, e.amount, e.payer_id, u.name AS payer_name
-            FROM expenses e
-            JOIN users u ON e.payer_id = u.id
-            WHERE e.group_id = :group_id
-            ORDER BY e.id DESC
-        ");
-        $stmtExp->execute(['group_id' => $groupId]);
-        $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $stmtExp = $pdo->prepare("
+        SELECT e.id, e.description AS title, e.amount, e.payer_id, u.name AS payer_name
+        FROM expenses e
+        JOIN users u ON e.payer_id = u.id
+        WHERE e.group_id = :group_id
+        ORDER BY e.id DESC
+    ");
+    $stmtExp->execute(['group_id' => $groupId]);
+    $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
 
     $expenses = [];
     $totalGroupExpenses = 0;
     $myTotalPaid = 0;
     $myTotalShare = 0;
-
-    $categoryMap = [
-        'Repas' => ['icon' => 'restaurant', 'color' => 'bg-red-50 text-red-danger'],
-        'Transport' => ['icon' => 'directions_car', 'color' => 'bg-blue-50 text-blue-500'],
-        'Logement' => ['icon' => 'home', 'color' => 'bg-orange-50 text-orange-500'],
-        'Courses' => ['icon' => 'shopping_cart', 'color' => 'bg-green-50 text-green-success'],
-        'Autres' => ['icon' => 'more_horiz', 'color' => 'bg-slate-100 text-slate-500']
-    ];
 
     foreach ($expensesRaw as $exp) {
         $amount = (float) $exp['amount'];
@@ -104,8 +83,16 @@ try {
             $payerDisplay = $exp['payer_name'];
         }
 
-        $category = $exp['category'] ?? 'Autres';
-        $style = $categoryMap[$category] ?? $categoryMap['Autres'];
+        // On génère une icône et une couleur aléatoire (basée sur le titre) pour faire un joli rendu HTML
+        $icons = [
+            'restaurant' => 'bg-red-50 text-red-danger',
+            'local_gas_station' => 'bg-yellow-50 text-yellow-500',
+            'home' => 'bg-orange-50 text-orange-500',
+            'shopping_cart' => 'bg-green-50 text-green-success'
+        ];
+        $iconKeys = array_keys($icons);
+        // Astuce pour que la même dépense ait toujours la même couleur
+        $randomIcon = $iconKeys[crc32($exp['title'] ?: 'X') % count($iconKeys)];
 
         $expenses[] = [
             "id" => $exp['id'],
@@ -113,8 +100,8 @@ try {
             "payer" => $payerDisplay,
             "amount" => $amount,
             "owed" => $owed,
-            "icon" => $style['icon'],
-            "colorClass" => $style['color']
+            "icon" => $randomIcon,
+            "colorClass" => $icons[$randomIcon]
         ];
     }
 
