@@ -1,4 +1,8 @@
 <?php
+// Paramètres de sécurité pour les cookies de session
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 // 1. On vide toutes les variables de la session

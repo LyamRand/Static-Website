@@ -1,6 +1,10 @@
 <?php
 // check_auth.php
 header("Content-Type: application/json");
+// Paramètres de sécurité pour les cookies de session
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 // On vérifie si l'utilisateur a une session active

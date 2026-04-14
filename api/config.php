@@ -1,4 +1,14 @@
 <?php
+// Reporting maximal (développement)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+// Header HSTS (sécurité transport)
+if (!empty($_SERVER['HTTPS'])) {
+    header("Strict-Transport-Security: max-age=31536000");
+}
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 
