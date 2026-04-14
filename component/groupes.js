@@ -1,3 +1,4 @@
+import { store } from '../store.js';
 const { ref, onMounted } = Vue;
 
 export default {
@@ -60,7 +61,7 @@ export default {
             fetchGroupes();
         });
 
-        return { groupes, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm };
+        return { store, groupes, isAddGroupModalOpen, selectedGroupIcon, newGroupForm, submitForm };
     },
     template: `
     <div class="p-10 max-w-[1100px] w-full mx-auto">
@@ -89,7 +90,7 @@ export default {
                     <div class="bg-surface rounded-2xl px-6 py-4 flex items-center gap-6 min-w-[250px]">
                         <span class="text-sm font-bold text-slate-500">Solde actuel</span>
                         <span class="text-xl font-black ml-auto" :class="groupe.solde >= 0 ? 'text-green-success' : 'text-red-danger'">
-                            {{ groupe.solde > 0 ? '+' : '' }}{{ groupe.solde.toFixed(2).replace('.', ',') }} €
+                            {{ groupe.solde > 0 ? '+' : '' }}{{ store.formatCurrency(Math.abs(groupe.solde)) }}
                         </span>
                     </div>
                 </router-link>

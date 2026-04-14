@@ -149,9 +149,9 @@ export default {
                         </div>
                         <div class="text-right flex items-center gap-4">
                             <div>
-                                <p class="text-xl font-black text-slate-900">{{ depense.amount.toFixed(2).replace('.', ',') }} €</p>
+                                <p class="text-xl font-black text-slate-900">{{ store.formatCurrency(depense.amount) }}</p>
                                 <p class="text-xs font-medium" :class="depense.owed > 0 ? 'text-green-success font-bold' : 'text-slate-400'">
-                                    {{ depense.owed > 0 ? 'On vous doit : ' + depense.owed.toFixed(2).replace('.', ',') + ' €' : 'Votre part : ' + Math.abs(depense.owed).toFixed(2).replace('.', ',') + ' €' }}
+                                    {{ depense.owed > 0 ? 'On vous doit : ' + store.formatCurrency(Math.abs(depense.owed)) : 'Votre part : ' + store.formatCurrency(Math.abs(depense.owed)) }}
                                 </p>
                             </div>
                             <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">edit</span>
@@ -165,7 +165,7 @@ export default {
                 <div class="bg-primary rounded-[32px] p-8 text-white shadow-xl shadow-primary/20 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
                     <h3 class="text-sm font-bold text-primary-100 uppercase tracking-wider mb-2 opacity-90">Dépenses totales du mois</h3>
-                    <p class="text-5xl font-black mb-2">{{ currentGroupStats.total.toFixed(2).replace('.', ',') }} €</p>
+                    <p class="text-5xl font-black mb-2">{{ store.formatCurrency(currentGroupStats.total) }}</p>
                 </div>
             </div>
         </div>
@@ -179,8 +179,8 @@ export default {
                 <div class="space-y-6 text-left">
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Montant (€)</label>
-                            <input type="number" step="0.01" v-model="expenseForm.montant" placeholder="€ 200,00" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Montant</label>
+                            <input type="number" step="0.01" v-model="expenseForm.montant" placeholder="200" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Description</label>

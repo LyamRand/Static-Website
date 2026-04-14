@@ -93,7 +93,7 @@ export default {
                     </div>
                     <span class="text-sm font-bold text-slate-500">Solde total</span>
                 </div>
-                <p class="text-[34px] font-black text-slate-900">{{ soldeTotal > 0 ? '+' : '' }}{{ soldeTotal.toFixed(2).replace('.', ',') }} €</p>
+                <p class="text-[34px] font-black text-slate-900">{{ soldeTotal > 0 ? '+' : '' }}{{ store.formatCurrency(Math.abs(soldeTotal)) }}</p>
             </div>
             
             <div class="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-center h-[160px]">
@@ -103,7 +103,7 @@ export default {
                     </div>
                     <span class="text-sm font-bold text-slate-500">On te doit</span>
                 </div>
-                <p class="text-[34px] font-black text-green-success">{{ onTeDoit.toFixed(2).replace('.', ',') }} €</p>
+                <p class="text-[34px] font-black text-green-success">{{ store.formatCurrency(Math.abs(onTeDoit)) }}</p>
             </div>
 
             <div class="bg-white p-7 rounded-[32px] border border-slate-100 shadow-sm flex flex-col justify-center h-[160px]">
@@ -113,7 +113,7 @@ export default {
                     </div>
                     <span class="text-sm font-bold text-slate-500">Tu dois</span>
                 </div>
-                <p class="text-[34px] font-black text-red-danger">{{ tuDois.toFixed(2).replace('.', ',') }} €</p>
+                <p class="text-[34px] font-black text-red-danger">{{ store.formatCurrency(Math.abs(tuDois)) }}</p>
             </div>
         </div>
 
@@ -137,7 +137,7 @@ export default {
                             <div class="bg-surface rounded-2xl p-4 flex justify-between items-center mt-6">
                                 <span class="text-xs font-bold text-slate-500">Solde actuel</span>
                                 <span class="text-sm font-black" :class="groupe.solde >= 0 ? 'text-green-success' : 'text-red-danger'">
-                                    {{ groupe.solde > 0 ? '+' : '' }}{{ groupe.solde.toFixed(2).replace('.', ',') }} €
+                                    {{ groupe.solde > 0 ? '+' : '' }}{{ store.formatCurrency(Math.abs(groupe.solde)) }}
                                 </span>
                             </div>
                         </div>
@@ -174,7 +174,7 @@ export default {
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-[17px] font-black text-slate-900">{{ act.amount.toFixed(2).replace('.', ',') }} €</p>
+                            <p class="text-[17px] font-black text-slate-900">{{ store.formatCurrency(Math.abs(act.amount)) }}</p>
                         </div>
                     </div>
                 </div>
