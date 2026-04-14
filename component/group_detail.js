@@ -10,7 +10,7 @@ export default {
         const showExpenseModal = ref(false);
         const currentGroupExpenses = ref([]);
         const currentGroupStats = ref({ total: 0, unbalanced: 0 });
-        
+
         // Form state for expense
         const expenseForm = ref({
             montant: '',
@@ -41,7 +41,7 @@ export default {
         };
 
         const deleteGroup = async () => {
-            if(confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible.")) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible.")) {
                 try {
                     const res = await fetch('./api/delete_group.php', {
                         method: 'POST',
@@ -53,7 +53,7 @@ export default {
                     } else {
                         alert(data.error);
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error(e);
                 }
             }
@@ -88,11 +88,11 @@ export default {
                 } else {
                     alert(data.error);
                 }
-            } catch(e) { console.error(e); }
+            } catch (e) { console.error(e); }
         };
 
         const deleteExpense = async (id) => {
-            if(confirm("Supprimer cette dépense ?")) {
+            if (confirm("Supprimer cette dépense ?")) {
                 try {
                     const res = await fetch('./api/delete_expense.php', {
                         method: 'POST',
@@ -104,7 +104,7 @@ export default {
                     } else {
                         alert(data.error);
                     }
-                } catch(e) { console.error(e); }
+                } catch (e) { console.error(e); }
             }
         };
 
@@ -202,7 +202,7 @@ export default {
                     <div class="grid grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Montant</label>
-                            <input type="number" step="0.01" v-model="expenseForm.montant" placeholder="200" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                            <input type="number" step="0.01" v-model="expenseForm.montant" placeholder="Montant dépensé" class="w-full bg-slate-100 border-none rounded-2xl px-5 py-4 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Description</label>
