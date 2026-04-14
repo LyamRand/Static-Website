@@ -5,7 +5,7 @@ export default {
     setup() {
         const groupes = ref([]);
         const isAddGroupModalOpen = ref(false);
-        const selectedGroupIcon = ref('home');
+        const selectedGroupIcon = ref('🏡');
         const newGroupForm = ref({ name: '', description: '', code: '' });
 
         const fetchGroupes = async () => {
@@ -116,10 +116,10 @@ export default {
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-3">Icône du groupe</label>
                         <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            <label v-for="icon in ['home', 'flight', 'landscape', 'sports_bar', 'more_horiz']" :key="icon" class="cursor-pointer flex-shrink-0">
+                            <label v-for="icon in ['🏡', '✈️', '🏝️', '🍻', '📁']" :key="icon" class="cursor-pointer flex-shrink-0">
                                 <input type="radio" :value="icon" v-model="selectedGroupIcon" class="peer hidden">
-                                <div class="flex items-center justify-center min-w-[65px] h-[65px] rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-900 hover:bg-slate-200 peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary">
-                                    <span class="material-symbols-outlined text-[32px]">{{ icon }}</span>
+                                <div class="flex items-center justify-center min-w-[65px] h-[65px] rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-900 hover:bg-slate-200 peer-checked:bg-transparent peer-checked:border-primary">
+                                    <span class="text-[32px]">{{ icon }}</span>
                                 </div>
                             </label>
                         </div>
