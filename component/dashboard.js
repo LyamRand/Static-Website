@@ -44,7 +44,7 @@ export default {
                     } else {
                         alert(data.error);
                     }
-                } catch(e) { console.error(e); }
+                } catch (e) { console.error(e); }
             } else {
                 // Create logic
                 if (!newGroupForm.value.name.trim()) return;
@@ -215,7 +215,7 @@ export default {
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Rejoindre un groupe</label>
-                        <input type="text" v-model="newGroupForm.code" placeholder="Saisir le code unique pour rejoindre" class="w-full px-5 py-4 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-bold placeholder-slate-400 uppercase" maxlength="6" />
+                        <input type="text" v-model="newGroupForm.code" placeholder="Saisir le code unique pour rejoindre" class="w-full px-5 py-4 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-slate-900 font-bold placeholder-slate-400" maxlength="6" />
                     </div>
 
                     <div class="flex gap-4 pt-4 mt-auto">
