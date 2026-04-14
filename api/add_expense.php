@@ -58,17 +58,34 @@ try {
     $stmtUsers->execute(['group_id' => $groupId]);
     $users = $stmtUsers->fetchAll(PDO::FETCH_ASSOC);
 
+    $partageOption = $_POST['partageOption'] ?? 'equal';
+    $customPercentages = $_POST['customPercentages'] ?? [];
+
     if (count($users) > 0) {
-        // Partage équitable
-        $splitAmount = $amount / count($users);
-        $stmtSplit = $pdo->prepare("INSERT INTO splits (expense_id, user_id, amount) VALUES (:expense_id, :user_id, :amount)");
-        
-        foreach ($users as $u) {
-            $stmtSplit->execute([
-                'expense_id' => $expenseId,
-                'user_id' => $u['user_id'],
-                'amount' => $splitAmount
-            ]);
+        if ($partageOption === 'custom' && is_array($customPercentages)) {
+            // Partage personnalisé en pourcentage
+            $stmtSplit = $pdo->prepare("INSERT INTO splits (expense_id, user_id, amount) VALUES (:expense_id, :user_id, :amount)");
+            foreach ($users as $u) {
+                $pct = isset($customPercentages[$u['user_id']]) ? floatval($customPercentages[$u['user_id']]) : 0;
+                $userAmount = $amount * ($pct / 100);
+                $stmtSplit->execute([
+                    'expense_id' => $expenseId,
+                    'user_id' => $u['user_id'],
+                    'amount' => $userAmount
+                ]);
+            }
+        } else {
+            // Partage équitable (défaut)
+            $splitAmount = $amount / count($users);
+            $stmtSplit = $pdo->prepare("INSERT INTO splits (expense_id, user_id, amount) VALUES (:expense_id, :user_id, :amount)");
+            
+            foreach ($users as $u) {
+                $stmtSplit->execute([
+                    'expense_id' => $expenseId,
+                    'user_id' => $u['user_id'],
+                    'amount' => $splitAmount
+                ]);
+            }
         }
     }
 

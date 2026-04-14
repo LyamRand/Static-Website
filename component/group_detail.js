@@ -17,7 +17,8 @@ export default {
             description: '',
             categorie: 'Repas',
             payeur: null,
-            partageOption: 'equal' // 'equal' or 'custom'
+            partageOption: 'equal', // 'equal' or 'custom'
+            customPercentages: {}
         });
 
         const fetchGroupDetails = async () => {
@@ -71,7 +72,9 @@ export default {
                         montant: expenseForm.value.montant,
                         description: expenseForm.value.description,
                         categorie: expenseForm.value.categorie,
-                        payeur: expenseForm.value.payeur
+                        payeur: expenseForm.value.payeur,
+                        partageOption: expenseForm.value.partageOption,
+                        customPercentages: expenseForm.value.customPercentages
                     })
                 });
                 const data = await res.json();
@@ -79,11 +82,30 @@ export default {
                     showExpenseModal.value = false;
                     expenseForm.value.montant = '';
                     expenseForm.value.description = '';
+                    expenseForm.value.customPercentages = {};
+                    expenseForm.value.partageOption = 'equal';
                     fetchGroupDetails();
                 } else {
                     alert(data.error);
                 }
             } catch(e) { console.error(e); }
+        };
+
+        const deleteExpense = async (id) => {
+            if(confirm("Supprimer cette dépense ?")) {
+                try {
+                    const res = await fetch('./api/delete_expense.php', {
+                        method: 'POST',
+                        body: JSON.stringify({ expense_id: id })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        fetchGroupDetails();
+                    } else {
+                        alert(data.error);
+                    }
+                } catch(e) { console.error(e); }
+            }
         };
 
         const openExpenseModal = () => {
@@ -95,7 +117,7 @@ export default {
             fetchGroupDetails();
         });
 
-        return { store, currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, expenseForm, saveExpense, deleteGroup, openExpenseModal };
+        return { store, currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, expenseForm, saveExpense, deleteExpense, deleteGroup, openExpenseModal };
     },
     template: `
     <div class="p-10 max-w-[1200px] w-full mx-auto">
@@ -154,7 +176,7 @@ export default {
                                     {{ depense.owed > 0 ? 'On vous doit : ' + store.formatCurrency(Math.abs(depense.owed)) : 'Votre part : ' + store.formatCurrency(Math.abs(depense.owed)) }}
                                 </p>
                             </div>
-                            <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">edit</span>
+                            <button @click="deleteExpense(depense.id)" class="material-symbols-outlined text-slate-300 hover:text-red-danger transition-colors cursor-pointer">delete</button>
                         </div>
                     </div>
                 </div>
@@ -225,7 +247,7 @@ export default {
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-3">Options de partage</label>
-                        <div class="flex rounded-2xl bg-slate-100 p-1.5">
+                        <div class="flex rounded-2xl bg-slate-100 p-1.5 mb-6">
                             <label class="flex-1 cursor-pointer">
                                 <input type="radio" value="equal" v-model="expenseForm.partageOption" class="peer hidden">
                                 <div class="text-center py-3 rounded-xl font-bold text-sm text-slate-500 peer-checked:bg-white peer-checked:text-slate-900 peer-checked:shadow-sm transition-all">
@@ -238,6 +260,17 @@ export default {
                                     Montants personnalisés (%)
                                 </div>
                             </label>
+                        </div>
+                        
+                        <div v-if="expenseForm.partageOption === 'custom'" class="flex flex-col gap-3">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Répartition personnalisée (%)</label>
+                            <div v-for="p in currentGroup.participantsInfo" :key="p.id" class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="text-sm font-bold text-slate-700">{{ store.user && p.id === store.user.id ? 'Moi' : p.name }}</span>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" min="0" max="100" placeholder="0" v-model.number="expenseForm.customPercentages[p.id]" class="w-16 bg-slate-100 border-none rounded-lg px-2 py-2 text-center font-bold text-slate-900 focus:ring-2 focus:ring-primary outline-none">
+                                    <span class="text-sm font-bold text-slate-500">%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
