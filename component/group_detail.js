@@ -162,7 +162,7 @@ export default {
                     <div v-for="depense in currentGroupExpenses" :key="depense.id" class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-all cursor-pointer group">
                         <div class="flex items-center gap-4">
                             <div :class="\`w-14 h-14 rounded-2xl flex items-center justify-center text-[26px] \${depense.colorClass}\`">
-                                <span class="material-symbols-outlined">{{ depense.icon }}</span>
+                                <span>{{ depense.icon }}</span>
                             </div>
                             <div>
                                 <h4 class="text-lg font-black text-slate-900 leading-tight">{{ depense.title }}</h4>
@@ -214,15 +214,15 @@ export default {
                         <label class="block text-sm font-bold text-slate-700 mb-3">Catégorie</label>
                         <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                             <label v-for="(cat, idx) in [
-                                {id: 'Repas', icon: 'restaurant'},
-                                {id: 'Transport', icon: 'directions_car'},
-                                {id: 'Logement', icon: 'home'},
-                                {id: 'Courses', icon: 'shopping_cart'},
-                                {id: 'Autres', icon: 'more_horiz'}
+                                {id: 'Repas', icon: '🍔'},
+                                {id: 'Transport', icon: '🚘'},
+                                {id: 'Logement', icon: '🏠'},
+                                {id: 'Courses', icon: '🛒'},
+                                {id: 'Autres', icon: '💬'}
                             ]" :key="cat.id" class="cursor-pointer flex-shrink-0">
                                 <input type="radio" :value="cat.id" v-model="expenseForm.categorie" class="peer hidden">
-                                <div class="flex flex-col items-center justify-center w-[85px] h-[85px] gap-1 rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-500 hover:bg-slate-200 peer-checked:bg-[#6155F5]/20 peer-checked:border-[#6155F5] peer-checked:text-[#6155F5]">
-                                    <span class="material-symbols-outlined text-[28px]">{{ cat.icon }}</span>
+                                <div class="flex flex-col items-center justify-center w-[85px] h-[85px] gap-1 rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-500 hover:bg-slate-200 peer-checked:bg-white peer-checked:border-[#6155F5] peer-checked:text-[#6155F5] peer-checked:shadow-sm">
+                                    <span class="text-[28px]">{{ cat.icon }}</span>
                                     <span class="text-xs font-bold">{{ cat.id }}</span>
                                 </div>
                             </label>

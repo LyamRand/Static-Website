@@ -45,15 +45,27 @@ try {
     $group['icone'] = $iconMap[$group['icone']] ?? '📁';
 
     // 2. Récupérer les dépenses de ce groupe
-    $stmtExp = $pdo->prepare("
-        SELECT e.id, e.description AS title, e.amount, e.payer_id, u.name AS payer_name
-        FROM expenses e
-        JOIN users u ON e.payer_id = u.id
-        WHERE e.group_id = :group_id
-        ORDER BY e.id DESC
-    ");
-    $stmtExp->execute(['group_id' => $groupId]);
-    $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $stmtExp = $pdo->prepare("
+            SELECT e.id, e.description AS title, e.amount, e.payer_id, e.category, u.name AS payer_name
+            FROM expenses e
+            JOIN users u ON e.payer_id = u.id
+            WHERE e.group_id = :group_id
+            ORDER BY e.id DESC
+        ");
+        $stmtExp->execute(['group_id' => $groupId]);
+        $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $ex) {
+        $stmtExp = $pdo->prepare("
+            SELECT e.id, e.description AS title, e.amount, e.payer_id, u.name AS payer_name
+            FROM expenses e
+            JOIN users u ON e.payer_id = u.id
+            WHERE e.group_id = :group_id
+            ORDER BY e.id DESC
+        ");
+        $stmtExp->execute(['group_id' => $groupId]);
+        $expensesRaw = $stmtExp->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     $expenses = [];
     $totalGroupExpenses = 0;
@@ -83,16 +95,17 @@ try {
             $payerDisplay = $exp['payer_name'];
         }
 
-        // On génère une icône et une couleur aléatoire (basée sur le titre) pour faire un joli rendu HTML
-        $icons = [
-            'restaurant' => 'bg-red-50 text-red-danger',
-            'local_gas_station' => 'bg-yellow-50 text-yellow-500',
-            'home' => 'bg-orange-50 text-orange-500',
-            'shopping_cart' => 'bg-green-50 text-green-success'
+        $category = $exp['category'] ?? 'Autres';
+        
+        $emojiMap = [
+            'Repas' => ['emoji' => '🍔', 'bg' => 'bg-white', 'border' => 'border border-slate-100 shadow-sm'],
+            'Transport' => ['emoji' => '🚘', 'bg' => 'bg-white', 'border' => 'border border-slate-100 shadow-sm'],
+            'Logement' => ['emoji' => '🏠', 'bg' => 'bg-white', 'border' => 'border border-slate-100 shadow-sm'],
+            'Courses' => ['emoji' => '🛒', 'bg' => 'bg-white', 'border' => 'border border-slate-100 shadow-sm'],
+            'Autres' => ['emoji' => '💬', 'bg' => 'bg-white', 'border' => 'border border-slate-100 shadow-sm']
         ];
-        $iconKeys = array_keys($icons);
-        // Astuce pour que la même dépense ait toujours la même couleur
-        $randomIcon = $iconKeys[crc32($exp['title'] ?: 'X') % count($iconKeys)];
+        
+        $style = $emojiMap[$category] ?? $emojiMap['Autres'];
 
         $expenses[] = [
             "id" => $exp['id'],
@@ -100,8 +113,8 @@ try {
             "payer" => $payerDisplay,
             "amount" => $amount,
             "owed" => $owed,
-            "icon" => $randomIcon,
-            "colorClass" => $icons[$randomIcon]
+            "icon" => $style['emoji'],
+            "colorClass" => $style['bg'] . ' ' . $style['border']
         ];
     }
 
