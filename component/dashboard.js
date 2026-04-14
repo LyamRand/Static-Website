@@ -8,7 +8,7 @@ export default {
         const onTeDoit = computed(() => groupes.value.filter(g => g.solde > 0).reduce((total, groupe) => total + groupe.solde, 0));
         const tuDois = computed(() => groupes.value.filter(g => g.solde < 0).reduce((total, groupe) => total + Math.abs(groupe.solde), 0));
         const isAddGroupModalOpen = ref(false);
-        const selectedGroupIcon = ref('🏡');
+        const selectedGroupIcon = ref('🏠');
         const newGroupForm = ref({ name: '', description: '', code: '' });
         const recentesActivites = ref([]);
 
@@ -198,9 +198,9 @@ export default {
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-3">Icône du groupe</label>
                         <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            <label v-for="icon in ['🏡', '✈️', '🏝️', '🍻', '📁']" :key="icon" class="cursor-pointer flex-shrink-0">
+                            <label v-for="icon in ['🏠', '✈️', '⛰️', '🍻', '💬']" :key="icon" class="cursor-pointer flex-shrink-0">
                                 <input type="radio" :value="icon" v-model="selectedGroupIcon" class="peer hidden">
-                                <div class="flex items-center justify-center min-w-[65px] h-[65px] rounded-2xl transition-all bg-slate-100 border-2 border-transparent text-slate-900 hover:bg-slate-200 peer-checked:bg-transparent peer-checked:border-primary">
+                                <div class="flex items-center justify-center min-w-[65px] h-[65px] rounded-2xl transition-all bg-slate-100 border-2 border-transparent hover:bg-slate-200 peer-checked:bg-white peer-checked:border-[#6155F5] peer-checked:shadow-sm">
                                     <span class="text-[32px]">{{ icon }}</span>
                                 </div>
                             </label>
