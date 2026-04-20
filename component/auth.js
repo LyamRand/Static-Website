@@ -72,7 +72,7 @@ export default {
 
         <div class="hidden md:flex md:w-1/2 bg-[#f2f2f2] flex-col p-12 relative overflow-hidden">
             <div class="mb-12 cursor-pointer" @click="$router.push('/')">
-                <h1 class="text-5xl font-logo text-black mb-1 tracking-wider">Splitz</h1>
+                <h1 class="text-5xl font-logo text-black mb-5 tracking-wider">Splitz</h1>
                 <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Partagez. Réglez. Profitez.</p>
             </div>
 
