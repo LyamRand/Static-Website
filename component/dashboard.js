@@ -163,7 +163,7 @@ export default {
                 <div v-if="recentesActivites.length > 0" class="flex flex-col gap-4">
                     <div v-for="act in recentesActivites" :key="act.id" class="bg-white rounded-[24px] p-5 border border-slate-100 shadow-sm flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div :class="['w-12 h-12 rounded-2xl flex items-center justify-center', act.colorClass]">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-100">
                                 <span class="text-[24px]">{{ act.icon }}</span>
                             </div>
                             <div>
