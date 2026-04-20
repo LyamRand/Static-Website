@@ -38,7 +38,7 @@ try {
     $stmt->execute(['user_id' => $userId]);
     $groupes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // On transforme les mots-clés en émojis pour l'affichage Vue.js
+    // On transforme les anciens mots-clés en émojis, ou on garde l'émoji si c'est déjà un
     $iconMap = [
         'home' => '🏠',
         'flight' => '✈️',
@@ -49,7 +49,7 @@ try {
     foreach ($groupes as &$g) {
         $g['solde'] = (float) $g['solde'];
         $g['participants'] = (int) $g['participants'];
-        $g['icone'] = $iconMap[$g['icone']] ?? '📁'; // Emoji par défaut si introuvable
+        $g['icone'] = isset($iconMap[$g['icone']]) ? $iconMap[$g['icone']] : ($g['icone'] ?: '📁');
     }
 
     echo json_encode(["success" => true, "groupes" => $groupes]);

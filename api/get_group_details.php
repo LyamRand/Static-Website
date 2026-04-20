@@ -44,9 +44,9 @@ try {
         exit;
     }
 
-    // Convertir le logo texte en emoji pour le design Vue.js
+    // Convertir l'ancien logo texte en emoji pour le design Vue.js, ou garder l'émoji
     $iconMap = ['home' => '🏠', 'flight' => '✈️', 'landscape' => '⛰️', 'sports_bar' => '🍻'];
-    $group['icone'] = $iconMap[$group['icone']] ?? '📁';
+    $group['icone'] = isset($iconMap[$group['icone']]) ? $iconMap[$group['icone']] : ($group['icone'] ?: '📁');
 
     // Vérifier et ajouter la colonne category si elle n'existe pas
     try {

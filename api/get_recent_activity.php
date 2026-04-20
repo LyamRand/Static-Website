@@ -66,7 +66,7 @@ try {
         ];
 
         $colorClass = $iconMap[$category] ?? $iconMap['Autres'];
-        $groupLogo = $groupIconMap[$act['logo']] ?? '📁';
+        $groupLogo = isset($groupIconMap[$act['logo']]) ? $groupIconMap[$act['logo']] : ($act['logo'] ?: '📁');
 
         $formatted[] = [
             "id" => $act['id'],
