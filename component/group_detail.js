@@ -59,6 +59,29 @@ export default {
             }
         };
 
+        const settleGroup = async () => {
+            if (currentGroupStats.value.total === 0) {
+                alert("Il n'y a aucune dépense à équilibrer.");
+                return;
+            }
+            if (confirm("Êtes-vous sûr de vouloir équilibrer les comptes ? Cela remettra toutes les dépenses du groupe à zéro.")) {
+                try {
+                    const res = await fetch('./api/settle_group.php', {
+                        method: 'POST',
+                        body: JSON.stringify({ group_id: route.params.id })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        fetchGroupDetails();
+                    } else {
+                        alert(data.error);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
         const saveExpense = async () => {
             if (!expenseForm.value.montant || !expenseForm.value.description || !expenseForm.value.payeur) {
                 alert("Veuillez remplir tous les champs.");
@@ -117,7 +140,7 @@ export default {
             fetchGroupDetails();
         });
 
-        return { store, currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, expenseForm, saveExpense, deleteExpense, deleteGroup, openExpenseModal };
+        return { store, currentGroup, currentGroupExpenses, currentGroupStats, showExpenseModal, expenseForm, saveExpense, deleteExpense, deleteGroup, settleGroup, openExpenseModal };
     },
     template: `
     <div class="p-10 max-w-[1200px] w-full mx-auto">
@@ -146,9 +169,14 @@ export default {
                     </div>
                 </div>
             </div>
-            <button @click="openExpenseModal" class="bg-primary hover:bg-[#5044e6] text-white px-8 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
-                <span class="material-symbols-outlined">add_circle</span> Ajouter une dépense
-            </button>
+            <div class="flex gap-4">
+                <button @click="settleGroup" class="bg-white hover:bg-slate-50 text-slate-700 px-6 py-4 rounded-[16px] font-bold text-lg transition-all shadow-sm border border-slate-200 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-green-success">price_check</span> Équilibrer
+                </button>
+                <button @click="openExpenseModal" class="bg-primary hover:bg-[#5044e6] text-white px-8 py-4 rounded-[16px] font-bold text-lg transition-all shadow-lg shadow-primary/30 flex items-center gap-2">
+                    <span class="material-symbols-outlined">add_circle</span> Ajouter une dépense
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
