@@ -8,7 +8,7 @@
 // --- Paramètres de connexion (à adapter selon votre serveur) ---
 $hote = "localhost";       // Adresse du serveur MySQL (MAMP = localhost)
 $baseDeDonnees = "ebus2_projet01_ttsi18"; // Nom de la base de données
-$utilisateur = "st93ll48ppl";       // Nom d'utilisateur MySQL (MAMP = root)
+$utilisateur = "st93ll48pppl";       // Nom d'utilisateur MySQL (MAMP = root)
 $motDePasse = "l3!z0p=5zt";       // Mot de passe MySQL (MAMP = root)
 
 // --- Tentative de connexion ---
