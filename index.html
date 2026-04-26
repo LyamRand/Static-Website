@@ -1,57 +1,915 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Splitz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitz — Partagez vos dépenses entre amis</title>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <!-- Tailwind CSS via CDN : toutes les classes utilitaires (bg-, rounded-, flex, etc.) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Vue 3 & Vue Router via CDN -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-  <script src="https://unpkg.com/vue-router@4.4.5/dist/vue-router.global.js"></script>
+    <!-- Vue.js 3 via CDN : rend la page interactive sans compilation -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700;800;900&family=Jost:wght@300;400;500&family=Pacifico&display=swap"
-    rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@300,0..1&display=swap"
-    rel="stylesheet" />
+    <!-- Google Fonts : Pacifico pour le logo, Fira Sans pour le texte -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fira+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#6155F5",
-            "mauve": "#6155F5",
-            "surface": "#F3F4F6",
-            "surface-dark": "#E5E7EB",
-            "green-success": "#22C55E",
-            "red-danger": "#EF4444",
-          },
-          fontFamily: {
-            "sans": ["Fira Sans", "sans-serif"],
-            "logo": ["Pacifico", "cursive"]
-          }
+    <!-- Configuration Tailwind : on ajoute notre couleur "primary" (#6155F5) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#6155F5' },
+                    fontFamily: {
+                        sans: ['Fira Sans', 'sans-serif'],
+                        logo: ['Pacifico', 'cursive']
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
+
+    <!-- Quelques styles CSS supplémentaires pour les détails fins -->
+    <style>
+        /* Scrollbar invisible mais fonctionnelle */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 
-<body class="bg-[#F9FAFB] font-sans text-slate-900 m-0 p-0 overflow-x-hidden">
+<body class="font-sans bg-gray-50 text-slate-900">
 
-  <div id="app">
-    <!-- Vue-Router monté ici : la navigation dynamisera cette balise -->
-    <router-view></router-view>
-  </div>
 
-  <script type="module" src="app.js"></script>
+    <!-- ============================================================
+     POINT DE MONTAGE VUE.JS
+     Vue.js contrôle tout ce qui est dans ce div.
+     ============================================================ -->
+    <div id="app">
+
+
+        <!-- ===========================================================
+         PAGE : ACCUEIL (page publique, avant connexion)
+         =========================================================== -->
+        <div v-if="pageCourante === 'accueil'" class="bg-white min-h-screen">
+
+            <!-- Barre de navigation -->
+            <nav class="border-b border-gray-100 px-8 py-5 flex justify-between items-center">
+                <span class="font-logo text-3xl">Splitz</span>
+                <button @click="pageCourante = 'auth'"
+                    class="bg-primary text-white px-6 py-2.5 rounded-full font-bold hover:bg-indigo-600 transition">
+                    Se connecter
+                </button>
+            </nav>
+
+            <!-- Section héro -->
+            <section class="max-w-6xl mx-auto px-6 py-28 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+                <div class="text-left">
+                    <h1 class="text-5xl font-black mb-6 leading-tight">
+                        Partagez vos dépenses<br>
+                        en toute<span class="text-primary"> simplicité</span>
+                    </h1>
+                    <p class="text-gray-500 text-xl mb-12">
+                        Créez un groupe, ajoutez vos dépenses et Splitz s'occupe du reste...
+                    </p>
+                    <button @click="pageCourante = 'auth'"
+                        class="bg-primary text-white px-12 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-600 transition shadow-xl shadow-primary/30">
+                        Commencer gratuitement →
+                    </button>
+                </div>
+                <div class="flex justify-center md:justify-end">
+                    <img src="/style/img/header.png" alt="Illustration Splitz"
+                        class="w-full max-w-lg object-contain rounded-3xl shadow-xl shadow-primary/10">
+                </div>
+            </section>
+
+            <!-- 3 cartes de présentation -->
+            <section class="bg-gray-50 py-20 px-6">
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-3xl p-8 shadow-sm">
+                        <div class="text-4xl mb-5">💰</div>
+                        <h3 class="font-bold text-xl mb-2">Suivi des dépenses</h3>
+                        <p class="text-gray-400">Ajoutez vos dépenses en quelques secondes.</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm">
+                        <div class="text-4xl mb-5">🔄</div>
+                        <h3 class="font-bold text-xl mb-2">Calcul automatique</h3>
+                        <p class="text-gray-400">Splitz calcule qui doit combien à qui.</p>
+                    </div>
+                    <div class="bg-white rounded-3xl p-8 shadow-sm">
+                        <div class="text-4xl mb-5">👥</div>
+                        <h3 class="font-bold text-xl mb-2">Groupes partagés</h3>
+                        <p class="text-gray-400">Créez des groupes pour vos voyages, colocs ou sorties.</p>
+                    </div>
+                </div>
+
+                <!-- Call to action (Application Mobile) -->
+                <div
+                    class="max-w-4xl mx-auto mt-20 bg-primary text-white rounded-3xl p-10 md:p-14 shadow-xl shadow-primary/30 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="text-center md:text-left md:w-3/5">
+                        <h2 class="text-3xl font-black mb-4">Prêt à simplifier<br>vos paiements ?</h2>
+                        <p class="text-white/80 text-lg">Rejoignez les milliers d'utilisateurs qui ne s'inquiètent plus
+                            jamais de la note à la fin de la soirée.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 items-center">
+                        <img src="/style/img/apple-store.png" alt="Télécharger sur l'App Store"
+                            class="h-12 cursor-pointer hover:opacity-80 transition">
+                        <img src="/style/img/google-play.png" alt="Disponible sur Google Play"
+                            class="h-12 cursor-pointer hover:opacity-80 transition">
+                    </div>
+                </div>
+            </section>
+
+            <footer class="text-center py-8 text-sm text-gray-400">
+                © 2026 Splitz. Tous droits réservés.
+            </footer>
+        </div>
+        <!-- FIN PAGE ACCUEIL -->
+
+
+        <!-- ===========================================================
+         PAGE : CONNEXION / INSCRIPTION
+         =========================================================== -->
+        <div v-if="pageCourante === 'auth'" class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+            <div class="w-full max-w-lg bg-white rounded-3xl shadow-xl p-10 border border-gray-100">
+
+                <!-- Logo -->
+                <div class="text-center mb-8">
+                    <span @click="pageCourante = 'accueil'"
+                        class="font-logo text-4xl cursor-pointer hover:opacity-80 transition">Splitz</span>
+                    <p class="text-gray-400 text-sm mt-2">Partagez. Réglez. Profitez.</p>
+                </div>
+
+                <!-- Onglets Connexion / Inscription -->
+                <div class="flex bg-gray-100 p-1 rounded-2xl mb-8">
+                    <button @click="ongletAuth = 'connexion'; message = ''"
+                        :class="ongletAuth === 'connexion' ? 'bg-white shadow text-slate-900' : 'text-slate-500'"
+                        class="flex-1 py-3 rounded-xl font-bold text-sm transition">
+                        Connexion
+                    </button>
+                    <button @click="ongletAuth = 'inscription'; message = ''"
+                        :class="ongletAuth === 'inscription' ? 'bg-white shadow text-slate-900' : 'text-slate-500'"
+                        class="flex-1 py-3 rounded-xl font-bold text-sm transition">
+                        Inscription
+                    </button>
+                </div>
+
+                <!-- Message d'erreur ou de succès -->
+                <div v-if="message"
+                    :class="messageErreur ? 'bg-red-50 border-red-200 text-red-600' : 'bg-green-50 border-green-200 text-green-700'"
+                    class="mb-6 p-4 border rounded-2xl text-sm font-bold text-center">
+                    {{ message }}
+                </div>
+
+                <!-- Formulaire CONNEXION -->
+                <form v-if="ongletAuth === 'connexion'" @submit.prevent="seConnecter" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                        <input v-model="champEmail" type="email" placeholder="exemple@mail.com" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-bold text-gray-700">Mot de passe</label>
+                            <a href="#" @click.prevent="afficherModalMdp = true"
+                                class="text-xs font-bold text-primary hover:underline transition">Mot de passe oublié
+                                ?</a>
+                        </div>
+                        <input v-model="champPassword" type="password" placeholder="••••••••••••" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+
+                        <!-- Se souvenir de moi -->
+                        <div class="flex items-center gap-2 mt-4 pl-1">
+                            <input type="checkbox" id="souvenir_moi"
+                                class="w-4 h-4 text-primary bg-gray-100 rounded border-gray-300 focus:ring-primary focus:ring-2 cursor-pointer accent-primary">
+                            <label for="souvenir_moi"
+                                class="text-sm font-semibold text-gray-500 cursor-pointer select-none">Se souvenir de
+                                moi</label>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
+                        Se connecter →
+                    </button>
+                </form>
+
+                <!-- Formulaire INSCRIPTION -->
+                <form v-if="ongletAuth === 'inscription'" @submit.prevent="sInscrire" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nom complet</label>
+                        <input v-model="champNom" type="text" placeholder="Marie Dupont" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                        <input v-model="champEmail" type="email" placeholder="marie@exemple.com" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Mot de passe</label>
+                        <input v-model="champPassword" type="password" placeholder="••••••••••••" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-primary text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
+                        Créer mon compte →
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        <!-- FIN PAGE AUTH -->
+
+
+        <!-- ===========================================================
+         LAYOUT PROTÉGÉ : Sidebar + Header + Contenu
+         Visible pour toutes les pages connectées (dashboard, groupes, groupe, parametres)
+         =========================================================== -->
+        <div v-if="pageCourante === 'dashboard' || pageCourante === 'groupes' || pageCourante === 'groupe' || pageCourante === 'parametres'"
+            class="flex min-h-screen bg-gray-50">
+
+            <!-- -------------------------------------------------------
+             BARRE LATÉRALE GAUCHE (Sidebar)
+             w-52 : largeur fixe de 208px
+             fixed : reste en place quand on scrolle
+             ------------------------------------------------------- -->
+            <aside class="w-52 bg-white border-r border-gray-100 flex flex-col fixed h-full z-20 py-6">
+
+                <!-- Logo Splitz en haut de la sidebar -->
+                <div class="px-6 mb-10">
+                    <span class="font-logo text-3xl text-slate-900">Splitz</span>
+                </div>
+
+                <!-- Navigation principale -->
+                <nav class="flex-1 px-3 space-y-1">
+
+                    <!--
+                    Lien "Tableau de bord"
+                    :class conditionnel : fond mauve clair + texte mauve si page active
+                -->
+                    <a @click.prevent="allerAuDashboard" href="#" :class="pageCourante === 'dashboard'
+                       ? 'bg-primary/10 text-primary font-bold'
+                       : 'text-gray-600 hover:bg-gray-100 font-semibold'"
+                        class="flex items-center gap-3 px-4 py-3 rounded-2xl transition text-sm">
+                        <!-- Icônes importées depuis Heroicons -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 0 1-1.125-1.125v-3.75ZM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-8.25ZM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-2.25Z" />
+                        </svg>
+
+                        Tableau de bord
+                    </a>
+
+                    <!-- Lien "Mes groupes" -->
+                    <a @click.prevent="allerAuxGroupes" href="#" :class="pageCourante === 'groupes' || pageCourante === 'groupe'
+                       ? 'bg-primary/10 text-primary font-bold'
+                       : 'text-gray-600 hover:bg-gray-100 font-semibold'"
+                        class="flex items-center gap-3 px-4 py-3 rounded-2xl transition text-sm">
+                        <!-- Icône SVG "personnes" pour les groupes -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                        </svg>
+                        Mes groupes
+                    </a>
+                </nav>
+
+                <!-- Lien "Paramètres" en bas de la sidebar -->
+                <div class="px-3 mt-4">
+                    <a @click.prevent="pageCourante = 'parametres'" href="#" :class="pageCourante === 'parametres'
+                       ? 'bg-primary/10 text-primary font-bold'
+                       : 'text-gray-600 hover:bg-gray-100 font-semibold'"
+                        class="flex items-center gap-3 px-4 py-3 rounded-2xl transition text-sm">
+                        <!-- Icône SVG "engrenage" pour les paramètres -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Paramètres
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Zone principale (décalée de 208px = largeur sidebar) -->
+            <div class="flex-1 ml-52 flex flex-col min-h-screen">
+
+                <!-- -------------------------------------------------------
+                 HEADER : Barre du haut (recherche + notif + profil)
+                 sticky top-0 : reste collé en haut même quand on scrolle
+                 ------------------------------------------------------- -->
+                <header class="bg-white border-b border-gray-100 px-8 py-4 flex items-center gap-4 sticky top-0 z-10">
+
+                    <!-- Barre de recherche (décorative, comme sur le screenshot) -->
+                    <div class="flex-1 max-w-sm">
+                        <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2.5">
+                            <!-- Icône loupe -->
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <span class="text-sm text-gray-400">Rechercher un de vos groupes...</span>
+                        </div>
+                    </div>
+
+                    <!-- Espace flexible pour pousser les éléments à droite -->
+                    <div class="flex-1"></div>
+
+                    <!-- Profil utilisateur : nom + "COMPTE PERSONNEL" + avatar -->
+                    <div v-if="utilisateur" class="flex items-center gap-3">
+                        <div class="text-right">
+                            <!-- Nom de l'utilisateur connecté -->
+                            <p class="text-sm font-bold text-slate-900 leading-tight">{{ utilisateur.name }}</p>
+                            <!-- Sous-titre fixe -->
+                            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Compte personnel</p>
+                        </div>
+                        <!-- Avatar : cercle mauve avec les 2 initiales du nom -->
+                        <!-- Note : le clic ne fait rien ici, la déconnexion est dans les Paramètres -->
+                        <div class="w-10 h-10 rounded-full bg-primary text-white font-black flex items-center justify-center text-sm"
+                            title="Connecté en tant que {{ utilisateur.name }}">
+                            {{ utilisateur.name.substring(0, 2).toUpperCase() }}
+                        </div>
+                    </div>
+                </header>
+
+                <!-- ---------------------------------------------------
+                 CONTENU PRINCIPAL : change selon la page
+                 --------------------------------------------------- -->
+                <main class="flex-1 p-8">
+
+
+                    <!-- ===============================================
+                     PAGE : TABLEAU DE BORD
+                     =============================================== -->
+                    <div v-if="pageCourante === 'dashboard'">
+
+                        <!-- Titre de bienvenue -->
+                        <h1 class="text-3xl font-black mb-1">
+                            Salut, {{ utilisateur ? utilisateur.name : '' }} 👋
+                        </h1>
+                        <p class="text-gray-400 mb-8 text-sm">Voici le récapitulatif de tes comptes partagés ce mois-ci.
+                        </p>
+
+                        <!-- 3 cartes statistiques en ligne -->
+                        <div class="grid grid-cols-3 gap-6 mb-10">
+
+                            <!-- Carte 1 : Solde total -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <!-- Icône bleue -->
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-500">Solde total</span>
+                                </div>
+                                <!-- Vert si positif, rouge si négatif -->
+                                <p class="text-3xl font-black"
+                                    :class="soldeTotal >= 0 ? 'text-slate-900' : 'text-red-500'">
+                                    {{ soldeTotal >= 0 ? '+' : '' }}{{ formaterSomme(soldeTotal) }}
+                                </p>
+                            </div>
+
+                            <!-- Carte 2 : On te doit -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-500">On te doit</span>
+                                </div>
+                                <p class="text-3xl font-black text-green-500">{{ formaterSomme(montantDu) }}</p>
+                            </div>
+
+                            <!-- Carte 3 : Tu dois -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-500">Tu dois</span>
+                                </div>
+                                <p class="text-3xl font-black text-red-500">{{ formaterSomme(montantDette) }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Grille 2 colonnes : Mes groupes (gauche) + Activité récente (droite) -->
+                        <div class="grid grid-cols-5 gap-6">
+
+                            <!-- Colonne gauche : Mes groupes (occupe 3/5 de la largeur) -->
+                            <div class="col-span-3">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-extrabold">Mes groupes</h2>
+                                    <!-- Lien "Voir tout" pour aller à la page groupes -->
+                                    <a @click.prevent="allerAuxGroupes" href="#"
+                                        class="text-sm font-bold text-primary hover:underline">Voir tout</a>
+                                </div>
+
+                                <!-- Grille de mini-cartes de groupes -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <!--
+                                    v-for : affiche les 4 premiers groupes maximum sur le dashboard.
+                                    slice(0, 4) : prend les 4 premiers éléments du tableau.
+                                -->
+                                    <div v-for="groupe in groupes.slice(0, 4)" :key="groupe.id"
+                                        @click="voirGroupe(groupe.id)"
+                                        class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/40 transition cursor-pointer">
+
+                                        <!-- Icône + nom -->
+                                        <div class="flex items-center gap-3 mb-4">
+                                            <div
+                                                class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-xl">
+                                                {{ groupe.icone }}
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-sm leading-tight">{{ groupe.nom }}</p>
+                                                <p class="text-xs text-gray-400">{{ groupe.participants }}
+                                                    participant(s)</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Solde du groupe -->
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs font-bold text-gray-400">Solde actuel</span>
+                                            <span class="text-sm font-black"
+                                                :class="groupe.solde >= 0 ? 'text-green-500' : 'text-red-500'">
+                                                {{ groupe.solde > 0 ? '+' : '' }}{{ formaterSomme(groupe.solde) }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Message si aucun groupe -->
+                                    <div v-if="groupes.length === 0" class="col-span-2 text-center py-8 text-gray-400">
+                                        <p class="text-4xl mb-2">📭</p>
+                                        <p class="font-bold text-sm">Aucun groupe pour l'instant.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Colonne droite : Activité récente (occupe 2/5 de la largeur) -->
+                            <div class="col-span-2">
+                                <h2 class="text-xl font-extrabold mb-4">Activité récente</h2>
+
+                                <!-- Liste des dernières dépenses -->
+                                <div class="flex flex-col gap-3">
+                                    <!--
+                                    v-for sur activiteRecente (tableau des 5 dernières dépenses,
+                                    calculé par PHP dans api/activite_recente.php)
+                                -->
+                                    <div v-for="activite in activiteRecente" :key="activite.id"
+                                        class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex justify-between items-center">
+                                        <div class="flex items-center gap-3">
+                                            <!-- Icône du groupe de cette dépense -->
+                                            <div
+                                                class="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+                                                {{ activite.icone_groupe }}
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-sm leading-tight">{{ activite.description }}
+                                                </p>
+                                                <p class="text-xs text-gray-400">
+                                                    Nom du groupe : <span
+                                                        class="font-semibold">{{activite.nom_groupe}}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span class="font-black text-sm text-slate-900 flex-shrink-0 ml-4">{{
+                                            formaterSomme(activite.amount) }}</span>
+                                    </div>
+
+                                    <!-- Message si aucune activité -->
+                                    <div v-if="activiteRecente.length === 0"
+                                        class="text-center py-8 text-gray-400 bg-white rounded-2xl border border-gray-100">
+                                        <p class="text-sm font-bold">Aucune activité récente.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FIN PAGE DASHBOARD -->
+
+
+                    <!-- ===============================================
+                     PAGE : MES GROUPES (liste complète)
+                     =============================================== -->
+                    <div v-if="pageCourante === 'groupes'">
+
+                        <!-- Titre de la page + bouton "Ajouter un groupe" -->
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="flex items-center gap-4">
+                                <!-- Icône "personnes" à gauche du titre -->
+                                <div class="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                                    </svg>
+                                </div>
+                                <h1 class="text-3xl font-black">Mes groupes</h1>
+                            </div>
+                            <!-- Bouton pour ouvrir le modal de création/rejoindre -->
+                            <button @click="afficherFormGroupe = true"
+                                class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
+                                <span class="text-xl leading-none">+</span>
+                                Ajouter un groupe
+                            </button>
+                        </div>
+
+                        <!-- Message d'info -->
+                        <div v-if="message"
+                            :class="messageErreur ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'"
+                            class="mb-6 p-4 rounded-2xl font-bold text-sm">
+                            {{ message }}
+                        </div>
+
+                        <!-- Liste des groupes (style "ligne" comme sur le screenshot) -->
+                        <div class="flex flex-col gap-3">
+
+                            <!--
+                            v-for : une ligne par groupe.
+                            Le groupe est affiché comme une grande ligne horizontale.
+                        -->
+                            <div v-for="groupe in groupes" :key="groupe.id" @click="voirGroupe(groupe.id)"
+                                class="bg-white rounded-2xl px-6 py-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/40 transition cursor-pointer flex items-center">
+
+                                <!-- Icône du groupe (grand cercle gris) -->
+                                <div
+                                    class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 mr-5">
+                                    {{ groupe.icone }}
+                                </div>
+
+                                <!-- Nom + nombre de participants -->
+                                <div class="flex-1">
+                                    <p class="font-bold text-lg leading-tight">{{ groupe.nom }}</p>
+                                    <p class="text-sm text-gray-400 mt-0.5">{{ groupe.participants }} participant(s)</p>
+                                </div>
+
+                                <!-- Solde de l'utilisateur dans ce groupe (à droite) -->
+                                <div class="text-right ml-6">
+                                    <p class="text-xs font-bold text-gray-400 mb-1">Solde actuel</p>
+                                    <p class="font-black text-lg"
+                                        :class="groupe.solde > 0 ? 'text-green-500' : groupe.solde < 0 ? 'text-red-500' : 'text-gray-400'">
+                                        {{ groupe.solde > 0 ? '+' : '' }}{{ formaterSomme(groupe.solde) }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Message si aucun groupe -->
+                            <div v-if="groupes.length === 0"
+                                class="bg-white rounded-2xl p-16 border-2 border-dashed border-gray-200 text-center">
+                                <p class="text-5xl mb-4">📭</p>
+                                <p class="text-gray-400 font-bold">Vous n'avez encore aucun groupe.</p>
+                                <p class="text-gray-400 text-sm mt-1">Créez-en un ou rejoignez-en un avec un code !</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FIN PAGE MES GROUPES -->
+
+
+                    <!-- ===============================================
+                     PAGE : DÉTAIL D'UN GROUPE (dépenses)
+                     =============================================== -->
+                    <div v-if="pageCourante === 'groupe' && groupeActuel">
+
+                        <!-- Retour -->
+                        <a @click.prevent="allerAuxGroupes" href="#"
+                            class="text-sm font-bold text-gray-400 hover:text-primary transition mb-6 inline-block">
+                            ← Retour à mes groupes
+                        </a>
+
+                        <!-- En-tête du groupe -->
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="flex items-center gap-5">
+                                <div
+                                    class="w-16 h-16 bg-gray-100 rounded-3xl flex items-center justify-center text-4xl">
+                                    {{ groupeActuel.icone }}
+                                </div>
+                                <div>
+                                    <h1 class="text-3xl font-black">{{ groupeActuel.nom }}</h1>
+                                    <p class="text-gray-400 mt-1 text-sm">
+                                        Code d'invitation :
+                                        <span class="font-black text-primary tracking-widest">{{ groupeActuel.code
+                                            }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <!-- Bouton quitter le groupe -->
+                                <button @click="quitterGroupe"
+                                    class="bg-red-50 text-red-500 px-6 py-3 rounded-2xl font-bold hover:bg-red-100 transition">
+                                    ⬅︎ Quitter le groupe
+                                </button>
+                                <!-- Bouton ajouter dépense -->
+                                <button @click="ouvrirModalDepense"
+                                    class="bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
+                                    + Ajouter une dépense
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Disposition en deux colonnes : Dépenses (3/4) / Total (1/4) -->
+                        <div class="flex flex-col lg:flex-row gap-8">
+
+                            <!-- Colonne GAUCHE (Liste des dépenses - 3/4) -->
+                            <div class="lg:w-3/4">
+                                <h2 class="text-xl font-extrabold mb-4">Dépenses</h2>
+
+                                <!-- Message si aucune dépense -->
+                                <div v-if="depenses.length === 0"
+                                    class="bg-white rounded-2xl p-12 border-2 border-dashed border-gray-200 text-center">
+                                    <p class="text-gray-400 font-bold">Aucune dépense pour l'instant.</p>
+                                </div>
+
+                                <!-- Liste des dépenses -->
+                                <div v-else class="flex flex-col gap-3">
+                                    <div v-for="dep in depenses" :key="dep.id"
+                                        class="bg-white rounded-2xl px-6 py-5 border border-gray-100 shadow-sm flex items-center">
+
+                                        <!-- Icône + description + payeur -->
+                                        <div
+                                            class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 mr-5">
+                                            💳
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-bold text-lg leading-tight truncate">{{ dep.description }}
+                                            </p>
+                                            <p class="text-sm text-gray-400 mt-0.5">
+                                                Payé par <span class="font-bold text-gray-600">{{ dep.nom_payeur
+                                                    }}</span>
+                                                · {{ dep.date }}
+                                            </p>
+                                        </div>
+
+                                        <!-- Montant -->
+                                        <p class="font-black text-xl ml-4 whitespace-nowrap">{{
+                                            formaterSomme(dep.amount) }}</p>
+
+                                        <!-- Bouton supprimer -->
+                                        <button @click.stop="supprimerDepense(dep.id)"
+                                            class="ml-4 text-gray-300 hover:text-red-500 transition font-black w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Colonne DROITE (Total - 1/4) -->
+                            <div class="lg:w-1/4">
+                                <!-- Carte total du groupe -->
+                                <div
+                                    class="bg-primary rounded-3xl p-6 text-white shadow-xl shadow-primary/20 sticky top-8">
+                                    <p class="text-xs font-bold uppercase opacity-70 mb-2 leading-tight">Total des
+                                        dépenses du groupe</p>
+                                    <p class="text-3xl font-black truncate" :title="formaterSomme(statsGroupe.total)">{{
+                                        formaterSomme(statsGroupe.total) }}</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- FIN DÉTAIL GROUPE -->
+
+
+                    <!-- ===============================================
+                     PAGE : PARAMÈTRES
+                     =============================================== -->
+                    <div v-if="pageCourante === 'parametres'">
+                        <!-- Titre de la page : icône + texte sur la même ligne (comme "Mes groupes") -->
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                                </svg>
+                            </div>
+                            <h1 class="text-3xl font-black">Paramètres</h1>
+                        </div>
+
+                        <!-- Carte de changement de devise -->
+                        <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm max-w-2xl">
+                            <div class="mb-6">
+                                <h2 class="text-xl font-extrabold mb-1">Devise</h2>
+                                <p class="text-gray-400 text-sm mb-6">Choisissez votre devise par défaut.</p>
+                                <div class="relative">
+                                    <select v-model="deviseCourante"
+                                        class="appearance-none w-full bg-gray-100 rounded-xl px-4 py-3 font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                        <option value="EUR">💶 Euro (€)</option>
+                                        <option value="USD">💵 Dollar Américain ($)</option>
+                                        <option value="GBP">💷 Livre Sterling (£)</option>
+                                    </select>
+                                    <!-- Chevron -->
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bouton sauvegarder : affiche une confirmation visuelle -->
+                            <button @click="afficherMessage('Préférences sauvegardées !', false)"
+                                class="flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-2xl hover:bg-indigo-600 transition">
+                                💾 Sauvegarder
+                            </button>
+                        </div>
+
+                        <!-- Carte de déconnexion -->
+                        <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm max-w-2xl mt-6">
+                            <h2 class="text-xl font-extrabold mb-1">Compte</h2>
+                            <p class="text-gray-400 text-sm mb-6">Déconnexion de votre compte.</p>
+                            <button @click="seDeconnecter"
+                                class="flex items-center gap-2 bg-red-50 text-red-500 font-bold px-8 py-3 rounded-2xl hover:bg-red-100 transition">
+                                ⬅︎ Se déconnecter
+                            </button>
+                        </div>
+                    </div>
+                    <!-- FIN PAGE PARAMÈTRES -->
+
+
+                </main>
+            </div>
+        </div>
+        <!-- FIN LAYOUT PROTÉGÉ -->
+
+
+        <!-- ===========================================================
+         MODAL : CRÉER OU REJOINDRE UN GROUPE
+         =========================================================== -->
+        <div v-if="afficherFormGroupe" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl">
+
+                <h3 class="text-2xl font-extrabold mb-8">Nouveau groupe</h3>
+
+                <!-- Formulaire CRÉER -->
+                <form @submit.prevent="creerGroupe" class="space-y-5 mb-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nom du groupe</label>
+                        <input v-model="champNomGroupe" type="text" placeholder="Comment s'appelle le groupe ?" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+
+                    <!-- Sélection icône -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-3">Icône du groupe</label>
+                        <div class="flex gap-3">
+                            <label v-for="emoji in ['🏠', '✈️', '⛰️', '🍻', '💬']" :key="emoji" class="cursor-pointer">
+                                <input type="radio" :value="emoji" v-model="champIconeGroupe" class="hidden">
+                                <div :class="champIconeGroupe === emoji ? 'bg-primary/15 border-primary border-2' : 'bg-gray-100 border-2 border-transparent'"
+                                    class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl transition hover:bg-gray-200">
+                                    {{ emoji }}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-primary text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition">
+                        C'est parti !
+                    </button>
+                </form>
+
+                <!-- Séparateur OU -->
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                    <span class="text-sm font-bold text-gray-400">ou</span>
+                    <div class="flex-1 h-px bg-gray-200"></div>
+                </div>
+
+                <!-- Formulaire REJOINDRE -->
+                <form @submit.prevent="rejoindreGroupe" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Rejoindre un groupe</label>
+                        <input v-model="champCodeGroupe" type="text" placeholder="Saisir le code unique pour rejoindre"
+                            maxlength="6"
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-gray-800 text-white font-bold py-4 rounded-2xl hover:bg-gray-900 transition">
+                        Rejoindre
+                    </button>
+                </form>
+
+                <!-- Bouton annuler -->
+                <button @click="afficherFormGroupe = false"
+                    class="mt-4 w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-2xl hover:bg-gray-200 transition text-sm">
+                    Annuler
+                </button>
+            </div>
+        </div>
+        <!-- FIN MODAL GROUPE -->
+
+
+        <!-- ===========================================================
+         MODAL : AJOUTER UNE DÉPENSE
+         =========================================================== -->
+        <div v-if="afficherFormDepense" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl p-10 w-full max-w-lg shadow-2xl">
+
+                <h3 class="text-2xl font-extrabold mb-8">Ajouter une dépense</h3>
+
+                <form @submit.prevent="ajouterDepense" class="space-y-6">
+
+                    <!-- Montant -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Montant (€)</label>
+                        <input v-model="champMontant" type="number" step="0.01" min="0.01" placeholder="25.50" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-bold">
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                        <input v-model="champDescription" type="text" placeholder="Ex : Restaurant sushi" required
+                            class="w-full px-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary font-semibold">
+                    </div>
+
+                    <!-- Payeur -->
+                    <div v-if="groupeActuel && groupeActuel.membres">
+                        <label class="block text-sm font-bold text-gray-700 mb-3">Payé par</label>
+                        <div class="flex flex-wrap gap-2">
+                            <label v-for="membre in groupeActuel.membres" :key="membre.id" class="cursor-pointer">
+                                <input type="radio" :value="membre.id" v-model="champPayeurId" class="hidden">
+                                <div :class="champPayeurId == membre.id
+                                     ? 'bg-primary/15 border-primary text-primary'
+                                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
+                                    class="px-4 py-2 rounded-full border-2 font-bold text-sm transition">
+                                    {{ utilisateur && membre.id == utilisateur.id ? 'Moi' : membre.name }}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="flex gap-4 pt-2">
+                        <button type="submit"
+                            class="flex-1 bg-primary text-white font-bold py-4 rounded-2xl hover:bg-indigo-600 transition shadow-lg">
+                            Enregistrer
+                        </button>
+                        <button type="button" @click="afficherFormDepense = false"
+                            class="flex-1 bg-gray-100 text-gray-600 font-bold py-4 rounded-2xl hover:bg-gray-200 transition">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- FIN MODAL DÉPENSE -->
+
+        <!-- ===========================================================
+         MODAL : MOT DE PASSE OUBLIÉ (Simulation)
+         =========================================================== -->
+        <div v-if="afficherModalMdp" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-3xl p-10 w-full max-w-sm shadow-2xl text-center">
+                <div class="text-5xl mb-4">📩</div>
+                <h3 class="text-2xl font-extrabold mb-2">E-mail envoyé !</h3>
+                <p class="text-gray-500 mb-8">Un lien de réinitialisation de mot de passe a été envoyé à votre adresse
+                    e-mail.</p>
+                <button @click="afficherModalMdp = false"
+                    class="w-full bg-primary text-white font-bold py-3 rounded-2xl hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
+                    Fermer
+                </button>
+            </div>
+        </div>
+        <!-- FIN MODAL MOT DE PASSE OUBLIÉ -->
+
+    </div>
+    <!-- FIN #app -->
+
+    <!-- Logique Vue.js dans un fichier séparé pour garder le HTML propre -->
+    <script src="app.js"></script>
+
 </body>
 
 </html>

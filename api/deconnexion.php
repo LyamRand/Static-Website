@@ -1,23 +1,18 @@
 <?php
-// Paramètres de sécurité pour les cookies de session
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+// ============================================================
+// FICHIER : api/deconnexion.php
+// RÔLE    : Détruire la session de l'utilisateur (le déconnecter).
+// ============================================================
+
+// On démarre la session pour pouvoir y accéder.
 session_start();
 
-// 1. On vide toutes les variables de la session
-$_SESSION = array();
+// header JSON.
+header("Content-Type: application/json");
 
-// 2. On détruit la session côté serveur
+// session_destroy() supprime toutes les données de la session côté serveur.
+// L'utilisateur n'est plus reconnu comme connecté.
 session_destroy();
 
-// 3. On supprime le cookie en lui donnant une date d'expiration dans le passé (ex: il y a 1 heure)
-// Assurez-vous d'utiliser exactement les mêmes paramètres (nom, chemin) que lors de sa création !
-if (isset($_COOKIE['remember_user'])) {
-    setcookie("remember_user", "", time() - 3600, "/", "", true, true);
-}
-
-// 4. On renvoie une réponse JSON à Vue.js pour dire que c'est fait
-header("Content-Type: application/json");
-echo json_encode(["success" => true, "message" => "Déconnexion réussie"]);
-?>
+// On confirme au JavaScript que c'est bon.
+echo json_encode(["succes" => true, "message" => "Déconnexion réussie."]);
