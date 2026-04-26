@@ -117,7 +117,7 @@ createApp({
                         utilisateur.value = data.utilisateur;
                         allerAuDashboard();
                     } else {
-                        afficherMessage(data.message, true);
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }
                 })
                 .catch(function () { afficherMessage("Erreur de connexion au serveur.", true); });
@@ -135,7 +135,7 @@ createApp({
                         utilisateur.value = data.utilisateur;
                         allerAuDashboard();
                     } else {
-                        afficherMessage(data.message, true);
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }
                 })
                 .catch(function () { afficherMessage("Erreur de connexion au serveur.", true); });
@@ -217,7 +217,7 @@ createApp({
                         allerAuxGroupes();
                         chargerDashboard(); // Met à jour les compteurs du dashboard
                     } else {
-                        afficherMessage(data.message, true);
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }
                 });
         }
@@ -238,7 +238,7 @@ createApp({
                         allerAuxGroupes();
                         chargerDashboard(); // Met à jour les compteurs du dashboard
                     } else {
-                        afficherMessage(data.message, true);
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }
                 });
         }
@@ -258,7 +258,7 @@ createApp({
                         chargerDashboard();        // Mettre à jour les soldes + la liste
                         allerAuxGroupes();         // Retourner à la liste des groupes
                     } else {
-                        afficherMessage(data.message, true);
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }
                 });
         }
@@ -294,7 +294,7 @@ createApp({
                         chargerDepenses(groupeActuel.value.id); // Rafraîchit la liste dans le groupe
                         chargerDashboard();                     // Rafraîchit les soldes
                     } else {
-                        afficherMessage(data.message, true);
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }
                 });
         }
