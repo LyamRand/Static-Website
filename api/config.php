@@ -10,10 +10,14 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-// SECURITE : Header HSTS pour forcer l'utilisation de HTTPS (max-age d'un an)
-if (!empty($_SERVER['HTTPS'])) {
-    header("Strict-Transport-Security: max-age=31536000");
+// SECURITE : Forcer l'utilisation stricte de HTTPS
+if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+    http_response_code(403); // 403 = Interdit
+    die(json_encode(["succes" => false, "message" => "Connexion HTTPS obligatoire."]));
 }
+
+// Si on arrive ici, la connexion est bien en HTTPS. On ajoute le header HSTS.
+header("Strict-Transport-Security: max-age=31536000");
 
 // --- Paramètres de connexion (à adapter selon votre serveur) ---
 $hote = "localhost";       // Adresse du serveur MySQL (MAMP = localhost)
