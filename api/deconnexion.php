@@ -4,6 +4,13 @@
 // RÔLE    : Détruire la session de l'utilisateur (le déconnecter).
 // ============================================================
 
+// SECURITE : Ne pas recréer de cookie si l'utilisateur est déjà déconnecté
+if (!isset($_COOKIE[session_name()])) {
+    header("Content-Type: application/json");
+    echo json_encode(["succes" => true]);
+    exit;
+}
+
 // On démarre la session pour pouvoir y accéder.
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
 ini_set('session.cookie_httponly', 1);

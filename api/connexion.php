@@ -8,28 +8,19 @@ require_once __DIR__ . '/config.php';
 //                   ou { "succes": false, "message": "..." }
 // ============================================================
 
-// --- 1. DÉMARRER LA SESSION ---
-// La session permet de "mémoriser" que l'utilisateur est connecté
-// d'une page à l'autre (ou d'un appel API à l'autre).
-// SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
-session_start();
-
-// --- 2. ENTÊTE HTTP ---
+// --- 1. ENTÊTE HTTP ---
 // On dit au navigateur que la réponse sera du JSON (format de données).
 header("Content-Type: application/json");
 // On autorise les appels depuis n'importe quelle origine (pour le développement local).
 header("Access-Control-Allow-Origin: *");
 
-// --- 3. LIRE LES DONNÉES ENVOYÉES PAR VUE.JS ---
+// --- 2. LIRE LES DONNÉES ENVOYÉES PAR VUE.JS ---
 // Vue.js envoie les données en format JSON dans le corps (body) de la requête.
 // file_get_contents("php://input") lit ce corps brut.
 // json_decode(..., true) convertit le JSON en tableau PHP.
 $donnees = json_decode(file_get_contents("php://input"), true);
 
-// --- 5. VÉRIFIER QUE LES CHAMPS NÉCESSAIRES SONT PRÉSENTS ---
+// --- 3. VÉRIFIER QUE LES CHAMPS NÉCESSAIRES SONT PRÉSENTS ---
 // On vérifie que l'email et le mot de passe ont bien été envoyés.
 if (empty($donnees["email"]) || empty($donnees["mot_de_passe"])) {
     // Si un champ manque, on renvoie une erreur et on arrête le script.
@@ -37,7 +28,7 @@ if (empty($donnees["email"]) || empty($donnees["mot_de_passe"])) {
     exit;
 }
 
-// --- 6. RÉCUPÉRER L'UTILISATEUR DANS LA BASE DE DONNÉES ---
+// --- 4. RÉCUPÉRER L'UTILISATEUR DANS LA BASE DE DONNÉES ---
 // RÈGLE DE SÉCURITÉ : On n'insère JAMAIS une variable directement dans la requête SQL.
 // On utilise un "placeholder" (:email) et on le remplace ensuite de façon sécurisée.
 // Ceci évite les injections SQL (une attaque de hackers très courante).
@@ -49,7 +40,7 @@ $requete->execute([":email" => $donnees["email"]]);
 // fetch() récupère UNE seule ligne de résultat sous forme de tableau associatif.
 $utilisateur = $requete->fetch(PDO::FETCH_ASSOC);
 
-// --- 7. VÉRIFIER LE MOT DE PASSE ---
+// --- 5. VÉRIFIER LE MOT DE PASSE ---
 // $utilisateur sera false si aucun compte n'est trouvé avec cet email.
 // password_verify() compare le mot de passe en clair avec le hash stocké en BDD.
 // On utilise la même condition pour les deux cas pour éviter d'indiquer
@@ -59,12 +50,19 @@ if (!$utilisateur || !password_verify($donnees["mot_de_passe"], $utilisateur["pw
     exit;
 }
 
-// --- 8. ENREGISTRER L'UTILISATEUR EN SESSION ---
+// --- 6. ENREGISTRER L'UTILISATEUR EN SESSION ---
+// SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
+// On crée le cookie UNIQUEMENT maintenant que l'utilisateur est validé.
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
+session_start();
+
 // Si tout est correct, on stocke l'ID de l'utilisateur dans la session.
 // Cela "marque" l'utilisateur comme connecté sur le serveur.
 $_SESSION["id_utilisateur"] = $utilisateur["id"];
 
-// --- 9. RENVOYER LA RÉPONSE AU NAVIGATEUR ---
+// --- 7. RENVOYER LA RÉPONSE AU NAVIGATEUR ---
 // On renvoie un message de succès et les infos de l'utilisateur (SANS le mot de passe !).
 echo json_encode([
     "succes"      => true,

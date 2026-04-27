@@ -8,13 +8,6 @@ require_once __DIR__ . '/config.php';
 //                   ou { "succes": false, "message": "..." }
 // ============================================================
 
-// Démarrer la session pour pouvoir connecter l'utilisateur juste après.
-// SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
-session_start();
-
 // Dire au navigateur que la réponse sera du JSON.
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
@@ -76,10 +69,6 @@ $insertion->execute([
 // au nouvel enregistrement que l'on vient d'insérer.
 $nouvelId = $pdo->lastInsertId();
 
-// --- CONNECTER AUTOMATIQUEMENT L'UTILISATEUR ---
-// SECURITE : Pour ne pas différencier la réponse d'un compte existant, 
-// on ne connecte PLUS automatiquement l'utilisateur ici. Il devra se connecter manuellement.
-// $_SESSION["id_utilisateur"] = $nouvelId; // Ligne désactivée
 
 $emailSimule = "À : $email\nSujet : Bienvenue !\nBonjour " . $donnees["nom"] . ", votre compte a bien été créé. Vous pouvez maintenant vous connecter.";
 

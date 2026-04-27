@@ -8,6 +8,13 @@
 //                   ou { "connecte": false }
 // ============================================================
 
+// SECURITE : Ne pas recréer un cookie vide inutilement (Consigne du prof)
+if (!isset($_COOKIE[session_name()])) {
+    header("Content-Type: application/json");
+    echo json_encode(["connecte" => false]);
+    exit;
+}
+
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
