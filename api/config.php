@@ -5,6 +5,11 @@
 //            Ce fichier est inclus par TOUS les autres scripts PHP.
 // ============================================================
 
+// SECURITE : Header HSTS pour forcer l'utilisation de HTTPS (max-age d'un an)
+if (!empty($_SERVER['HTTPS'])) {
+    header("Strict-Transport-Security: max-age=31536000");
+}
+
 // --- Paramètres de connexion (à adapter selon votre serveur) ---
 $hote = "localhost";       // Adresse du serveur MySQL (MAMP = localhost)
 $baseDeDonnees = "ebus2_projet01_ttsi18"; // Nom de la base de données

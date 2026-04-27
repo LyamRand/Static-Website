@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 // ============================================================
 // FICHIER : api/connexion.php
 // RÔLE    : Vérifier les identifiants d'un utilisateur.
@@ -18,11 +19,7 @@ header("Content-Type: application/json");
 // On autorise les appels depuis n'importe quelle origine (pour le développement local).
 header("Access-Control-Allow-Origin: *");
 
-// --- 3. INCLURE LA CONNEXION À LA BASE DE DONNÉES ---
-// On "inclut" config.php pour avoir accès à la variable $pdo.
-require_once "config.php";
-
-// --- 4. LIRE LES DONNÉES ENVOYÉES PAR VUE.JS ---
+// --- 3. LIRE LES DONNÉES ENVOYÉES PAR VUE.JS ---
 // Vue.js envoie les données en format JSON dans le corps (body) de la requête.
 // file_get_contents("php://input") lit ce corps brut.
 // json_decode(..., true) convertit le JSON en tableau PHP.

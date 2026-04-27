@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config.php';
 // ============================================================
 // FICHIER : api/inscription.php
 // RÔLE    : Créer un nouveau compte utilisateur.
@@ -13,9 +14,6 @@ session_start();
 // Dire au navigateur que la réponse sera du JSON.
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-
-// Inclure la connexion PDO à la base de données.
-require_once "config.php";
 
 // --- LIRE LES DONNÉES ENVOYÉES PAR VUE.JS ---
 $donnees = json_decode(file_get_contents("php://input"), true);
