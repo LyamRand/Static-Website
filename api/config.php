@@ -5,6 +5,11 @@
 //            Ce fichier est inclus par TOUS les autres scripts PHP.
 // ============================================================
 
+// SECURITE : Reporting maximal des erreurs
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 // SECURITE : Header HSTS pour forcer l'utilisation de HTTPS (max-age d'un an)
 if (!empty($_SERVER['HTTPS'])) {
     header("Strict-Transport-Security: max-age=31536000");
