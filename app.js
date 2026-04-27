@@ -132,8 +132,16 @@ createApp({
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (data.succes) {
-                        utilisateur.value = data.utilisateur;
-                        allerAuDashboard();
+                        // SECURITE : On ne connecte plus directement l'utilisateur.
+                        // On affiche le message générique (simulation d'email).
+                        afficherMessage(data.message, false);
+                        if (data.contenu_email) {
+                            console.log("=== EMAIL SIMULÉ ENVOYÉ ===");
+                            console.log(data.contenu_email);
+                            console.log("===========================");
+                        }
+                        ongletAuth.value = 'connexion'; // On bascule sur l'onglet de connexion
+                        champPassword.value = ''; // On vide le mot de passe par sécurité
                     } else {
                         afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
                     }

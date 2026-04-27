@@ -36,10 +36,19 @@ $email = trim($donnees["email"]);
 $verification = $pdo->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
 $verification->execute([":email" => $email]);
 
+// SECURITE : Anti-énumération d'utilisateurs
+// Que l'utilisateur existe ou non, on affiche EXACTEMENT le même message.
+$messageGenerique = "Si l'adresse est valide, un email a été envoyé avec les instructions (simulation).";
+
 // rowCount() retourne le nombre de lignes trouvées (ici : 0 ou 1).
 if ($verification->rowCount() > 0) {
-    // Un compte avec cet email existe déjà, on refuse l'inscription.
-    echo json_encode(["succes" => false, "message" => "Cette adresse email est déjà utilisée."]);
+    // Un compte existe déjà, on refuse l'inscription mais SANS LE DIRE au visiteur.
+    $emailSimule = "À : $email\nSujet : Tentative d'inscription\nBonjour, vous avez tenté de créer un compte, mais cette adresse est déjà enregistrée. Veuillez vous connecter.";
+    echo json_encode([
+        "succes" => true, 
+        "message" => $messageGenerique,
+        "contenu_email" => $emailSimule
+    ]);
     exit;
 }
 
@@ -68,16 +77,15 @@ $insertion->execute([
 $nouvelId = $pdo->lastInsertId();
 
 // --- CONNECTER AUTOMATIQUEMENT L'UTILISATEUR ---
-// On enregistre son ID en session pour qu'il soit directement connecté.
-$_SESSION["id_utilisateur"] = $nouvelId;
+// SECURITE : Pour ne pas différencier la réponse d'un compte existant, 
+// on ne connecte PLUS automatiquement l'utilisateur ici. Il devra se connecter manuellement.
+// $_SESSION["id_utilisateur"] = $nouvelId; // Ligne désactivée
+
+$emailSimule = "À : $email\nSujet : Bienvenue !\nBonjour " . $donnees["nom"] . ", votre compte a bien été créé. Vous pouvez maintenant vous connecter.";
 
 // --- RENVOYER LA RÉPONSE DE SUCCÈS ---
 echo json_encode([
-    "succes"      => true,
-    "message"     => "Compte créé avec succès !",
-    "utilisateur" => [
-        "id"    => $nouvelId,
-        "name"  => $donnees["nom"],
-        "email" => $email
-    ]
+    "succes"        => true,
+    "message"       => $messageGenerique,
+    "contenu_email" => $emailSimule
 ]);
