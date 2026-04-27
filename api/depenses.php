@@ -6,6 +6,10 @@
 //            Renvoie : { liste: [...], stats: { total: 0 } }
 // ============================================================
 
+// SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 session_start();
 header("Content-Type: application/json");
 require_once "config.php";

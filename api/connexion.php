@@ -11,6 +11,10 @@ require_once __DIR__ . '/config.php';
 // --- 1. DÉMARRER LA SESSION ---
 // La session permet de "mémoriser" que l'utilisateur est connecté
 // d'une page à l'autre (ou d'un appel API à l'autre).
+// SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 // --- 2. ENTÊTE HTTP ---

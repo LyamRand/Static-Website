@@ -9,6 +9,10 @@ require_once __DIR__ . '/config.php';
 // ============================================================
 
 // Démarrer la session pour pouvoir connecter l'utilisateur juste après.
+// SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 // Dire au navigateur que la réponse sera du JSON.
