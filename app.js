@@ -24,7 +24,7 @@ createApp({
         const groupes = ref([]);             // Liste de tous les groupes de l'utilisateur
         const groupeActuel = ref(null);      // Groupe que l'on consulte en ce moment
         const depenses = ref([]);            // Dépenses du groupe actuel
-        const statsGroupe = ref({ total: 0 }); // Total dépensé dans le groupe affiché
+        const statsGroupe = ref({ total: 0, nb_membres: 0, part_par_personne: 0, mon_solde: 0 }); // Stats du groupe affiché
         const activiteRecente = ref([]);     // 5 dernières dépenses pour le dashboard
 
         // ---- Soldes du dashboard (calculés depuis groupes) ----

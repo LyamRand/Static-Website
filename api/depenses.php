@@ -57,8 +57,35 @@ $requeteStats = $pdo->prepare("
 ");
 $requeteStats->execute([":groupe_id" => $idGroupe]);
 $stats = $requeteStats->fetch(PDO::FETCH_ASSOC);
+$total = (float)$stats["total"];
+
+// Nombre de membres dans ce groupe
+$requeteMembres = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :groupe_id");
+$requeteMembres->execute([":groupe_id" => $idGroupe]);
+$nbMembres = (int)$requeteMembres->fetchColumn();
+
+// Part égale par personne (total ÷ nb membres)
+$partParPersonne = $nbMembres > 0 ? round($total / $nbMembres, 2) : 0;
+
+// Ce que l'utilisateur connecté a payé dans ce groupe
+$idUtilisateur = $_SESSION["id_utilisateur"];
+$requeteMonPaye = $pdo->prepare("
+    SELECT COALESCE(SUM(amount), 0) FROM expenses
+    WHERE group_id = :groupe_id AND payer_id = :user_id
+");
+$requeteMonPaye->execute([":groupe_id" => $idGroupe, ":user_id" => $idUtilisateur]);
+$jaiPaye = (float)$requeteMonPaye->fetchColumn();
+
+// Solde = ce que j'ai payé - ma part égale
+// Positif = les autres me doivent, Négatif = je dois aux autres
+$monSolde = round($jaiPaye - $partParPersonne, 2);
 
 echo json_encode([
     "liste" => $listeDepenses,
-    "stats" => ["total" => (float)$stats["total"]]
+    "stats" => [
+        "total"            => $total,
+        "nb_membres"       => $nbMembres,
+        "part_par_personne" => $partParPersonne,
+        "mon_solde"        => $monSolde
+    ]
 ]);
