@@ -29,8 +29,8 @@ if (!isset($_SESSION["id_utilisateur"])) {
 }
 
 // L'utilisateur a une session → on récupère ses infos depuis la BDD
-$requete = $pdo->prepare("SELECT id, name, email FROM users WHERE id = :id LIMIT 1");
-$requete->execute([":id" => $_SESSION["id_utilisateur"]]);
+$requete = $pdo->prepare("SELECT id, name, email FROM users WHERE id = :user_id LIMIT 1");
+$requete->execute([":user_id" => $_SESSION["id_utilisateur"]]);
 $utilisateur = $requete->fetch(PDO::FETCH_ASSOC);
 
 if (!$utilisateur) {

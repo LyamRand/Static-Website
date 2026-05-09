@@ -26,10 +26,10 @@ $req = $pdo->prepare("
     SELECT g.id, g.name AS nom, g.logo AS icone, g.code
     FROM groups g
     JOIN group_users gu ON gu.group_id = g.id
-    WHERE gu.user_id = :id
+    WHERE gu.user_id = :user_id
     ORDER BY g.id DESC
 ");
-$req->execute([":id" => $idUtilisateur]);
+$req->execute([":user_id" => $idUtilisateur]);
 $groupes = $req->fetchAll(PDO::FETCH_ASSOC);
 
 // Étape 2 — Pour chaque groupe, on calcule le nombre de membres et le solde en PHP

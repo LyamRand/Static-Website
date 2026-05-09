@@ -32,8 +32,8 @@ $idDepense = (int)$donnees["id"];
 
 // --- SUPPRIMER LA DÉPENSE ---
 // DELETE FROM supprime la ligne. WHERE id = :id cible uniquement cette dépense.
-$suppression = $pdo->prepare("DELETE FROM expenses WHERE id = :id");
-$suppression->execute([":id" => $idDepense]);
+$suppression = $pdo->prepare("DELETE FROM expenses WHERE id = :expense_id");
+$suppression->execute([":expense_id" => $idDepense]);
 
 // rowCount() vérifie si une ligne a bien été supprimée.
 if ($suppression->rowCount() > 0) {
