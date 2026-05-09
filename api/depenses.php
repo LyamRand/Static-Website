@@ -38,10 +38,10 @@ $requeteDepenses = $pdo->prepare("
         u.name AS nom_payeur
     FROM expenses e
     JOIN users u ON u.id = e.payer_id
-    WHERE e.group_id = :groupe_id
+    WHERE e.group_id = :group_id
     ORDER BY e.expense_date DESC, e.id DESC
 ");
-$requeteDepenses->execute([":groupe_id" => $idGroupe]);
+$requeteDepenses->execute([":group_id" => $idGroupe]);
 $listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($listeDepenses as &$dep) {
@@ -53,15 +53,15 @@ foreach ($listeDepenses as &$dep) {
 $requeteStats = $pdo->prepare("
     SELECT COALESCE(SUM(amount), 0) AS total
     FROM expenses
-    WHERE group_id = :groupe_id
+    WHERE group_id = :group_id
 ");
-$requeteStats->execute([":groupe_id" => $idGroupe]);
+$requeteStats->execute([":group_id" => $idGroupe]);
 $stats = $requeteStats->fetch(PDO::FETCH_ASSOC);
 $total = (float)$stats["total"];
 
 // Nombre de membres dans ce groupe
-$requeteMembres = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :groupe_id");
-$requeteMembres->execute([":groupe_id" => $idGroupe]);
+$requeteMembres = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
+$requeteMembres->execute([":group_id" => $idGroupe]);
 $nbMembres = (int)$requeteMembres->fetchColumn();
 
 // Part égale par personne (total ÷ nb membres)
@@ -71,9 +71,9 @@ $partParPersonne = $nbMembres > 0 ? round($total / $nbMembres, 2) : 0;
 $idUtilisateur = $_SESSION["id_utilisateur"];
 $requeteMonPaye = $pdo->prepare("
     SELECT COALESCE(SUM(amount), 0) FROM expenses
-    WHERE group_id = :groupe_id AND payer_id = :user_id
+    WHERE group_id = :group_id AND payer_id = :user_id
 ");
-$requeteMonPaye->execute([":groupe_id" => $idGroupe, ":user_id" => $idUtilisateur]);
+$requeteMonPaye->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
 $jaiPaye = (float)$requeteMonPaye->fetchColumn();
 
 // Solde = ce que j'ai payé - ma part égale

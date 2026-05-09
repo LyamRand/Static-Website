@@ -41,10 +41,10 @@ if ($montant <= 0) {
 // La colonne date s'appelle "expense_date" dans la base de données
 $insertion = $pdo->prepare("
     INSERT INTO expenses (group_id, payer_id, amount, description, expense_date)
-    VALUES (:groupe_id, :payer_id, :amount, :description, :date)
+    VALUES (:group_id, :payer_id, :amount, :description, :date)
 ");
 $insertion->execute([
-    ":groupe_id"   => $idGroupe,
+    ":group_id"    => $idGroupe,
     ":payer_id"    => $idPayeur,
     ":amount"      => $montant,
     ":description" => $description,

@@ -43,8 +43,8 @@ if (!$groupe) {
 $idGroupe = $groupe["id"];
 
 // Vérifier que l'utilisateur n'est pas déjà membre
-$verif = $pdo->prepare("SELECT 1 FROM group_users WHERE group_id = :gid AND user_id = :uid");
-$verif->execute([":gid" => $idGroupe, ":uid" => $idUtilisateur]);
+$verif = $pdo->prepare("SELECT 1 FROM group_users WHERE group_id = :group_id AND user_id = :user_id");
+$verif->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
 
 if ($verif->rowCount() > 0) {
     echo json_encode(["succes" => false, "message" => "Vous êtes déjà membre de ce groupe."]);
@@ -52,7 +52,7 @@ if ($verif->rowCount() > 0) {
 }
 
 // Ajouter l'utilisateur au groupe
-$ajout = $pdo->prepare("INSERT INTO group_users (group_id, user_id) VALUES (:gid, :uid)");
-$ajout->execute([":gid" => $idGroupe, ":uid" => $idUtilisateur]);
+$ajout = $pdo->prepare("INSERT INTO group_users (group_id, user_id) VALUES (:group_id, :user_id)");
+$ajout->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
 
 echo json_encode(["succes" => true, "message" => "Vous avez rejoint le groupe !"]);

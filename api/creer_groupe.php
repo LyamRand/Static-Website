@@ -50,10 +50,10 @@ $idNouveauGroupe = $pdo->lastInsertId();
 // Ajouter le créateur comme premier membre
 $ajoutMembre = $pdo->prepare("
     INSERT INTO group_users (group_id, user_id)
-    VALUES (:groupe_id, :user_id)
+    VALUES (:group_id, :user_id)
 ");
 $ajoutMembre->execute([
-    ":groupe_id" => $idNouveauGroupe,
+    ":group_id" => $idNouveauGroupe,
     ":user_id"   => $idUtilisateur
 ]);
 
