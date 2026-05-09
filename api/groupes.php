@@ -35,21 +35,21 @@ $groupes = $req->fetchAll(PDO::FETCH_ASSOC);
 // Étape 2 — Pour chaque groupe, on calcule le nombre de membres et le solde en PHP
 // Formule du solde : ce que j'ai payé  -  (total du groupe ÷ nb membres)
 foreach ($groupes as &$groupe) {
-    $gid = $groupe["id"];
+    $idGroupe = $groupe["id"];
 
     // Nombre de membres dans ce groupe
-    $req = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :gid");
-    $req->execute([":gid" => $gid]);
+    $req = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
+    $req->execute([":group_id" => $idGroupe]);
     $nbMembres = (int) $req->fetchColumn();
 
     // Ce que MOI j'ai payé dans ce groupe
-    $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :gid AND payer_id = :uid");
-    $req->execute([":gid" => $gid, ":uid" => $idUtilisateur]);
+    $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id AND payer_id = :user_id");
+    $req->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
     $jaiPaye = (float) $req->fetchColumn();
 
     // Total de toutes les dépenses du groupe
-    $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :gid");
-    $req->execute([":gid" => $gid]);
+    $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id");
+    $req->execute([":group_id" => $idGroupe]);
     $totalGroupe = (float) $req->fetchColumn();
 
     // Ma part égale = total ÷ nb membres (si groupe non vide)

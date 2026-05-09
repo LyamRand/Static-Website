@@ -190,7 +190,7 @@ createApp({
 
         function voirGroupe(idGroupe) {
             message.value = '';
-            fetch('api/groupe_detail.php?id=' + idGroupe)
+            fetch('api/groupe_detail.php?group_id=' + idGroupe)
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     groupeActuel.value = data;

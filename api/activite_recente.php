@@ -34,12 +34,12 @@ $requete = $pdo->prepare("
         g.logo AS icone_groupe
     FROM expenses e
     JOIN groups g ON g.id = e.group_id
-    JOIN group_users gu ON gu.group_id = e.group_id AND gu.user_id = :id
+    JOIN group_users gu ON gu.group_id = e.group_id AND gu.user_id = :user_id
     GROUP BY e.id
     ORDER BY e.expense_date DESC, e.id DESC
     LIMIT 5
 ");
-$requete->execute([":id" => $idUtilisateur]);
+$requete->execute([":user_id" => $idUtilisateur]);
 
 $activites = $requete->fetchAll(PDO::FETCH_ASSOC);
 

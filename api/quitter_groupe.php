@@ -33,18 +33,18 @@ if (empty($donnees["groupe_id"])) {
 $idGroupe = (int)$donnees["groupe_id"];
 
 // Retirer l'utilisateur du groupe
-$quitter = $pdo->prepare("DELETE FROM group_users WHERE group_id = :gid AND user_id = :uid");
-$quitter->execute([":gid" => $idGroupe, ":uid" => $idUtilisateur]);
+$quitter = $pdo->prepare("DELETE FROM group_users WHERE group_id = :group_id AND user_id = :user_id");
+$quitter->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
 
 // Vérifier s'il reste encore des membres dans ce groupe
-$compter = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :gid");
-$compter->execute([":gid" => $idGroupe]);
+$compter = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
+$compter->execute([":group_id" => $idGroupe]);
 $nbMembres = (int)$compter->fetchColumn();
 
 if ($nbMembres === 0) {
     // Plus personne dans le groupe → supprimer les dépenses puis le groupe
-    $pdo->prepare("DELETE FROM expenses WHERE group_id = :gid")->execute([":gid" => $idGroupe]);
-    $pdo->prepare("DELETE FROM groups WHERE id = :gid")->execute([":gid" => $idGroupe]);
+    $pdo->prepare("DELETE FROM expenses WHERE group_id = :group_id")->execute([":group_id" => $idGroupe]);
+    $pdo->prepare("DELETE FROM groups WHERE id = :group_id")->execute([":group_id" => $idGroupe]);
     echo json_encode(["succes" => true, "supprime" => true, "message" => "Groupe supprimé car il était vide."]);
 } else {
     echo json_encode(["succes" => true, "supprime" => false, "message" => "Vous avez quitté le groupe."]);

@@ -2,7 +2,7 @@
 // ============================================================
 // FICHIER : api/groupe_detail.php
 // RÔLE    : Renvoyer les détails d'un groupe (nom, icône, code, membres).
-//            Reçoit  : ?id=123 (dans l'URL, via GET)
+//            Reçoit  : ?group_id=123 (dans l'URL, via GET)
 //            Renvoie : { id, nom, icone, code, membres: [{id, name}, ...] }
 // ============================================================
 
@@ -20,16 +20,16 @@ if (!isset($_SESSION["id_utilisateur"])) {
     exit;
 }
 
-if (!isset($_GET["id"])) {
+if (!isset($_GET["group_id"])) {
     echo json_encode(["erreur" => "ID de groupe manquant."]);
     exit;
 }
 
-$idGroupe = (int)$_GET["id"];
+$idGroupe = (int)$_GET["group_id"];
 
 // Note : dans la table "groups", le code d'invitation s'appelle "code" (pas "description")
-$requeteGroupe = $pdo->prepare("SELECT id, name AS nom, logo AS icone, code FROM groups WHERE id = :id");
-$requeteGroupe->execute([":id" => $idGroupe]);
+$requeteGroupe = $pdo->prepare("SELECT id, name AS nom, logo AS icone, code FROM groups WHERE id = :group_id");
+$requeteGroupe->execute([":group_id" => $idGroupe]);
 $groupe = $requeteGroupe->fetch(PDO::FETCH_ASSOC);
 
 if (!$groupe) {
@@ -42,9 +42,9 @@ $requeteMembres = $pdo->prepare("
     SELECT u.id, u.name
     FROM users u
     JOIN group_users gu ON gu.user_id = u.id
-    WHERE gu.group_id = :groupe_id
+    WHERE gu.group_id = :group_id
 ");
-$requeteMembres->execute([":groupe_id" => $idGroupe]);
+$requeteMembres->execute([":group_id" => $idGroupe]);
 $membres = $requeteMembres->fetchAll(PDO::FETCH_ASSOC);
 
 $groupe["membres"] = $membres;
