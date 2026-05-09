@@ -39,10 +39,10 @@ if (!$groupe) {
 
 // Liste des membres du groupe
 $requeteMembres = $pdo->prepare("
-    SELECT u.id, u.name
-    FROM users u
-    JOIN group_users gu ON gu.user_id = u.id
-    WHERE gu.group_id = :group_id
+    SELECT users.id, users.name
+    FROM users
+    JOIN group_users ON group_users.user_id = users.id
+    WHERE group_users.group_id = :group_id
 ");
 $requeteMembres->execute([":group_id" => $idGroupe]);
 $membres = $requeteMembres->fetchAll(PDO::FETCH_ASSOC);

@@ -23,20 +23,20 @@ if (!isset($_SESSION["id_utilisateur"])) {
 $idUtilisateur = $_SESSION["id_utilisateur"];
 
 // Les 5 dernières dépenses dans les groupes de l'utilisateur.
-// GROUP BY e.id évite les doublons (un groupe avec plusieurs membres donnait plusieurs lignes).
+// GROUP BY expenses.id évite les doublons (un groupe avec plusieurs membres donnait plusieurs lignes).
 // La colonne date s'appelle "expense_date" dans la base de données.
 $requete = $pdo->prepare("
     SELECT
-        e.id,
-        e.amount,
-        e.description,
-        g.name AS nom_groupe,
-        g.logo AS icone_groupe
-    FROM expenses e
-    JOIN groups g ON g.id = e.group_id
-    JOIN group_users gu ON gu.group_id = e.group_id AND gu.user_id = :user_id
-    GROUP BY e.id
-    ORDER BY e.expense_date DESC, e.id DESC
+        expenses.id,
+        expenses.amount,
+        expenses.description,
+        groups.name AS nom_groupe,
+        groups.logo AS icone_groupe
+    FROM expenses
+    JOIN groups ON groups.id = expenses.group_id
+    JOIN group_users ON group_users.group_id = expenses.group_id AND group_users.user_id = :user_id
+    GROUP BY expenses.id
+    ORDER BY expenses.expense_date DESC, expenses.id DESC
     LIMIT 5
 ");
 $requete->execute([":user_id" => $idUtilisateur]);

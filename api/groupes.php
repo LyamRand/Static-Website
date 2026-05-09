@@ -23,11 +23,11 @@ $idUtilisateur = $_SESSION["id_utilisateur"];
 
 // Étape 1 — Récupérer la liste des groupes de l'utilisateur (id, nom, icone, code)
 $req = $pdo->prepare("
-    SELECT g.id, g.name AS nom, g.logo AS icone, g.code
-    FROM groups g
-    JOIN group_users gu ON gu.group_id = g.id
-    WHERE gu.user_id = :user_id
-    ORDER BY g.id DESC
+    SELECT groups.id, groups.name AS nom, groups.logo AS icone, groups.code
+    FROM groups
+    JOIN group_users ON group_users.group_id = groups.id
+    WHERE group_users.user_id = :user_id
+    ORDER BY groups.id DESC
 ");
 $req->execute([":user_id" => $idUtilisateur]);
 $groupes = $req->fetchAll(PDO::FETCH_ASSOC);

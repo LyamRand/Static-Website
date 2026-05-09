@@ -31,15 +31,15 @@ $idGroupe = (int)$_GET["groupe_id"];
 // La colonne date s'appelle "expense_date" dans la base de données
 $requeteDepenses = $pdo->prepare("
     SELECT
-        e.id,
-        e.amount,
-        e.description,
-        e.expense_date AS date,
-        u.name AS nom_payeur
-    FROM expenses e
-    JOIN users u ON u.id = e.payer_id
-    WHERE e.group_id = :group_id
-    ORDER BY e.expense_date DESC, e.id DESC
+        expenses.id,
+        expenses.amount,
+        expenses.description,
+        expenses.expense_date AS date,
+        users.name AS nom_payeur
+    FROM expenses
+    JOIN users ON users.id = expenses.payer_id
+    WHERE expenses.group_id = :group_id
+    ORDER BY expenses.expense_date DESC, expenses.id DESC
 ");
 $requeteDepenses->execute([":group_id" => $idGroupe]);
 $listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC);
