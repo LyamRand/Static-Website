@@ -31,7 +31,7 @@ $idGroupe = (int) $donnees["groupe_id"];
 $idPayeur = (int) $donnees["payeur_id"];
 $montant = (float) $donnees["montant"];
 $description = trim($donnees["description"]);
-$date = date("d-m-Y");
+$date = date("Y-m-d");
 
 if ($montant <= 0) {
     echo json_encode(["succes" => false, "message" => "Le montant doit être supérieur à 0."]);
