@@ -112,7 +112,6 @@ echo json_encode([
     "stats" => [
         "total" => $total,
         "nb_membres" => $nbMembres,
-        "part_par_personne" => $partParPersonne,
         "mon_solde" => $monSolde,
         "soldes_membres" => $soldesMembres
     ]
