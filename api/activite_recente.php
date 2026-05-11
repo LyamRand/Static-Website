@@ -35,7 +35,6 @@ $requete = $pdo->prepare("
     FROM expenses
     JOIN groups ON groups.id = expenses.group_id
     JOIN group_users ON group_users.group_id = expenses.group_id AND group_users.user_id = :user_id
-    GROUP BY expenses.id
     ORDER BY expenses.expense_date DESC, expenses.id DESC
     LIMIT 5
 ");
@@ -44,8 +43,8 @@ $requete->execute([":user_id" => $idUtilisateur]);
 $activites = $requete->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($activites as &$activite) {
-    $activite["amount"] = (float)$activite["amount"];
-    $activite["id"]     = (int)$activite["id"];
+    $activite["amount"] = (float) $activite["amount"];
+    $activite["id"] = (int) $activite["id"];
 }
 
 echo json_encode($activites);

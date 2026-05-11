@@ -25,7 +25,7 @@ if (!isset($_GET["groupe_id"])) {
     exit;
 }
 
-$idGroupe = (int)$_GET["groupe_id"];
+$idGroupe = (int) $_GET["groupe_id"];
 
 // Liste des dépenses avec le nom du payeur
 // La colonne date s'appelle "expense_date" dans la base de données
@@ -45,8 +45,8 @@ $requeteDepenses->execute([":group_id" => $idGroupe]);
 $listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($listeDepenses as &$dep) {
-    $dep["id"]     = (int)$dep["id"];
-    $dep["amount"] = (float)$dep["amount"];
+    $dep["id"] = (int) $dep["id"];
+    $dep["amount"] = (float) $dep["amount"];
 }
 
 // Total dépensé dans ce groupe
@@ -57,12 +57,12 @@ $requeteStats = $pdo->prepare("
 ");
 $requeteStats->execute([":group_id" => $idGroupe]);
 $stats = $requeteStats->fetch(PDO::FETCH_ASSOC);
-$total = (float)$stats["total"];
+$total = (float) $stats["total"];
 
 // Nombre de membres dans ce groupe
 $requeteMembres = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
 $requeteMembres->execute([":group_id" => $idGroupe]);
-$nbMembres = (int)$requeteMembres->fetchColumn();
+$nbMembres = (int) $requeteMembres->fetchColumn();
 
 // Part égale par personne (total ÷ nb membres)
 $partParPersonne = $nbMembres > 0 ? round($total / $nbMembres, 2) : 0;
@@ -74,18 +74,46 @@ $requeteMonPaye = $pdo->prepare("
     WHERE group_id = :group_id AND payer_id = :user_id
 ");
 $requeteMonPaye->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
-$jaiPaye = (float)$requeteMonPaye->fetchColumn();
+$jaiPaye = (float) $requeteMonPaye->fetchColumn();
 
 // Solde = ce que j'ai payé - ma part égale
 // Positif = les autres me doivent, Négatif = je dois aux autres
 $monSolde = round($jaiPaye - $partParPersonne, 2);
 
+// Calcul du solde pour chaque membre du groupe
+$requeteSoldes = $pdo->prepare("
+    SELECT 
+        users.id, 
+        users.name AS nom, 
+        COALESCE(SUM(expenses.amount), 0) AS total_paye
+    FROM group_users
+    JOIN users ON group_users.user_id = users.id
+    LEFT JOIN expenses ON expenses.payer_id = users.id AND expenses.group_id = group_users.group_id
+    WHERE group_users.group_id = :group_id
+    GROUP BY users.id, users.name
+");
+$requeteSoldes->execute([":group_id" => $idGroupe]);
+$membres = $requeteSoldes->fetchAll(PDO::FETCH_ASSOC);
+
+$soldesMembres = [];
+foreach ($membres as $membre) {
+    $totalPaye = (float) $membre["total_paye"];
+    $solde = round($totalPaye - $partParPersonne, 2);
+    $soldesMembres[] = [
+        "id" => (int) $membre["id"],
+        "nom" => $membre["nom"],
+        "total_paye" => $totalPaye,
+        "solde" => $solde
+    ];
+}
+
 echo json_encode([
     "liste" => $listeDepenses,
     "stats" => [
-        "total"            => $total,
-        "nb_membres"       => $nbMembres,
+        "total" => $total,
+        "nb_membres" => $nbMembres,
         "part_par_personne" => $partParPersonne,
-        "mon_solde"        => $monSolde
+        "mon_solde" => $monSolde,
+        "soldes_membres" => $soldesMembres
     ]
 ]);

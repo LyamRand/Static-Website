@@ -28,37 +28,55 @@ if (empty($donnees["nom"])) {
     exit;
 }
 
-$nomGroupe   = trim($donnees["nom"]);
+$nomGroupe = trim($donnees["nom"]);
 $iconeGroupe = $donnees["icone"] ?? "💬";
 
 // Générer un code unique d'invitation (6 caractères)
 $codeUnique = strtoupper(substr(str_shuffle(uniqid()), 0, 6));
 
-// Note : dans la table "groups", le code s'appelle "code" (pas "description")
-$insertion = $pdo->prepare("
-    INSERT INTO groups (name, logo, code)
-    VALUES (:nom, :logo, :code)
-");
-$insertion->execute([
-    ":nom"  => $nomGroupe,
-    ":logo" => $iconeGroupe,
-    ":code" => $codeUnique
-]);
+try {
+    // Démarrer la transaction
+    $pdo->beginTransaction();
 
-$idNouveauGroupe = $pdo->lastInsertId();
+    // Note : dans la table "groups", le code s'appelle "code" (pas "description")
+    $insertion = $pdo->prepare("
+        INSERT INTO groups (name, logo, code)
+        VALUES (:nom, :logo, :code)
+    ");
+    $insertion->execute([
+        ":nom" => $nomGroupe,
+        ":logo" => $iconeGroupe,
+        ":code" => $codeUnique
+    ]);
 
-// Ajouter le créateur comme premier membre
-$ajoutMembre = $pdo->prepare("
-    INSERT INTO group_users (group_id, user_id)
-    VALUES (:group_id, :user_id)
-");
-$ajoutMembre->execute([
-    ":group_id" => $idNouveauGroupe,
-    ":user_id"   => $idUtilisateur
-]);
+    $idNouveauGroupe = $pdo->lastInsertId();
 
-echo json_encode([
-    "succes"    => true,
-    "groupe_id" => (int)$idNouveauGroupe,
-    "code"      => $codeUnique
-]);
+    // Ajouter le créateur comme premier membre
+    $ajoutMembre = $pdo->prepare("
+        INSERT INTO group_users (group_id, user_id)
+        VALUES (:group_id, :user_id)
+    ");
+    $ajoutMembre->execute([
+        ":group_id" => $idNouveauGroupe,
+        ":user_id" => $idUtilisateur
+    ]);
+
+    // Valider la transaction si tout s'est bien passé
+    $pdo->commit();
+
+    echo json_encode([
+        "succes" => true,
+        "groupe_id" => (int) $idNouveauGroupe,
+        "code" => $codeUnique
+    ]);
+} catch (Exception $e) {
+    // Annuler la transaction en cas d'erreur
+    $pdo->rollBack();
+    
+    http_response_code(500);
+    echo json_encode([
+        "succes" => false,
+        "message" => "Erreur lors de la création du groupe.",
+        "erreur" => $e->getMessage()
+    ]);
+}
