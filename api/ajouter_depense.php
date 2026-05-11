@@ -27,11 +27,11 @@ if (empty($donnees["groupe_id"]) || empty($donnees["payeur_id"]) || empty($donne
     exit;
 }
 
-$idGroupe    = (int)$donnees["groupe_id"];
-$idPayeur    = (int)$donnees["payeur_id"];
-$montant     = (float)$donnees["montant"];
+$idGroupe = (int) $donnees["groupe_id"];
+$idPayeur = (int) $donnees["payeur_id"];
+$montant = (float) $donnees["montant"];
 $description = trim($donnees["description"]);
-$date        = date("Y-m-d");
+$date = date("d-m-Y");
 
 if ($montant <= 0) {
     echo json_encode(["succes" => false, "message" => "Le montant doit être supérieur à 0."]);
@@ -44,11 +44,11 @@ $insertion = $pdo->prepare("
     VALUES (:group_id, :payer_id, :amount, :description, :date)
 ");
 $insertion->execute([
-    ":group_id"    => $idGroupe,
-    ":payer_id"    => $idPayeur,
-    ":amount"      => $montant,
+    ":group_id" => $idGroupe,
+    ":payer_id" => $idPayeur,
+    ":amount" => $montant,
     ":description" => $description,
-    ":date"        => $date
+    ":date" => $date
 ]);
 
 echo json_encode(["succes" => true, "message" => "Dépense ajoutée !"]);
