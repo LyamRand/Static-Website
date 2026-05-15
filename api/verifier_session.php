@@ -1,11 +1,9 @@
 <?php
 // ============================================================
 // FICHIER : api/verifier_session.php
-// RÔLE    : Vérifier si l'utilisateur a déjà une session active.
-//            Appelé au démarrage de l'app pour éviter de repasser
-//            par l'accueil après un F5.
-//            Renvoie : { "connecte": true, "utilisateur": {...} }
-//                   ou { "connecte": false }
+// RÔLE    : Vérifier si l'utilisateur a déjà une session active (appelé au démarrage de l'app pour éviter de repasser par l'accueil après un F5)
+//           Renvoie : { "connecte": true, "utilisateur": {...} }
+//                     ou { "connecte": false }
 // ============================================================
 
 // SECURITE : Ne pas recréer un cookie vide inutilement (Consigne du prof)
@@ -28,19 +26,23 @@ if (!isset($_SESSION["id_utilisateur"])) {
     exit;
 }
 
-// L'utilisateur a une session → on récupère ses infos depuis la BDD
+// --- DOUBLE VÉRIFICATION (SÉCURITÉ) ---
+// L'utilisateur a une session PHP valide mais on vérifie quand même s'il existe toujours dans la base de données
+// Pourquoi ? Si connecté, puis qu'on a supprimé son compte de la base, sa session PHP serait encore active
 $requete = $pdo->prepare("SELECT id, name, email FROM users WHERE id = :user_id LIMIT 1");
 $requete->execute([":user_id" => $_SESSION["id_utilisateur"]]);
 $utilisateur = $requete->fetch(PDO::FETCH_ASSOC);
 
 if (!$utilisateur) {
-    // L'utilisateur n'existe plus en BDD → on détruit la session
+    // --- CAS SPÉCIAL ---
+    // La session dit "il est connecté", mais MySQL dit "cet utilisateur n'existe plus"
+    // On détruit immédiatement la session par sécurité
     session_destroy();
     echo json_encode(["connecte" => false]);
     exit;
 }
 
 echo json_encode([
-    "connecte"    => true,
+    "connecte" => true,
     "utilisateur" => $utilisateur
 ]);

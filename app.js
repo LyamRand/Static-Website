@@ -2,13 +2,12 @@
 // app.js — Logique Vue.js de l'application Splitz
 //
 // Ce fichier contient UNIQUEMENT la logique JavaScript.
-// Le HTML avec les directives Vue (v-if, v-for, @click...) est dans index.html.
+// Le HTML avec les directives Vue.JS (v-if, v-for, @click...) est dans index.html
 //
-// Navigation : on change la variable "pageCourante" pour afficher
-// une page différente. Pas de Vue Router, juste un ref().
+// Navigation : on change la variable "pageCourante" pour afficher une page différente
 // ================================================================
 
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, onMounted, watch } = Vue;
 
 createApp({
     setup() {
@@ -48,11 +47,17 @@ createApp({
         const afficherFormGroupe = ref(false);  // Modal créer/rejoindre un groupe
         const afficherFormDepense = ref(false); // Modal ajouter une dépense
         const afficherModalMdp = ref(false);    // Modal mot de passe oublié (simulation)
+        const menuMobileOuvert = ref(false);    // Menu affiché en mode "mobile"
 
         // ---- Messages de retour utilisateur ----
         const message = ref('');
         const messageErreur = ref(false); // true = fond rouge, false = fond vert
 
+
+        // Fermer le menu mobile automatiquement quand on change de page
+        watch(pageCourante, () => {
+            menuMobileOuvert.value = false;
+        });
 
         // ================================================================
         // FONCTIONS UTILITAIRES
@@ -185,9 +190,10 @@ createApp({
 
 
         // ================================================================
-        // GROUPES
+        // PAGE GROUPES
         // ================================================================
 
+        // Charger la liste des groupes 
         function voirGroupe(idGroupe) {
             message.value = '';
             fetch('api/groupe_detail.php?group_id=' + idGroupe)
@@ -200,6 +206,7 @@ createApp({
             chargerDepenses(idGroupe);
         }
 
+        // Charger les dépenses 
         function chargerDepenses(idGroupe) {
             fetch('api/depenses.php?groupe_id=' + idGroupe)
                 .then(function (r) { return r.json(); })
@@ -209,6 +216,7 @@ createApp({
                 });
         }
 
+        // Créer un groupe
         function creerGroupe() {
             fetch('api/creer_groupe.php', {
                 method: 'POST',
@@ -230,6 +238,7 @@ createApp({
                 });
         }
 
+        // Rejoindre un groupe
         function rejoindreGroupe() {
             if (!champCodeGroupe.value) return;
             fetch('api/rejoindre_groupe.php', {
@@ -354,8 +363,8 @@ createApp({
             ongletAuth, champEmail, champPassword, champNom,
             champNomGroupe, champIconeGroupe, champCodeGroupe,
             champMontant, champDescription, champPayeurId,
-            // Modals
-            afficherFormGroupe, afficherFormDepense, afficherModalMdp,
+            // Modals & Menu
+            afficherFormGroupe, afficherFormDepense, afficherModalMdp, menuMobileOuvert,
             // Messages
             message, messageErreur,
             // Fonctions

@@ -1,9 +1,9 @@
 <?php
 // ============================================================
 // FICHIER : api/depenses.php
-// RÔLE    : Renvoyer les dépenses d'un groupe + les statistiques.
-//            Reçoit  : ?groupe_id=123 (dans l'URL, via GET)
-//            Renvoie : { liste: [...], stats: { total: 0 } }
+// RÔLE    : Renvoyer les dépenses d'un groupe + les statistiques
+//           Reçoit  : ?groupe_id=123 (dans l'URL, via GET)
+//           Renvoie : { liste: [...], stats: { total: 0 } }
 // ============================================================
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
@@ -15,11 +15,13 @@ header("Content-Type: application/json");
 require_once "config.php";
 
 if (!isset($_SESSION["id_utilisateur"])) {
-    http_response_code(401);
+    http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
     echo json_encode(["erreur" => "Non connecté."]);
     exit;
 }
 
+// --- LECTURE DU PARAMÈTRE DANS L'URL ---
+// $_GET permet de lire les données qui sont envoyées directement dans l'adresse web (URL)
 if (!isset($_GET["groupe_id"])) {
     echo json_encode(["erreur" => "groupe_id manquant."]);
     exit;
@@ -27,8 +29,9 @@ if (!isset($_GET["groupe_id"])) {
 
 $idGroupe = (int) $_GET["groupe_id"];
 
-// Liste des dépenses avec le nom du payeur
-// La colonne date s'appelle "expense_date" dans la base de données
+// --- 1. RÉCUPÉRATION DE LA LISTE DES DÉPENSES ---
+// JOIN pour lier la table "expenses" (qui contient les dépenses) à la table "users" (qui contient les utilisateurs).
+// Permet d'afficher le "nom" de la personne plutôt que juste son ID de payeur (payer_id)
 $requeteDepenses = $pdo->prepare("
     SELECT
         expenses.id,
@@ -49,7 +52,9 @@ foreach ($listeDepenses as &$dep) {
     $dep["amount"] = (float) $dep["amount"];
 }
 
-// Total dépensé dans ce groupe
+// --- 2. CALCUL DU TOTAL DÉPENSÉ DANS LE GROUPE ---
+// SUM(amount) = additionner tous les montants
+// COALESCE(..., 0) = Si le groupe n'a aucune dépense (résultat vide), renvoier 0 au lieu de NULL
 $requeteStats = $pdo->prepare("
     SELECT COALESCE(SUM(amount), 0) AS total
     FROM expenses
@@ -59,12 +64,14 @@ $requeteStats->execute([":group_id" => $idGroupe]);
 $stats = $requeteStats->fetch(PDO::FETCH_ASSOC);
 $total = (float) $stats["total"];
 
-// Nombre de membres dans ce groupe
+// --- 3. CALCUL DU NOMBRE DE MEMBRES ET PART ÉGALE ---
+// COUNT(*) = compter le nombre de lignes trouvées
+// fetchColumn() : au lieu de renvoyer un tableau comme fetchAll(), il renvoie direct le nombre (la valeur de la première colonne)
 $requeteMembres = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
 $requeteMembres->execute([":group_id" => $idGroupe]);
 $nbMembres = (int) $requeteMembres->fetchColumn();
 
-// Part égale par personne (total ÷ nb membres)
+// Part égale par personne (total divisé par nb membres)
 $partParPersonne = $nbMembres > 0 ? round($total / $nbMembres, 2) : 0;
 
 // Ce que l'utilisateur connecté a payé dans ce groupe
@@ -80,7 +87,8 @@ $jaiPaye = (float) $requeteMonPaye->fetchColumn();
 // Positif = les autres me doivent, Négatif = je dois aux autres
 $monSolde = round($jaiPaye - $partParPersonne, 2);
 
-// Calcul du solde pour chaque membre du groupe
+// --- 4. CALCUL DU SOLDE GLOBAL POUR CHAQUE MEMBRE ---
+// LEFT JOIN = liste TOUS les membres du groupe, regarde ce que chacun a payé, et additionne tout
 $requeteSoldes = $pdo->prepare("
     SELECT 
         users.id, 

@@ -237,7 +237,11 @@
              w-52 : largeur fixe de 208px
              fixed : reste en place quand on scrolle
              ------------------------------------------------------- -->
-            <aside class="w-52 bg-white border-r border-gray-100 flex flex-col fixed h-full z-20 py-6">
+            <!-- Overlay sombre sur mobile -->
+            <div v-if="menuMobileOuvert" @click="menuMobileOuvert = false" class="fixed inset-0 bg-slate-900/50 z-20 md:hidden transition-opacity"></div>
+
+            <aside :class="menuMobileOuvert ? 'translate-x-0' : '-translate-x-full md:translate-x-0'" 
+                   class="w-52 bg-white border-r border-gray-100 flex flex-col fixed h-full z-30 py-6 transition-transform duration-300">
 
                 <!-- Logo Splitz en haut de la sidebar -->
                 <div class="px-6 mb-10">
@@ -298,14 +302,21 @@
                 </div>
             </aside>
 
-            <!-- Zone principale (décalée de 208px = largeur sidebar) -->
-            <div class="flex-1 ml-52 flex flex-col min-h-screen">
+            <!-- Zone principale (décalée de 208px sur PC = largeur sidebar) -->
+            <div class="flex-1 ml-0 md:ml-52 flex flex-col min-h-screen transition-all duration-300">
 
                 <!-- -------------------------------------------------------
                  HEADER : Barre du haut (recherche + notif + profil)
                  sticky top-0 : reste collé en haut même quand on scrolle
                  ------------------------------------------------------- -->
-                <header class="bg-white border-b border-gray-100 px-8 py-4 flex items-center gap-4 sticky top-0 z-10">
+                <header class="bg-white border-b border-gray-100 px-4 md:px-8 py-4 flex items-center gap-4 sticky top-0 z-10">
+                
+                    <!-- Bouton Menu Burger (Mobile) -->
+                    <button @click="menuMobileOuvert = true" class="md:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-xl transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
 
                     <!-- Barre de recherche (décorative, comme sur le screenshot) -->
                     <div class="flex-1 max-w-sm">
@@ -342,7 +353,7 @@
                 <!-- ---------------------------------------------------
                  CONTENU PRINCIPAL : change selon la page
                  --------------------------------------------------- -->
-                <main class="flex-1 p-8">
+                <main class="flex-1 p-4 md:p-8">
 
 
                     <!-- ===============================================
@@ -358,7 +369,7 @@
                         </p>
 
                         <!-- 3 cartes statistiques en ligne -->
-                        <div class="grid grid-cols-3 gap-6 mb-10">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
                             <!-- Carte 1 : Solde total -->
                             <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
@@ -412,10 +423,10 @@
                         </div>
 
                         <!-- Grille 2 colonnes : Mes groupes (gauche) + Activité récente (droite) -->
-                        <div class="grid grid-cols-5 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
 
                             <!-- Colonne gauche : Mes groupes (occupe 3/5 de la largeur) -->
-                            <div class="col-span-3">
+                            <div class="md:col-span-3">
                                 <div class="flex justify-between items-center mb-4">
                                     <h2 class="text-xl font-extrabold">Mes groupes</h2>
                                     <!-- Lien "Voir tout" pour aller à la page groupes -->
@@ -424,7 +435,7 @@
                                 </div>
 
                                 <!-- Grille de mini-cartes de groupes -->
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <!--
                                     v-for : affiche les 4 premiers groupes maximum sur le dashboard.
                                     slice(0, 4) : prend les 4 premiers éléments du tableau.
@@ -465,7 +476,7 @@
                             </div>
 
                             <!-- Colonne droite : Activité récente (occupe 2/5 de la largeur) -->
-                            <div class="col-span-2">
+                            <div class="md:col-span-2">
                                 <h2 class="text-xl font-extrabold mb-4">Activité récente</h2>
 
                                 <!-- Liste des dernières dépenses -->
@@ -513,7 +524,7 @@
                     <div v-if="pageCourante === 'groupes'">
 
                         <!-- Titre de la page + bouton "Ajouter un groupe" -->
-                        <div class="flex justify-between items-center mb-8">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                             <div class="flex items-center gap-4">
                                 <!-- Icône "personnes" à gauche du titre -->
                                 <div class="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center">
@@ -596,7 +607,7 @@
                         </a>
 
                         <!-- En-tête du groupe -->
-                        <div class="flex justify-between items-center mb-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                             <div class="flex items-center gap-5">
                                 <div
                                     class="w-16 h-16 bg-gray-100 rounded-3xl flex items-center justify-center text-4xl">
@@ -611,7 +622,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
+                            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                                 <!-- Bouton quitter le groupe -->
                                 <button @click="quitterGroupe"
                                     class="bg-red-50 text-red-500 px-6 py-3 rounded-2xl font-bold hover:bg-red-100 transition">
@@ -720,9 +731,11 @@
                                     <!-- Soldes de tous les membres -->
                                     <p class="text-xs font-bold uppercase opacity-70 mb-2">Soldes des membres</p>
                                     <div class="flex flex-col gap-2">
-                                        <div v-for="membre in statsGroupe.soldes_membres" :key="membre.id" class="bg-white/15 rounded-xl px-3 py-2 flex justify-between items-center">
+                                        <div v-for="membre in statsGroupe.soldes_membres" :key="membre.id"
+                                            class="bg-white/15 rounded-xl px-3 py-2 flex justify-between items-center">
                                             <span class="text-sm font-bold truncate mr-2">{{ membre.nom }}</span>
-                                            <span class="text-sm font-black shrink-0" :class="membre.solde > 0 ? 'text-green-300' : membre.solde < 0 ? 'text-yellow-300' : 'text-white/70'">
+                                            <span class="text-sm font-black shrink-0"
+                                                :class="membre.solde > 0 ? 'text-green-300' : membre.solde < 0 ? 'text-yellow-300' : 'text-white/70'">
                                                 {{ membre.solde > 0 ? '+' : '' }}{{ formaterSomme(membre.solde) }}
                                             </span>
                                         </div>
@@ -804,7 +817,7 @@
          MODAL : CRÉER OU REJOINDRE UN GROUPE
          =========================================================== -->
         <div v-if="afficherFormGroupe" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl p-10 w-full max-w-md shadow-2xl">
+            <div class="bg-white rounded-3xl p-6 md:p-10 w-full max-w-md shadow-2xl">
 
                 <h3 class="text-2xl font-extrabold mb-8">Nouveau groupe</h3>
 
@@ -871,7 +884,7 @@
          MODAL : AJOUTER UNE DÉPENSE
          =========================================================== -->
         <div v-if="afficherFormDepense" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl p-10 w-full max-w-lg shadow-2xl">
+            <div class="bg-white rounded-3xl p-6 md:p-10 w-full max-w-lg shadow-2xl">
 
                 <h3 class="text-2xl font-extrabold mb-8">Ajouter une dépense</h3>
 
@@ -927,7 +940,7 @@
          MODAL : MOT DE PASSE OUBLIÉ (Simulation)
          =========================================================== -->
         <div v-if="afficherModalMdp" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-3xl p-10 w-full max-w-sm shadow-2xl text-center">
+            <div class="bg-white rounded-3xl p-6 md:p-10 w-full max-w-sm shadow-2xl text-center">
                 <div class="text-5xl mb-4">📩</div>
                 <h3 class="text-2xl font-extrabold mb-2">E-mail envoyé !</h3>
                 <p class="text-gray-500 mb-8">Un lien de réinitialisation de mot de passe a été envoyé à votre adresse
@@ -946,6 +959,37 @@
     <!-- Logique Vue.js dans un fichier séparé pour garder le HTML propre -->
     <script src="app.js"></script>
 
+    <!-- =========================================================================
+         Mémo pour l'oral
+         =========================================================================
+         Les principales commandes (directives) Vue.js utilisées dans ce fichier :
+         
+         1. v-model="variable"
+            - À quoi ça sert ? Ça relie (dans les deux sens) un champ de formulaire (input) à une variable dans le code (dans app.js).
+            - Exemple : Si on tape "Bob" dans l'input, la variable devient "Bob". Si on vide la variable dans le code, l'input se vide tout seul sur l'écran !
+            - Où le voir ? Dans tous les formulaires (connexion, création de groupe, ajout de dépense).
+
+         2. @click="fonction()" ou @submit.prevent="..."
+            - À quoi ça sert ? C'est le raccourci pour "v-on:click". Ça déclenche une action (fonction) quand on clique ou qu'on valide un formulaire.
+            - Le ".prevent" sert à empêcher le comportement normal du navigateur (par exemple : empêcher la page de recharger entièrement quand on valide un formulaire).
+            
+         3. v-if="condition" / v-else
+            - À quoi ça sert ? Ça affiche ou cache un élément HTML (la div est littéralement détruite ou recréée selon la condition).
+            - Exemple : v-if="pageCourante === 'dashboard'" n'affiche le contenu du tableau de bord que si la variable vaut 'dashboard'.
+
+         4. v-for="element in liste" :key="element.id"
+            - À quoi ça sert ? Ça crée une boucle. Ça copie-colle la div HTML autant de fois qu'il y a d'éléments dans la liste.
+            - Le ":key" est obligatoire pour que Vue.js s'y retrouve et ne se mélange pas les pinceaux si l'ordre de la liste change.
+            - Exemple : On s'en sert pour afficher les cartes des groupes, la liste des dépenses, ou la liste des petites icônes.
+
+         5. :class="{ 'nom-classe': condition }"
+            - À quoi ça sert ? Le ":" au début est le raccourci pour "v-bind". Ça permet de dire "Ajoute cette classe CSS (comme un style Tailwind) *seulement* si la condition est vraie".
+            - Exemple : Pour mettre un gros bord violet autour de l'icône quand elle est sélectionnée lors de la création d'un groupe.
+
+         6. {{ variable }}
+            - À quoi ça sert ? C'est ce qu'on appelle "l'interpolation" (les moustaches). Ça permet d'afficher la valeur d'une variable Javascript directement dans le texte HTML.
+            - Exemple : {{ utilisateur.name }} va être remplacé par "Valentin Deigers" sur l'écran.
+    ========================================================================== -->
 </body>
 
 </html>

@@ -2,8 +2,8 @@
 // ============================================================
 // FICHIER : api/ajouter_depense.php
 // RÔLE    : Enregistrer une nouvelle dépense dans la base de données.
-//            Reçoit  : { "groupe_id": 1, "payeur_id": 2, "montant": 25.50, "description": "..." }
-//            Renvoie : { "succes": true } ou { "succes": false, "message": "..." }
+//           Reçoit  : { "groupe_id": 1, "payeur_id": 2, "montant": 25.50, "description": "..." }
+//           Renvoie : { "succes": true } ou { "succes": false, "message": "..." }
 // ============================================================
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
@@ -15,22 +15,23 @@ header("Content-Type: application/json");
 require_once "config.php";
 
 if (!isset($_SESSION["id_utilisateur"])) {
-    http_response_code(401);
+    http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
     echo json_encode(["succes" => false, "message" => "Non connecté."]);
     exit;
 }
 
-$donnees = json_decode(file_get_contents("php://input"), true);
+// --- LECTURE DES DONNÉES ENVOYÉES PAR VUE.JS ---
+$donnees = json_decode(file_get_contents("php://input"), true); // file_get_contents("php://input") lit ce texte JSON brut et json_decode le transforme en tableau PHP utilisable
 
 if (empty($donnees["groupe_id"]) || empty($donnees["payeur_id"]) || empty($donnees["montant"]) || empty($donnees["description"])) {
     echo json_encode(["succes" => false, "message" => "Tous les champs sont requis."]);
     exit;
 }
 
-$idGroupe = (int) $donnees["groupe_id"];
+$idGroupe = (int) $donnees["groupe_id"]; //int : permet de stocker un nombre entier uniquement
 $idPayeur = (int) $donnees["payeur_id"];
-$montant = (float) $donnees["montant"];
-$description = trim($donnees["description"]);
+$montant = (float) $donnees["montant"]; // float : permet de stocker des valeurs décimales
+$description = trim($donnees["description"]); // "trim" permet de supprimer les espaces inutiles au début et à la fin du texte
 $date = date("Y-m-d");
 
 if ($montant <= 0) {
@@ -38,11 +39,13 @@ if ($montant <= 0) {
     exit;
 }
 
-// La colonne date s'appelle "expense_date" dans la base de données
+// --- ENREGISTREMENT DANS LA BD ---
 $insertion = $pdo->prepare("
-    INSERT INTO expenses (group_id, payer_id, amount, description, expense_date)
-    VALUES (:group_id, :payer_id, :amount, :description, :date)
-");
+        INSERT INTO expenses (group_id, payer_id, amount, description, expense_date)
+        VALUES (:group_id, :payer_id, :amount, :description, :date)
+    ");
+
+// Remplacer les étiquettes (" : ") par les vraies valeurs des variables
 $insertion->execute([
     ":group_id" => $idGroupe,
     ":payer_id" => $idPayeur,
@@ -51,4 +54,5 @@ $insertion->execute([
     ":date" => $date
 ]);
 
+// --- RÉPONSE AU FRONT-END ---
 echo json_encode(["succes" => true, "message" => "Dépense ajoutée !"]);

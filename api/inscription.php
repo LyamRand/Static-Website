@@ -21,24 +21,24 @@ if (empty($donnees["nom"]) || empty($donnees["email"]) || empty($donnees["mot_de
     exit;
 }
 
-// Nettoyer l'email en supprimant les espaces en trop.
+// Nettoyer l'email en supprimant les espaces en trop
 $email = trim($donnees["email"]);
 
 // --- VÉRIFIER SI L'EMAIL EST DÉJÀ UTILISÉ ---
-// On cherche si un compte existe déjà avec cet email.
+// On cherche si un compte existe déjà avec cet email
 $verification = $pdo->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
 $verification->execute([":email" => $email]);
 
 // SECURITE : Anti-énumération d'utilisateurs
-// Que l'utilisateur existe ou non, on affiche EXACTEMENT le même message.
+// Que l'utilisateur existe ou non, on affiche EXACTEMENT le même message
 $messageGenerique = "Si l'adresse est valide, un email a été envoyé avec les instructions (simulation).";
 
-// rowCount() retourne le nombre de lignes trouvées (ici : 0 ou 1).
+// rowCount() retourne le nombre de lignes trouvées (ici : 0 ou 1)
 if ($verification->rowCount() > 0) {
-    // Un compte existe déjà, on refuse l'inscription mais SANS LE DIRE au visiteur.
+    // Un compte existe déjà, on refuse l'inscription mais sans le dire au visiteur
     $emailSimule = "À : $email\nSujet : Tentative d'inscription\nBonjour, vous avez tenté de créer un compte, mais cette adresse est déjà enregistrée. Veuillez vous connecter.";
     echo json_encode([
-        "succes" => true, 
+        "succes" => true,
         "message" => $messageGenerique,
         "contenu_email" => $emailSimule
     ]);
@@ -46,12 +46,11 @@ if ($verification->rowCount() > 0) {
 }
 
 // --- HASHER LE MOT DE PASSE ---
-// On ne stocke JAMAIS le mot de passe en clair dans la base de données !
-// password_hash() le transforme en une chaîne de caractères illisible (un "hash").
-// Seul password_verify() (dans connexion.php) peut vérifier si un mot de passe correspond.
+// password_hash() le transforme en une chaîne de caractères illisible
+// seul password_verify() (dans connexion.php) peut vérifier si un mot de passe correspond
 $motDePasseHash = password_hash($donnees["mot_de_passe"], PASSWORD_DEFAULT);
 
-// --- INSÉRER LE NOUVEL UTILISATEUR EN BASE DE DONNÉES ---
+// --- INSÉRER LE NOUVEL UTILISATEUR EN BD ---
 // On prépare la requête avec des placeholders (:nom, :email, :hash) pour la sécurité.
 $insertion = $pdo->prepare(
     "INSERT INTO users (name, email, pwd_hash) VALUES (:nom, :email, :hash)"
@@ -59,14 +58,13 @@ $insertion = $pdo->prepare(
 
 // execute() remplace les placeholders par les vraies valeurs et exécute la requête.
 $insertion->execute([
-    ":nom"   => $donnees["nom"],
+    ":nom" => $donnees["nom"],
     ":email" => $email,
-    ":hash"  => $motDePasseHash
+    ":hash" => $motDePasseHash
 ]);
 
 // --- RÉCUPÉRER L'ID DU NOUVEL UTILISATEUR ---
-// lastInsertId() retourne l'identifiant (ID) que MySQL vient d'attribuer
-// au nouvel enregistrement que l'on vient d'insérer.
+// lastInsertId() retourne l'identifiant (ID) que MySQL vient d'attribuer au nouvel enregistrement que l'on vient d'insérer
 $nouvelId = $pdo->lastInsertId();
 
 
@@ -74,7 +72,7 @@ $emailSimule = "À : $email\nSujet : Bienvenue !\nBonjour " . $donnees["nom"] . 
 
 // --- RENVOYER LA RÉPONSE DE SUCCÈS ---
 echo json_encode([
-    "succes"        => true,
-    "message"       => $messageGenerique,
+    "succes" => true,
+    "message" => $messageGenerique,
     "contenu_email" => $emailSimule
 ]);
