@@ -49,7 +49,7 @@
     </style>
 </head>
 
-<body class="font-sans bg-gray-50 text-slate-900">
+<body class="font-sans bg-gray-50 text-slate-900 overflow-x-hidden">
 
 
     <!-- ============================================================
@@ -335,7 +335,7 @@
 
                     <!-- Profil utilisateur : nom + "COMPTE PERSONNEL" + avatar -->
                     <div v-if="utilisateur" class="flex items-center gap-3 shrink-0">
-                        <div class="text-right">
+                        <div class="text-right hidden sm:block">
                             <!-- Nom de l'utilisateur connecté -->
                             <p class="text-sm font-bold text-slate-900 leading-tight">{{ utilisateur.name }}</p>
                             <!-- Sous-titre fixe -->
