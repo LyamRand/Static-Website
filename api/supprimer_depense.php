@@ -18,7 +18,9 @@ if (!isset($_SESSION["id_utilisateur"])) {
     http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
     echo json_encode(["succes" => false, "message" => "Non connecté."]);
     exit;
-}
+} 
+// isset = vérifie si la variable existe 
+// !isset = vérifie si la variable n'existe pas 
 
 $donnees = json_decode(file_get_contents("php://input"), true);
 

@@ -14,9 +14,9 @@ if (!isset($_COOKIE[session_name()])) {
 }
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_httponly', 1); // ini_set=permet de modifier les paramètres de la session // http_only=permet de sécuriser la session 
+ini_set('session.cookie_secure', 1); // secure=permet de sécuriser la session 
+ini_set('session.cookie_samesite', 'Strict'); // samesite=permet de sécuriser la session 
 session_start();
 header("Content-Type: application/json");
 require_once "config.php";
