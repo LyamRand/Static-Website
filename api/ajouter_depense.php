@@ -29,7 +29,7 @@ if (empty($donnees["groupe_id"]) || empty($donnees["payeur_id"]) || empty($donne
 }
 
 $idGroupe = (int) $donnees["groupe_id"]; //int : permet de stocker un nombre entier uniquement
-$idPayeur = (int) $donnees["payeur_id"];
+$idPayeur = (int) $donnees["payeur_id"]; 
 $montant = (float) $donnees["montant"]; // float : permet de stocker des valeurs décimales
 $description = trim($donnees["description"]); // "trim" permet de supprimer les espaces inutiles au début et à la fin du texte
 $date = date("Y-m-d");
@@ -40,10 +40,10 @@ if ($montant <= 0) {
 }
 
 // --- ENREGISTREMENT DANS LA BD ---
-$insertion = $pdo->prepare("
+$insertion = $pdo->prepare(" 
         INSERT INTO expenses (group_id, payer_id, amount, description, expense_date)
         VALUES (:group_id, :payer_id, :amount, :description, :date)
-    ");
+    "); //
 
 // Remplacer les étiquettes (" : ") par les vraies valeurs des variables
 $insertion->execute([
@@ -52,7 +52,7 @@ $insertion->execute([
     ":amount" => $montant,
     ":description" => $description,
     ":date" => $date
-]);
+]); // 
 
 // --- RÉPONSE AU FRONT-END ---
-echo json_encode(["succes" => true, "message" => "Dépense ajoutée !"]);
+echo json_encode(["succes" => true, "message" => "Dépense ajoutée !"]); // on renvoie un message de succès au front-end     

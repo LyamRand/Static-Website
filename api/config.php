@@ -14,7 +14,7 @@ if ($env === 'dev') {
     // SECURITE : Reporting maximal des erreurs (Développement)
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
+    ini_set('display_startup_errors', 1); // 
 } else {
     // SECURITE : Reporting minimal des erreurs (Production = app publiée en ligne)
     error_reporting(0);
@@ -23,7 +23,7 @@ if ($env === 'dev') {
 }
 
 // SECURITE : Forcer l'utilisation stricte de HTTPS
-if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') { // si HTTPS n'est pas activé
     http_response_code(403); // 403 = Interdit
     die(json_encode(["succes" => false, "message" => "Connexion HTTPS obligatoire."]));
 }

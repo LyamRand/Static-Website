@@ -75,4 +75,4 @@ echo json_encode([
     "succes" => true,
     "message" => $messageGenerique,
     "contenu_email" => $emailSimule
-]);
+]); 

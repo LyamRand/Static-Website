@@ -43,7 +43,7 @@ foreach ($groupes as &$groupe) {
     // Nombre de membres dans ce groupe
     $req = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
     $req->execute([":group_id" => $idGroupe]);
-    $nbMembres = (int) $req->fetchColumn();
+    $nbMembres = (int) $req->fetchColumn(); 
 
     // Ce que moi j'ai payé dans ce groupe
     $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id AND payer_id = :user_id");
@@ -59,7 +59,7 @@ foreach ($groupes as &$groupe) {
     $maPartEgale = $nbMembres > 0 ? $totalGroupe / $nbMembres : 0;
 
     $groupe["participants"] = $nbMembres;
-    $groupe["solde"] = round($jaiPaye - $maPartEgale, 2);
+    $groupe["solde"] = round($jaiPaye - $maPartEgale, 2); // On arrondit le solde à 2 décimales 
 }
 
-echo json_encode($groupes);
+echo json_encode($groupes); 

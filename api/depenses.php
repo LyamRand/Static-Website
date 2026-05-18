@@ -45,7 +45,10 @@ $requeteDepenses = $pdo->prepare("
     ORDER BY expenses.expense_date DESC, expenses.id DESC
 ");
 $requeteDepenses->execute([":group_id" => $idGroupe]);
-$listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC);
+$listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC); 
+//"Avec fetchAll, on récupère TOUTES les dépenses d'un coup"
+// "sous forme de tableau associatif PHP, et on stocke le tout"
+// "dans $listeDepenses pour pouvoir les lister ou faire une boucle."
 
 foreach ($listeDepenses as &$dep) {
     $dep["id"] = (int) $dep["id"];
