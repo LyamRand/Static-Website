@@ -14,9 +14,9 @@ if (!isset($_COOKIE[session_name()])) {
 }
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_httponly', 1); // ini_set=permet de modifier les paramètres de la session // http_only=permet de sécuriser la session 
+ini_set('session.cookie_secure', 1); // secure=permet de sécuriser la session 
+ini_set('session.cookie_samesite', 'Strict'); // samesite=permet de sécuriser la session 
 session_start();
 header("Content-Type: application/json");
 require_once "config.php";
@@ -24,7 +24,8 @@ require_once "config.php";
 if (!isset($_SESSION["id_utilisateur"])) {
     echo json_encode(["connecte" => false]);
     exit;
-}
+} // si l'utilisateur n'est pas connecté, on affiche un message d'erreur
+
 
 // --- DOUBLE VÉRIFICATION (SÉCURITÉ) ---
 // L'utilisateur a une session PHP valide mais on vérifie quand même s'il existe toujours dans la base de données
@@ -45,4 +46,4 @@ if (!$utilisateur) {
 echo json_encode([
     "connecte" => true,
     "utilisateur" => $utilisateur
-]);
+]); 

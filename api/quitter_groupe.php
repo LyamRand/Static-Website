@@ -27,7 +27,7 @@ $donnees = json_decode(file_get_contents("php://input"), true);
 if (empty($donnees["groupe_id"])) {
     echo json_encode(["succes" => false, "message" => "groupe_id manquant."]);
     exit;
-}
+} // empty() vérifie si la variable est vide (true si vide, false si non vide)
 
 $idGroupe = (int) $donnees["groupe_id"];
 
@@ -40,7 +40,7 @@ $quitter->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]); // 
 // Compte combien de lignes il reste pour ce groupe dans la table de liaison
 $compter = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
 $compter->execute([":group_id" => $idGroupe]);
-$nbMembres = (int) $compter->fetchColumn();
+$nbMembres = (int) $compter->fetchColumn(); // On convertit en nombre entier
 
 // --- 3. SUPPRESSION EN CASCADE (NETTOYAGE) ---
 if ($nbMembres === 0) {
