@@ -255,19 +255,18 @@ createApp({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: champCodeGroupe.value.toUpperCase() }) // JSON.stringify = transforme les données en chaîne JSON (texte)
             }) // .then() = on attend la réponse de l'API. ()
-        })
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
-        if (data.succes) {
-            afficherFormGroupe.value = false;
-            champCodeGroupe.value = '';
-            afficherMessage("Vous avez rejoint le groupe !", false);
-            allerAuxGroupes();
-            chargerDashboard(); // Met à jour les compteurs du dashboard
-        } else {
-            afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
-        }
-    });
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.succes) {
+                    afficherFormGroupe.value = false;
+                    champCodeGroupe.value = '';
+                    afficherMessage("Vous avez rejoint le groupe !", false);
+                    allerAuxGroupes();
+                    chargerDashboard(); // Met à jour les compteurs du dashboard
+                } else {
+                    afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
+                }
+            });
         }
 
 // Quitter un groupe ; si plus personne dedans, le groupe est supprimé de la BDD
@@ -386,3 +385,4 @@ return {
 };
     }
 }).mount('#app');
+// Fin du fichier
