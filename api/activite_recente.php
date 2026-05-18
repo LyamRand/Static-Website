@@ -20,7 +20,7 @@ if (!isset($_SESSION["id_utilisateur"])) {
     exit;
 }
 
-$idUtilisateur = $_SESSION["id_utilisateur"];
+$idUtilisateur = $_SESSION["id_utilisateur"]; // 
 
 // Les 5 dernières dépenses dans les groupes de l'utilisateur
 $requete = $pdo->prepare(" 
