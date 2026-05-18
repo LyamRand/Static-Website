@@ -12,6 +12,15 @@ const { createApp, ref, onMounted, watch } = Vue;
 createApp({
     setup() {
 
+        // " const maVariable = ref('valeur'); " cette ligne sert à créer une variable connectée en direct avec la page web.
+        // Je crée une "variable spéciale" qui est réactive donc si je modifie sa valeur dans mon JS, la page web se met à jour toute seule là où elle est affichée.
+        // "ref" veut dire que dès que la valeur change dans mon code, la page se met à jour toute seule, sans avoir besoin de la recharger.
+        // ref(0) : pour un nombre (le solde total)
+        // ref([]) : pour une liste (un tableau vide) qui sera remplie plus tard par le serveur (liste des dépenses)
+        // ref(null) : pour signifier l'absence de donnée (ex: utilisateur = null veut dire que personne n'est connecté)
+        // ref('') : pour préparer un texte vide (un champ de formulaire)
+
+
         // ---- Pages et navigation ----
         const pageCourante = ref('accueil'); // 'accueil', 'auth', 'dashboard', 'groupes', 'groupe', 'parametres'
         const deviseCourante = ref('EUR');   // Devise affichée partout via formaterSomme()
@@ -47,7 +56,7 @@ createApp({
         const afficherFormGroupe = ref(false);  // Modal créer/rejoindre un groupe
         const afficherFormDepense = ref(false); // Modal ajouter une dépense
         const afficherModalMdp = ref(false);    // Modal mot de passe oublié (simulation)
-        const menuMobileOuvert = ref(false);    // Menu affiché en mode "mobile"
+        const menuMobileOuvert = ref(false);    // Menu affiché en mode "mobile" 
 
         // ---- Messages de retour utilisateur ----
         const message = ref('');
