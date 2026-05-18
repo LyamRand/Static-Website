@@ -21,7 +21,7 @@ if (!isset($_SESSION["id_utilisateur"])) {
 }
 
 // --- LECTURE DES DONNÉES ENVOYÉES PAR VUE.JS ---
-$donnees = json_decode(file_get_contents("php://input"), true); // file_get_contents("php://input") lit ce texte JSON brut et json_decode le transforme en tableau PHP utilisable
+$donnees = json_decode(file_get_contents("php://input"), true); // Récupère les données brutes envoyées par la requête HTTP (php://input) puis on les décode depuis le format JSON pour les transformer en un tableau PHP qu'on stocke dans $donnees pour pouvoir les manipuler facilement.
 
 if (empty($donnees["groupe_id"]) || empty($donnees["payeur_id"]) || empty($donnees["montant"]) || empty($donnees["description"])) {
     echo json_encode(["succes" => false, "message" => "Tous les champs sont requis."]);
