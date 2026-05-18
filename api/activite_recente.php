@@ -9,8 +9,8 @@
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_samesite', 'Strict');
-session_start();
-header("Content-Type: application/json");
+session_start(); // J'ouvre la mémoire du serveur (la session) pour reconnaître l'utilisateur. C'est ce qui permet au serveur de se souvenir de qui est connecté entre chaque clic.
+header("Content-Type: application/json"); // Je préviens le navigateur : attention, je ne vais pas te renvoyer une page web classique, mais des données brutes au format JSON pour que mon JavaScript puisse les exploiter
 require_once "config.php";
 
 if (!isset($_SESSION["id_utilisateur"])) {
