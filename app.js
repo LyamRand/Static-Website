@@ -255,134 +255,139 @@ createApp({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: champCodeGroupe.value.toUpperCase() }) // JSON.stringify = transforme les données en chaîne JSON (texte)
             }) // .then() = on attend la réponse de l'API. ()
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                if (data.succes) {
-                    afficherFormGroupe.value = false;
-                    champCodeGroupe.value = '';
-                    afficherMessage("Vous avez rejoint le groupe !", false);
-                    allerAuxGroupes();
-                    chargerDashboard(); // Met à jour les compteurs du dashboard
-                } else {
-                    afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
-                }
-            });
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.succes) {
+                        afficherFormGroupe.value = false;
+                        champCodeGroupe.value = '';
+                        afficherMessage("Vous avez rejoint le groupe !", false);
+                        allerAuxGroupes();
+                        chargerDashboard(); // Met à jour les compteurs du dashboard
+                    } else {
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
+                    }
+                });
         }
 
-// Quitter un groupe ; si plus personne dedans, le groupe est supprimé de la BDD
-function quitterGroupe() {
-    if (!confirm('Voulez-vous vraiment quitter ce groupe ?')) return;
-    fetch('api/quitter_groupe.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupe_id: groupeActuel.value.id })
-    })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            if (data.succes) {
-                groupeActuel.value = null; // Fermer la page de détail
-                chargerDashboard();        // Mettre à jour les soldes + la liste
-                allerAuxGroupes();         // Retourner à la liste des groupes
-            } else {
-                afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
-            }
+        // Quitter un groupe ; si plus personne dedans, le groupe est supprimé de la BDD
+        function quitterGroupe() { // On quitte le groupe.
+            if (!confirm('Voulez-vous vraiment quitter ce groupe ?')) return;
+            fetch('api/quitter_groupe.php', {
+                method: 'POST', // On envoie les données.
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ groupe_id: groupeActuel.value.id }) // JSON.stringify = transforme les données en chaîne JSON (texte)
+            })
+                .then(function (r) { return r.json(); }) // (r) = réponse de l'API et return r.json() = on transforme la réponse en tableau JS utilisable.
+                .then(function (data) { // "data" = les informations récupérées depuis le serveur.
+                    if (data.succes) { // Si "succes" est vrai, on continue.
+                        groupeActuel.value = null; // Fermer la page de détail
+                        chargerDashboard();        // Mettre à jour les soldes + la liste
+                        allerAuxGroupes();         // Retourner à la liste des groupes
+                    } else {
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
+                    }
+                });
+        }
+
+
+        // ================================================================
+        // DÉPENSES
+        // ================================================================
+
+        // Ouvre le modal et pré-sélectionne l'utilisateur connecté comme payeur
+        function ouvrirModalDepense() {
+            champMontant.value = ''; // On vide le champ.
+            champDescription.value = ''; // On vide le champ.
+            if (utilisateur.value) champPayeurId.value = utilisateur.value.id;
+            afficherFormDepense.value = true; // On affiche le formulaire.
+        }
+
+        function ajouterDepense() { // On ajoute une dépense.
+            fetch('api/ajouter_depense.php', {
+                method: 'POST', // On envoie les données.
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ // JSON.stringify = transforme les données en chaîne JSON (texte)
+                    groupe_id: groupeActuel.value.id,
+                    payeur_id: champPayeurId.value,
+                    montant: champMontant.value,
+                    description: champDescription.value
+                })
+            })
+                .then(function (r) { return r.json(); }) // (r) = réponse de l'API et return r.json() = on transforme la réponse en tableau JS utilisable.
+                .then(function (data) { // "data" = les informations récupérées depuis le serveur.
+                    if (data.succes) { // Si "succes" est vrai, on continue.
+                        afficherFormDepense.value = false;
+                        chargerDepenses(groupeActuel.value.id); // Rafraîchit la liste dans le groupe
+                        chargerDashboard();                     // Rafraîchit les soldes
+                    } else {
+                        afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
+                    }
+                });
+        }
+
+        function supprimerDepense(idDepense) { // On supprime une dépense.
+            if (!confirm("Supprimer cette dépense ?")) return;
+            fetch('api/supprimer_depense.php', {
+                method: 'POST', // On envoie les données.
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: idDepense }) // JSON.stringify = transforme les données en chaîne JSON (texte)
+            })
+                .then(function (r) { return r.json(); }) // (r) = réponse de l'API et return r.json() = on transforme la réponse en tableau JS utilisable.
+                .then(function (data) { // "data" = les informations récupérées depuis le serveur.
+                    if (data.succes) { // Si "succes" est vrai, on continue.
+                        chargerDepenses(groupeActuel.value.id); // Rafraîchit la liste
+                        chargerDashboard();                     // Rafraîchit les soldes
+                    }
+                });
+        }
+
+
+        // ================================================================
+        // DÉMARRAGE : vérifier la session PHP au chargement de la page
+        // Si l'utilisateur avait déjà une session (F5, retour sur l'onglet),
+        // on le redirige directement vers le dashboard sans repasser par l'accueil.
+        // ================================================================
+        onMounted(function () {
+            fetch('api/verifier_session.php')
+                .then(function (r) { return r.json(); }) // (r) = réponse de l'API et return r.json() = on transforme la réponse en tableau JS utilisable.
+                .then(function (data) { // "data" = les informations récupérées depuis le serveur.
+                    if (data.connecte) {
+                        utilisateur.value = data.utilisateur;
+                        allerAuDashboard();
+                    }
+                });
         });
-}
 
 
-// ================================================================
-// DÉPENSES
-// ================================================================
+        // ================================================================
+        // RETOUR : toutes les variables et fonctions accessibles dans index.html
+        // ================================================================
 
-// Ouvre le modal et pré-sélectionne l'utilisateur connecté comme payeur
-function ouvrirModalDepense() {
-    champMontant.value = '';
-    champDescription.value = '';
-    if (utilisateur.value) champPayeurId.value = utilisateur.value.id;
-    afficherFormDepense.value = true;
-}
+        // return sert à envoyer les variables et les fonctions vers le code HTML
+        // Pourquoi mettre tout ça à la fin ? Parce que pour que le code HTML puisse utiliser les fonctions et les variables, il faut qu'elles soient définies avant d'être utilisées.
+        // Mais attention, ça ne veut pas dire qu'elles seront utilisées tout de suite ! Elles ne seront utilisées que lorsque le code HTML en aura besoin.
 
-function ajouterDepense() {
-    fetch('api/ajouter_depense.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            groupe_id: groupeActuel.value.id,
-            payeur_id: champPayeurId.value,
-            montant: champMontant.value,
-            description: champDescription.value
-        })
-    })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            if (data.succes) {
-                afficherFormDepense.value = false;
-                chargerDepenses(groupeActuel.value.id); // Rafraîchit la liste dans le groupe
-                chargerDashboard();                     // Rafraîchit les soldes
-            } else {
-                afficherMessage(data.message || data.erreur || "Une erreur est survenue.", true);
-            }
-        });
-}
-
-function supprimerDepense(idDepense) {
-    if (!confirm("Supprimer cette dépense ?")) return;
-    fetch('api/supprimer_depense.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: idDepense })
-    })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            if (data.succes) {
-                chargerDepenses(groupeActuel.value.id); // Rafraîchit la liste
-                chargerDashboard();                     // Rafraîchit les soldes
-            }
-        });
-}
-
-
-// ================================================================
-// DÉMARRAGE : vérifier la session PHP au chargement de la page
-// Si l'utilisateur avait déjà une session (F5, retour sur l'onglet),
-// on le redirige directement vers le dashboard sans repasser par l'accueil.
-// ================================================================
-onMounted(function () {
-    fetch('api/verifier_session.php')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            if (data.connecte) {
-                utilisateur.value = data.utilisateur;
-                allerAuDashboard();
-            }
-        });
-});
-
-
-// ================================================================
-// RETOUR : toutes les variables et fonctions accessibles dans index.html
-// ================================================================
-return {
-    // Navigation
-    pageCourante, deviseCourante,
-    // Données
-    utilisateur, groupes, groupeActuel, depenses, statsGroupe, activiteRecente,
-    soldeTotal, montantDu, montantDette,
-    // Formulaires
-    ongletAuth, champEmail, champPassword, champNom,
-    champNomGroupe, champIconeGroupe, champCodeGroupe,
-    champMontant, champDescription, champPayeurId,
-    // Modals & Menu
-    afficherFormGroupe, afficherFormDepense, afficherModalMdp, menuMobileOuvert,
-    // Messages
-    message, messageErreur,
-    // Fonctions
-    formaterSomme, afficherMessage,
-    seConnecter, sInscrire, seDeconnecter,
-    allerAuDashboard, allerAuxGroupes, voirGroupe,
-    creerGroupe, rejoindreGroupe, quitterGroupe,
-    ouvrirModalDepense, ajouterDepense, supprimerDepense
-};
+        return {
+            // Navigation
+            pageCourante, deviseCourante,
+            // Données
+            utilisateur, groupes, groupeActuel, depenses, statsGroupe, activiteRecente,
+            soldeTotal, montantDu, montantDette,
+            // Formulaires
+            ongletAuth, champEmail, champPassword, champNom,
+            champNomGroupe, champIconeGroupe, champCodeGroupe,
+            champMontant, champDescription, champPayeurId,
+            // Modals & Menu
+            afficherFormGroupe, afficherFormDepense, afficherModalMdp, menuMobileOuvert,
+            // Messages
+            message, messageErreur,
+            // Fonctions
+            formaterSomme, afficherMessage,
+            seConnecter, sInscrire, seDeconnecter,
+            allerAuDashboard, allerAuxGroupes, voirGroupe,
+            creerGroupe, rejoindreGroupe, quitterGroupe,
+            ouvrirModalDepense, ajouterDepense, supprimerDepense
+        };
     }
 }).mount('#app');
 // Fin du fichier
