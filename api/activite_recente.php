@@ -14,7 +14,7 @@ session_start(); // J'ouvre la mémoire du serveur (la session) pour reconnaîtr
 header("Content-Type: application/json"); // Je préviens le navigateur : attention, je ne vais pas te renvoyer une page web classique, mais des données brutes au format JSON pour que mon JavaScript puisse les exploiter
 require_once "config.php";
 
-if (!isset($_SESSION["id_utilisateur"])) {
+if (!isset($_SESSION["id_utilisateur"])) { //COMMENTAIRE EXAM
     http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
     echo json_encode([]);
     exit;
@@ -41,13 +41,13 @@ $requete = $pdo->prepare("
 // "je t'enverrai les variables à sécuriser juste après, au moment du execute(
 $requete->execute([":user_id" => $idUtilisateur]);
 
-$activites = $requete->fetchAll(PDO::FETCH_ASSOC);
+$activites = $requete->fetchAll(PDO::FETCH_ASSOC); //COMMENTAIRE EXAM
 
 // On force le montant en nombre décimal et l'identifiant en nombre entier
 // "&" sert à modifier et sauvegarder directement le tableau "activites"
 foreach ($activites as &$activite) {
     $activite["amount"] = (float) $activite["amount"]; // float : permet de stocker des valeurs décimales
     $activite["id"] = (int) $activite["id"]; //int : permet de stocker un nombre entier uniquement
-}
+} //COMMENTAIRE EXAM
 
 echo json_encode($activites);

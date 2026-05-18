@@ -23,7 +23,7 @@ if (!isset($_SESSION["id_utilisateur"])) {
 if (!isset($_GET["group_id"])) {
     echo json_encode(["erreur" => "ID de groupe manquant."]);
     exit;
-}
+} // isset() vérifie si la variable existe et n'est pas NULL
 
 $idGroupe = (int) $_GET["group_id"];
 
@@ -56,4 +56,4 @@ $membres = $requeteMembres->fetchAll(PDO::FETCH_ASSOC);
 $groupe["membres"] = $membres;
 $groupe["id"] = (int) $groupe["id"];
 
-echo json_encode($groupe);
+echo json_encode($groupe); // json_encode() transforme le tableau PHP en chaîne de caractères JSON (texte)
