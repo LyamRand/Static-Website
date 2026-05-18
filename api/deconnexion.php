@@ -11,7 +11,8 @@ if (!isset($_COOKIE[session_name()])) {
     header("Content-Type: application/json");
     echo json_encode(["succes" => true]);
     exit;
-}
+} // isset = vérifie si la variable existe 
+// !isset = vérifie si la variable n'existe pas 
 
 // On démarre la session pour pouvoir y accéder
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
