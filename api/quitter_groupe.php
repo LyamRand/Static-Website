@@ -44,9 +44,9 @@ $nbMembres = (int) $compter->fetchColumn();
 
 // --- 3. SUPPRESSION EN CASCADE (NETTOYAGE) ---
 if ($nbMembres === 0) {
-    $pdo->prepare("DELETE FROM expenses WHERE group_id = :group_id")->execute([":group_id" => $idGroupe]);
+    $pdo->prepare("DELETE FROM expenses WHERE group_id = :group_id")->execute([":group_id" => $idGroupe]); // 
     $pdo->prepare("DELETE FROM groups WHERE id = :group_id")->execute([":group_id" => $idGroupe]);
     echo json_encode(["succes" => true, "supprime" => true, "message" => "Groupe supprimé car il était vide."]);
 } else {
     echo json_encode(["succes" => true, "supprime" => false, "message" => "Vous avez quitté le groupe."]);
-}
+} // echo = on renvoie un message au front-end 
