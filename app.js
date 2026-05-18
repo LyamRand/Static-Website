@@ -23,28 +23,28 @@ createApp({
 
         // ---- Pages et navigation ----
         const pageCourante = ref('accueil'); // 'accueil', 'auth', 'dashboard', 'groupes', 'groupe', 'parametres'
-        const deviseCourante = ref('EUR');   // Devise affichée partout via formaterSomme()
+        const deviseCourante = ref('EUR'); // Devise affichée partout via formaterSomme()
 
         // ---- Données utilisateur ----
-        const utilisateur = ref(null);       // null = non connecté
+        const utilisateur = ref(null); // null = non connecté
 
         // ---- Données des groupes ----
-        const groupes = ref([]);             // Liste de tous les groupes de l'utilisateur
-        const groupeActuel = ref(null);      // Groupe que l'on consulte en ce moment
-        const depenses = ref([]);            // Dépenses du groupe actuel
+        const groupes = ref([]); // Liste de tous les groupes de l'utilisateur
+        const groupeActuel = ref(null); // Groupe que l'on consulte en ce moment
+        const depenses = ref([]); // Dépenses du groupe actuel
         const statsGroupe = ref({ total: 0, nb_membres: 0, mon_solde: 0 }); // Stats du groupe affiché
-        const activiteRecente = ref([]);     // 5 dernières dépenses pour le dashboard
+        const activiteRecente = ref([]); // 5 dernières dépenses pour le dashboard
 
         // ---- Soldes du dashboard (calculés depuis groupes) ----
-        const soldeTotal = ref(0);   // Solde net de l'utilisateur sur tous ses groupes
-        const montantDu = ref(0);    // Ce que les autres lui doivent
+        const soldeTotal = ref(0); // Solde net de l'utilisateur sur tous ses groupes
+        const montantDu = ref(0); // Ce que les autres lui doivent
         const montantDette = ref(0); // Ce qu'il doit aux autres
 
         // ---- Champs des formulaires (liés au HTML avec v-model) ----
         const ongletAuth = ref('connexion'); // 'connexion' ou 'inscription'
         const champEmail = ref('');
         const champPassword = ref('');
-        const champNom = ref('');            // Uniquement pour l'inscription
+        const champNom = ref(''); // Uniquement pour l'inscription
         const champNomGroupe = ref('');
         const champIconeGroupe = ref('🏠');
         const champCodeGroupe = ref('');
@@ -53,10 +53,10 @@ createApp({
         const champPayeurId = ref(null);
 
         // ---- Visibilité des modals ----
-        const afficherFormGroupe = ref(false);  // Modal créer/rejoindre un groupe
+        const afficherFormGroupe = ref(false); // Modal créer/rejoindre un groupe
         const afficherFormDepense = ref(false); // Modal ajouter une dépense
-        const afficherModalMdp = ref(false);    // Modal mot de passe oublié (simulation)
-        const menuMobileOuvert = ref(false);    // Menu affiché en mode "mobile" 
+        const afficherModalMdp = ref(false); // Modal mot de passe oublié (simulation)
+        const menuMobileOuvert = ref(false); // Menu affiché en mode "mobile" 
 
         // ---- Messages de retour utilisateur ----
         const message = ref('');
