@@ -24,7 +24,8 @@ require_once "config.php";
 if (!isset($_SESSION["id_utilisateur"])) {
     echo json_encode(["connecte" => false]);
     exit;
-}
+} // si l'utilisateur n'est pas connecté, on affiche un message d'erreur
+
 
 // --- DOUBLE VÉRIFICATION (SÉCURITÉ) ---
 // L'utilisateur a une session PHP valide mais on vérifie quand même s'il existe toujours dans la base de données
@@ -45,4 +46,4 @@ if (!$utilisateur) {
 echo json_encode([
     "connecte" => true,
     "utilisateur" => $utilisateur
-]);
+]); 
