@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splitz — Partagez vos dépenses entre amis</title>
 
-    <!-- Tailwind CSS via CDN : toutes les classes utilitaires (bg-, rounded-, flex, etc.) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Vue.js 3 via CDN : rend la page interactive sans compilation -->
+    <!-- Vue.js 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    <!-- Google Fonts : Pacifico pour le logo, Fira Sans pour le texte -->
+    <!-- Google Fonts : Pacifico logo, Fira Sans texte -->
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fira+Sans:wght@400;600;700;800&display=swap"
         rel="stylesheet">
 
-    <!-- Configuration Tailwind : on ajoute notre couleur "primary" (#6155F5) -->
+    <!-- Configuration Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -31,9 +31,9 @@
         }
     </script>
 
-    <!-- Quelques styles CSS supplémentaires pour les détails fins -->
+    <!-- Quelques styles CSS supplémentaires -->
     <style>
-        /* Scrollbar invisible mais fonctionnelle */
+        /* Scrollbar invisible */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -51,11 +51,6 @@
 
 <body class="font-sans bg-gray-50 text-slate-900 overflow-x-hidden">
 
-
-    <!-- ============================================================
-     POINT DE MONTAGE VUE.JS
-     Vue.js contrôle tout ce qui est dans ce div.
-     ============================================================ -->
     <div id="app">
 
 
@@ -73,7 +68,7 @@
                 </button>
             </nav>
 
-            <!-- Section héro -->
+            <!-- Premier bloc d'intro -->
             <section class="max-w-6xl mx-auto px-6 py-28 grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
                 <div class="text-left">
                     <h1 class="text-5xl font-black mb-6 leading-tight">
@@ -114,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Call to action (Application Mobile) -->
+                <!-- Call to action -->
                 <div
                     class="max-w-4xl mx-auto mt-20 bg-primary text-white rounded-3xl p-10 md:p-14 shadow-xl shadow-primary/30 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div class="text-center md:text-left md:w-3/5">
@@ -151,7 +146,7 @@
                     <p class="text-gray-400 text-sm mt-2">Partagez. Réglez. Profitez.</p>
                 </div>
 
-                <!-- Onglets Connexion / Inscription -->
+                <!-- Onglets connexion / inscription -->
                 <div class="flex bg-gray-100 p-1 rounded-2xl mb-8">
                     <button @click="ongletAuth = 'connexion'; message = ''"
                         :class="ongletAuth === 'connexion' ? 'bg-white shadow text-slate-900' : 'text-slate-500'"
@@ -165,7 +160,7 @@
                     </button>
                 </div>
 
-                <!-- Message d'erreur ou de succès -->
+                <!-- Message d'erreur / de succès -->
                 <div v-if="message"
                     :class="messageErreur ? 'bg-red-50 border-red-200 text-red-600' : 'bg-green-50 border-green-200 text-green-700'"
                     class="mb-6 p-4 border rounded-2xl text-sm font-bold text-center">
@@ -226,22 +221,20 @@
 
 
         <!-- ===========================================================
-         LAYOUT PROTÉGÉ : Sidebar + Header + Contenu
-         Visible pour toutes les pages connectées (dashboard, groupes, groupe, parametres)
-         =========================================================== -->
+         LAYOUT : Sidebar + Header + Contenu
+        =========================================================== -->
         <div v-if="pageCourante === 'dashboard' || pageCourante === 'groupes' || pageCourante === 'groupe' || pageCourante === 'parametres'"
             class="flex min-h-screen bg-gray-50">
 
             <!-- -------------------------------------------------------
-             BARRE LATÉRALE GAUCHE (Sidebar)
-             w-52 : largeur fixe de 208px
-             fixed : reste en place quand on scrolle
-             ------------------------------------------------------- -->
-            <!-- Overlay sombre sur mobile -->
-            <div v-if="menuMobileOuvert" @click="menuMobileOuvert = false" class="fixed inset-0 bg-slate-900/50 z-20 md:hidden transition-opacity"></div>
+             BARRE LATÉRALE
+            ------------------------------------------------------- -->
+            <!-- Affichage sur mobile (Responsive)-->
+            <div v-if="menuMobileOuvert" @click="menuMobileOuvert = false"
+                class="fixed inset-0 bg-slate-900/50 z-20 md:hidden transition-opacity"></div>
 
-            <aside :class="menuMobileOuvert ? 'translate-x-0' : '-translate-x-full md:translate-x-0'" 
-                   class="w-52 bg-white border-r border-gray-100 flex flex-col fixed h-full z-30 py-6 transition-transform duration-300">
+            <aside :class="menuMobileOuvert ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+                class="w-52 bg-white border-r border-gray-100 flex flex-col fixed h-full z-30 py-6 transition-transform duration-300">
 
                 <!-- Logo Splitz en haut de la sidebar -->
                 <div class="px-6 mb-10">
@@ -251,15 +244,12 @@
                 <!-- Navigation principale -->
                 <nav class="flex-1 px-3 space-y-1">
 
-                    <!--
-                    Lien "Tableau de bord"
-                    :class conditionnel : fond mauve clair + texte mauve si page active
-                -->
+                    <!-- Lien "Tableau de bord" -->
                     <a @click.prevent="allerAuDashboard" href="#" :class="pageCourante === 'dashboard'
                        ? 'bg-primary/10 text-primary font-bold'
                        : 'text-gray-600 hover:bg-gray-100 font-semibold'"
                         class="flex items-center gap-3 px-4 py-3 rounded-2xl transition text-sm">
-                        <!-- Icônes importées depuis Heroicons -->
+                        <!-- Icône SVG -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -274,7 +264,7 @@
                        ? 'bg-primary/10 text-primary font-bold'
                        : 'text-gray-600 hover:bg-gray-100 font-semibold'"
                         class="flex items-center gap-3 px-4 py-3 rounded-2xl transition text-sm">
-                        <!-- Icône SVG "personnes" pour les groupes -->
+                        <!-- Icône SVG -->
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-5">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -284,13 +274,13 @@
                     </a>
                 </nav>
 
-                <!-- Lien "Paramètres" en bas de la sidebar -->
+                <!-- Lien "Paramètres" -->
                 <div class="px-3 mt-4">
                     <a @click.prevent="pageCourante = 'parametres'" href="#" :class="pageCourante === 'parametres'
                        ? 'bg-primary/10 text-primary font-bold'
                        : 'text-gray-600 hover:bg-gray-100 font-semibold'"
                         class="flex items-center gap-3 px-4 py-3 rounded-2xl transition text-sm">
-                        <!-- Icône SVG "engrenage" pour les paramètres -->
+                        <!-- Icône SVG -->
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -302,47 +292,50 @@
                 </div>
             </aside>
 
-            <!-- Zone principale (décalée de 208px sur PC = largeur sidebar) -->
+            <!-- Corps de la page -->
             <div class="flex-1 ml-0 md:ml-52 flex flex-col min-h-screen transition-all duration-300">
 
                 <!-- -------------------------------------------------------
-                 HEADER : Barre du haut (recherche + notif + profil)
-                 sticky top-0 : reste collé en haut même quand on scrolle
+                 HEADER
                  ------------------------------------------------------- -->
-                <header class="bg-white border-b border-gray-100 px-4 md:px-8 py-4 flex items-center gap-4 sticky top-0 z-10">
-                
+                <header
+                    class="bg-white border-b border-gray-100 px-4 md:px-8 py-4 flex items-center gap-4 sticky top-0 z-10">
+
                     <!-- Bouton Menu Burger (Mobile) -->
-                    <button @click="menuMobileOuvert = true" class="md:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-xl transition">
+                    <button @click="menuMobileOuvert = true"
+                        class="md:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-xl transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
 
-                    <!-- Barre de recherche (décorative, comme sur le screenshot) -->
+                    <!-- Barre de recherche (fictive) -->
                     <div class="flex-1 max-w-sm min-w-0">
                         <div class="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2.5 min-w-0">
-                            <!-- Icône loupe -->
-                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <!-- Icône SVG -->
+                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            <span class="text-sm text-gray-400 truncate flex-1 min-w-0">Rechercher un de vos groupes...</span>
+                            <span class="text-sm text-gray-400 truncate flex-1 min-w-0">Rechercher un de vos
+                                groupes...</span>
                         </div>
                     </div>
 
                     <!-- Espace flexible pour pousser les éléments à droite -->
                     <div class="flex-1"></div>
 
-                    <!-- Profil utilisateur : nom + "COMPTE PERSONNEL" + avatar -->
+                    <!-- Profil utilisateur : nom + "compte personnel" + avatar -->
                     <div v-if="utilisateur" class="flex items-center gap-3 shrink-0">
                         <div class="text-right hidden sm:block">
-                            <!-- Nom de l'utilisateur connecté -->
+                            <!-- Nom de l'utilisateur -->
                             <p class="text-sm font-bold text-slate-900 leading-tight">{{ utilisateur.name }}</p>
-                            <!-- Sous-titre fixe -->
+                            <!-- Sous-titre -->
                             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Compte personnel</p>
                         </div>
                         <!-- Avatar : cercle mauve avec les 2 initiales du nom -->
-                        <!-- Note : le clic ne fait rien ici, la déconnexion est dans les Paramètres -->
                         <div class="w-10 h-10 rounded-full bg-primary text-white font-black flex items-center justify-center text-sm"
                             title="Connecté en tant que {{ utilisateur.name }}">
                             {{ utilisateur.name.substring(0, 2).toUpperCase() }}
@@ -351,7 +344,7 @@
                 </header>
 
                 <!-- ---------------------------------------------------
-                 CONTENU PRINCIPAL : change selon la page
+                 CONTENU PRINCIPAL
                  --------------------------------------------------- -->
                 <main class="flex-1 p-4 md:p-8">
 
@@ -368,13 +361,13 @@
                         <p class="text-gray-400 mb-8 text-sm">Voici le récapitulatif de tes comptes partagés ce mois-ci.
                         </p>
 
-                        <!-- 3 cartes statistiques en ligne -->
+                        <!-- 3 cartes statistiques -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
                             <!-- Carte 1 : Solde total -->
                             <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                                 <div class="flex items-center gap-2 mb-3">
-                                    <!-- Icône bleue -->
+                                    <!-- Icône SVG -->
                                     <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                                         <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -422,10 +415,10 @@
                             </div>
                         </div>
 
-                        <!-- Grille 2 colonnes : Mes groupes (gauche) + Activité récente (droite) -->
+                        <!-- Grille 2 colonnes : Mes groupes (gauche) + activité récente (droite) -->
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
 
-                            <!-- Colonne gauche : Mes groupes (occupe 3/5 de la largeur) -->
+                            <!-- Colonne gauche : Mes groupes (3/5 de la largeur) -->
                             <div class="md:col-span-3">
                                 <div class="flex justify-between items-center mb-4">
                                     <h2 class="text-xl font-extrabold">Mes groupes</h2>
@@ -434,17 +427,14 @@
                                         class="text-sm font-bold text-primary hover:underline">Voir tout</a>
                                 </div>
 
-                                <!-- Grille de mini-cartes de groupes -->
+                                <!-- Mini-cartes de groupes -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <!--
-                                    v-for : affiche les 4 premiers groupes maximum sur le dashboard.
-                                    slice(0, 4) : prend les 4 premiers éléments du tableau.
-                                -->
+                                    <!-- v-for : affiche les 4 premiers groupes maximum sur le dashboard et slice(0, 4) : prend les 4 premiers éléments du tableau. -->
                                     <div v-for="groupe in groupes.slice(0, 4)" :key="groupe.id"
                                         @click="voirGroupe(groupe.id)"
                                         class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/40 transition cursor-pointer">
 
-                                        <!-- Icône + nom -->
+                                        <!-- Icône + nom groupe -->
                                         <div class="flex items-center gap-3 mb-4">
                                             <div
                                                 class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-xl">
@@ -536,7 +526,7 @@
                                 </div>
                                 <h1 class="text-3xl font-black">Mes groupes</h1>
                             </div>
-                            <!-- Bouton pour ouvrir le modal de création/rejoindre -->
+                            <!-- Bouton pour créer/rejoindre -->
                             <button @click="afficherFormGroupe = true"
                                 class="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
                                 <span class="text-xl leading-none">+</span>
@@ -551,17 +541,14 @@
                             {{ message }}
                         </div>
 
-                        <!-- Liste des groupes (style "ligne" comme sur le screenshot) -->
+                        <!-- Liste des groupes -->
                         <div class="flex flex-col gap-3">
 
-                            <!--
-                            v-for : une ligne par groupe.
-                            Le groupe est affiché comme une grande ligne horizontale.
-                        -->
+                            <!-- v-for : une ligne par groupe-->
                             <div v-for="groupe in groupes" :key="groupe.id" @click="voirGroupe(groupe.id)"
                                 class="bg-white rounded-2xl px-6 py-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/40 transition cursor-pointer flex items-center">
 
-                                <!-- Icône du groupe (grand cercle gris) -->
+                                <!-- Icône du groupe -->
                                 <div
                                     class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 mr-5">
                                     {{ groupe.icone }}
@@ -573,7 +560,7 @@
                                     <p class="text-sm text-gray-400 mt-0.5">{{ groupe.participants }} participant(s)</p>
                                 </div>
 
-                                <!-- Solde de l'utilisateur dans ce groupe (à droite) -->
+                                <!-- Solde de l'utilisateur dans ce groupe -->
                                 <div class="text-right ml-6">
                                     <p class="text-xs font-bold text-gray-400 mb-1">Solde actuel</p>
                                     <p class="font-black text-lg"
@@ -636,10 +623,10 @@
                             </div>
                         </div>
 
-                        <!-- Disposition en deux colonnes : Dépenses (3/4) / Total (1/4) -->
+                        <!-- Disposition en deux colonnes -->
                         <div class="flex flex-col lg:flex-row gap-8">
 
-                            <!-- Colonne GAUCHE (Liste des dépenses - 3/4) -->
+                            <!-- Colonne gauche (liste des dépenses - 3/4) -->
                             <div class="lg:w-3/4">
                                 <h2 class="text-xl font-extrabold mb-4">Dépenses</h2>
 
@@ -686,7 +673,7 @@
                                 </div>
                             </div>
 
-                            <!-- Colonne DROITE (Total - 1/4) -->
+                            <!-- Colonne droite (total - 1/4) -->
                             <div class="lg:w-1/4">
                                 <!-- Carte total du groupe -->
                                 <div
@@ -752,7 +739,7 @@
                      PAGE : PARAMÈTRES
                      =============================================== -->
                     <div v-if="pageCourante === 'parametres'">
-                        <!-- Titre de la page : icône + texte sur la même ligne (comme "Mes groupes") -->
+                        <!-- Titre page -->
                         <div class="flex items-center gap-4 mb-8">
                             <div class="w-12 h-12 bg-gray-200 rounded-2xl flex items-center justify-center">
                                 <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor"
@@ -764,7 +751,7 @@
                             <h1 class="text-3xl font-black">Paramètres</h1>
                         </div>
 
-                        <!-- Carte de changement de devise -->
+                        <!-- Changement de devise -->
                         <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm max-w-2xl">
                             <div class="mb-6">
                                 <h2 class="text-xl font-extrabold mb-1">Devise</h2>
@@ -776,7 +763,7 @@
                                         <option value="USD">💵 Dollar Américain ($)</option>
                                         <option value="GBP">💷 Livre Sterling (£)</option>
                                     </select>
-                                    <!-- Chevron -->
+                                    <!-- Flèche dépliante -->
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
                                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -787,14 +774,14 @@
                                 </div>
                             </div>
 
-                            <!-- Bouton sauvegarder : affiche une confirmation visuelle -->
+                            <!-- Bouton sauvegarder -->
                             <button @click="afficherMessage('Préférences sauvegardées !', false)"
                                 class="flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-2xl hover:bg-indigo-600 transition">
                                 💾 Sauvegarder
                             </button>
                         </div>
 
-                        <!-- Carte de déconnexion -->
+                        <!-- Déconnexion -->
                         <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm max-w-2xl mt-6">
                             <h2 class="text-xl font-extrabold mb-1">Compte</h2>
                             <p class="text-gray-400 text-sm mb-6">Déconnexion de votre compte.</p>
@@ -810,18 +797,18 @@
                 </main>
             </div>
         </div>
-        <!-- FIN LAYOUT PROTÉGÉ -->
+        <!-- FIN LAYOUT -->
 
 
         <!-- ===========================================================
-         MODAL : CRÉER OU REJOINDRE UN GROUPE
+         POP-UP : CRÉER OU REJOINDRE UN GROUPE
          =========================================================== -->
         <div v-if="afficherFormGroupe" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-3xl p-6 md:p-10 w-full max-w-md shadow-2xl">
 
                 <h3 class="text-2xl font-extrabold mb-8">Nouveau groupe</h3>
 
-                <!-- Formulaire CRÉER -->
+                <!-- Formulaire créer -->
                 <form @submit.prevent="creerGroupe" class="space-y-5 mb-6">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Nom du groupe</label>
@@ -856,7 +843,7 @@
                     <div class="flex-1 h-px bg-gray-200"></div>
                 </div>
 
-                <!-- Formulaire REJOINDRE -->
+                <!-- Formulaire rejoindre -->
                 <form @submit.prevent="rejoindreGroupe" class="space-y-4">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Rejoindre un groupe</label>
@@ -877,11 +864,11 @@
                 </button>
             </div>
         </div>
-        <!-- FIN MODAL GROUPE -->
+        <!-- FIN POP-UP -->
 
 
         <!-- ===========================================================
-         MODAL : AJOUTER UNE DÉPENSE
+         POP-UP : AJOUTER UNE DÉPENSE
          =========================================================== -->
         <div v-if="afficherFormDepense" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-3xl p-6 md:p-10 w-full max-w-lg shadow-2xl">
@@ -934,10 +921,10 @@
                 </form>
             </div>
         </div>
-        <!-- FIN MODAL DÉPENSE -->
+        <!-- FIN POP-UP DÉPENSE -->
 
         <!-- ===========================================================
-         MODAL : MOT DE PASSE OUBLIÉ (Simulation)
+         POP-UP : MOT DE PASSE OUBLIÉ (Simulation)
          =========================================================== -->
         <div v-if="afficherModalMdp" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-3xl p-6 md:p-10 w-full max-w-sm shadow-2xl text-center">
@@ -951,7 +938,7 @@
                 </button>
             </div>
         </div>
-        <!-- FIN MODAL MOT DE PASSE OUBLIÉ -->
+        <!-- FIN POP-UP MOT DE PASSE OUBLIÉ -->
 
     </div>
     <!-- FIN #app -->
@@ -965,30 +952,30 @@
          Les principales commandes (directives) Vue.js utilisées dans ce fichier :
          
          1. v-model="variable"
-            - À quoi ça sert ? Ça relie (dans les deux sens) un champ de formulaire (input) à une variable dans le code (dans app.js).
-            - Exemple : Si on tape "Bob" dans l'input, la variable devient "Bob". Si on vide la variable dans le code, l'input se vide tout seul sur l'écran !
-            - Où le voir ? Dans tous les formulaires (connexion, création de groupe, ajout de dépense).
+            - Pourquoi ? Relie (dans les deux sens) un champ de formulaire (input) à une variable dans le code (dans app.js).
+            - Exemple : Si on tape "Bob" dans l'input, la variable devient "Bob". Si on vide la variable dans le code, l'input se vide tout seul sur l'écran.
+            - Où le voir ? Dans tous les formulaires HTML (connexion, création de groupe, ajout de dépense)
 
          2. @click="fonction()" ou @submit.prevent="..."
-            - À quoi ça sert ? C'est le raccourci pour "v-on:click". Ça déclenche une action (fonction) quand on clique ou qu'on valide un formulaire.
+            - Pourquoi ? Raccourci pour "v-on:click"pour déclencher une action (fonction) quand on clique ou qu'on valide un formulaire.
             - Le ".prevent" sert à empêcher le comportement normal du navigateur (par exemple : empêcher la page de recharger entièrement quand on valide un formulaire).
             
          3. v-if="condition" / v-else
-            - À quoi ça sert ? Ça affiche ou cache un élément HTML (la div est littéralement détruite ou recréée selon la condition).
+            - Pourquoi ? Affiche ou cache un élément HTML (la div est détruite ou recréée selon la condition).
             - Exemple : v-if="pageCourante === 'dashboard'" n'affiche le contenu du tableau de bord que si la variable vaut 'dashboard'.
 
          4. v-for="element in liste" :key="element.id"
-            - À quoi ça sert ? Ça crée une boucle. Ça copie-colle la div HTML autant de fois qu'il y a d'éléments dans la liste.
-            - Le ":key" est obligatoire pour que Vue.js s'y retrouve et ne se mélange pas les pinceaux si l'ordre de la liste change.
+            - Pourquoi ? Copie-colle la div HTML autant de fois qu'il y a d'éléments dans la liste (boucle).
+            - Le ":key" est obligatoire pour que Vue.js s'y retrouve et ne se mélange pas si l'ordre de la liste change.
             - Exemple : On s'en sert pour afficher les cartes des groupes, la liste des dépenses, ou la liste des petites icônes.
 
          5. :class="{ 'nom-classe': condition }"
-            - À quoi ça sert ? Le ":" au début est le raccourci pour "v-bind". Ça permet de dire "Ajoute cette classe CSS (comme un style Tailwind) *seulement* si la condition est vraie".
+            - Pourquoi ? Le ":" au début est le raccourci pour "v-bind" et permet de dire "ajoute cette classe CSS seulement si la condition est vraie".
             - Exemple : Pour mettre un gros bord violet autour de l'icône quand elle est sélectionnée lors de la création d'un groupe.
 
          6. {{ variable }}
-            - À quoi ça sert ? C'est ce qu'on appelle "l'interpolation" (les moustaches). Ça permet d'afficher la valeur d'une variable Javascript directement dans le texte HTML.
-            - Exemple : {{ utilisateur.name }} va être remplacé par "Valentin Deigers" sur l'écran.
+            - Pourquoi ? C'est "l'interpolation" (les moustaches) et ça permet d'afficher la valeur d'une variable JS directement dans le texte HTML.
+            - Exemple : {{ utilisateur.name }} va être remplacé par "Prénom Nom" sur l'écran.
     ========================================================================== -->
 </body>
 
