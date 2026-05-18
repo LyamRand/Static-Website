@@ -39,9 +39,9 @@ $groupe = $rechercheGroupe->fetch(PDO::FETCH_ASSOC);
 if (!$groupe) {
     echo json_encode(["succes" => false, "message" => "Code de groupe invalide."]);
     exit;
-}
+} 
 
-$idGroupe = $groupe["id"];
+$idGroupe = $groupe["id"]; 
 
 // --- 2. VÉRIFICATION QUE L'UTILISATEUR N'EST PAS DÉJÀ MEMBRE DU GROUPE ---
 // Astuce de "SELECT 1" : au lieu de demander "SELECT id" (qui charge des données), on demande à MySQL de juste répondre "1" (Vrai) s'il trouve la ligne (plus rapide)
