@@ -20,7 +20,7 @@ if (empty($donnees["nom"]) || empty($donnees["email"]) || empty($donnees["mot_de
     echo json_encode(["succes" => false, "message" => "Tous les champs sont obligatoires."]);
     exit;
 }
-
+//strlen() = string length -> permet de compter le nombre de caractères dans une chaîne de caractères.  
 if (strlen($donnees["mot_de_passe"]) < 6) {
     echo json_encode(["succes" => false, "message" => "Le mot de passe doit contenir au moins 6 caractères."]);
     exit;
