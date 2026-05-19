@@ -6,9 +6,9 @@
 // ============================================================
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_httponly', 1); // ini_set = permet de modifier les paramètres de la session // http_only = permet de sécuriser la session 
+ini_set('session.cookie_secure', 1); // secure = permet de sécuriser la session 
+ini_set('session.cookie_samesite', 'Strict'); // samesite = permet de sécuriser la session 
 session_start(); // J'ouvre la mémoire du serveur (la session) pour reconnaître l'utilisateur. C'est ce qui permet au serveur de se souvenir de qui est connecté entre chaque clic.
 
 header("Content-Type: application/json"); // Je préviens le navigateur : attention, je ne vais pas te renvoyer une page web classique, mais des données brutes au format JSON pour que mon JavaScript puisse les exploiter
@@ -51,4 +51,4 @@ foreach ($activites as &$activite) {
     $activite["id"] = (int) $activite["id"]; //int : permet de stocker un nombre entier uniquement
 } //COMMENTAIRE EXAM
 
-echo json_encode($activites);
+echo json_encode($activites); // On renvoie les données au format JSON
