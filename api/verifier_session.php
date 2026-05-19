@@ -7,18 +7,18 @@
 // ============================================================
 
 // SECURITE : Ne pas recréer un cookie vide inutilement (Consigne du prof)
-if (!isset($_COOKIE[session_name()])) {
-    header("Content-Type: application/json");
-    echo json_encode(["connecte" => false]);
+if (!isset($_COOKIE[session_name()])) { // $_COOKIE[session_name()] sert à vérifier si la session existe
+    header("Content-Type: application/json"); // Content-Type: application/json est une en-tête HTTP qui indique que le corps de la réponse est au format JSON.
+    echo json_encode(["connecte" => false]); // j'envoie un message d'erreur au navigateur
     exit;
 }
 // isset = vérifie si la variable existe 
 // !isset = vérifie si la variable n'existe pas 
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1); // ini_set=permet de modifier les paramètres de la session // http_only=permet de sécuriser la session 
-ini_set('session.cookie_secure', 1); // secure=permet de sécuriser la session 
-ini_set('session.cookie_samesite', 'Strict'); // samesite=permet de sécuriser la session 
+ini_set('session.cookie_httponly', 1); // httponly = cookie non accessible par les scripts cotés client (car si un attaquant arrive à injecter du code JS sur la page, il ne pourra pas voler les cookies
+ini_set('session.cookie_secure', 1); // secure = force le HTTPS car si un attaquant arrive à intercepter les données entre le client et le serveur, il ne pourra pas voler force le HTTPS car si un attaquant arrive à intercepter les données entre le client et le serveur, il ne pourra pas voler
+ini_set('session.cookie_samesite', 'Strict'); // samesite = permet de sécuriser la session (ne pas envoyer le cookie à la moindre requête provenant d'un autre site)
 session_start();
 header("Content-Type: application/json");
 require_once "config.php";
@@ -48,4 +48,4 @@ if (!$utilisateur) {
 echo json_encode([
     "connecte" => true,
     "utilisateur" => $utilisateur
-]); 
+]);
