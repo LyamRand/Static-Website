@@ -22,14 +22,14 @@ if (!isset($_SESSION["id_utilisateur"])) {
 // !isset = vérifie si la variable n'existe pas 
 
 $idUtilisateur = $_SESSION["id_utilisateur"];
-$donnees = json_decode(file_get_contents("php://input"), true);
+$donnees = json_decode(file_get_contents("php://input"), true); // je décode les données envoyées par l'utilisateur
 
 if (empty($donnees["code"])) {
-    echo json_encode(["succes" => false, "message" => "Code requis."]);
+    echo json_encode(["succes" => false, "message" => "Code requis."]); // j'envoie un message d'erreur au navigateur
     exit;
 }
 
-$code = strtoupper(trim($donnees["code"]));
+$code = strtoupper(trim($donnees["code"])); // je stocke le code en majuscules et je retire les espaces
 
 // --- 1. RECHERCHE DU NUMÉRO DE GROUPE ENTRÉ ---
 // LIMIT 1 permet d'optimiser la recherche et MySQL s'arrête dès qu'il a trouvé le premier groupe.
@@ -37,21 +37,21 @@ $rechercheGroupe = $pdo->prepare("SELECT id FROM groups WHERE code = :code LIMIT
 $rechercheGroupe->execute([":code" => $code]);
 $groupe = $rechercheGroupe->fetch(PDO::FETCH_ASSOC);
 
-if (!$groupe) {
-    echo json_encode(["succes" => false, "message" => "Code de groupe invalide."]);
+if (!$groupe) { // Si le groupe n'est pas trouvé
+    echo json_encode(["succes" => false, "message" => "Code de groupe invalide."]); // j'envoie un message d'erreur au navigateur
     exit;
 } 
 
-$idGroupe = $groupe["id"]; 
+$idGroupe = $groupe["id"]; // je stocke l'id du groupe
 
 // --- 2. VÉRIFICATION QUE L'UTILISATEUR N'EST PAS DÉJÀ MEMBRE DU GROUPE ---
 // Astuce de "SELECT 1" : au lieu de demander "SELECT id" (qui charge des données), on demande à MySQL de juste répondre "1" (Vrai) s'il trouve la ligne (plus rapide)
 $verif = $pdo->prepare("SELECT 1 FROM group_users WHERE group_id = :group_id AND user_id = :user_id");
 $verif->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
 
-if ($verif->rowCount() > 0) {
-    echo json_encode(["succes" => false, "message" => "Vous êtes déjà membre de ce groupe."]);
-    exit;
+if ($verif->rowCount() > 0) { // si l'utilisateur est déjà membre du groupe
+    echo json_encode(["succes" => false, "message" => "Vous êtes déjà membre de ce groupe."]); // j'envoie un message d'erreur au navigateur
+    exit; // j'arrête L'exécution
 }
 
 // --- 3. AJOUT AU GROUPE ---
