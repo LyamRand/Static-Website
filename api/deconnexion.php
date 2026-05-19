@@ -16,8 +16,8 @@ if (!isset($_COOKIE[session_name()])) {
 
 // On démarre la session pour pouvoir y accéder
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1); // httponly = cookie non accessible par les scripts cotés client (car si un attaquant arrive à injecter du code JS sur la page, il ne pourra pas voler les cookies
+ini_set('session.cookie_secure', 1); // secure = force le HTTPS car si un attaquant arrive à intercepter les données entre le client et le serveur, il ne pourra pas voler permet de sécuriser la session 
 ini_set('session.cookie_samesite', 'Strict');
 session_start();
 

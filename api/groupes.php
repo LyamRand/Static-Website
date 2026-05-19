@@ -7,9 +7,9 @@
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
 //ini_set() permet de modifier les paramètres de PHP.
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_httponly', 1); // httponly = cookie non accessible par les scripts cotés client (car si un attaquant arrive à injecter du code JS sur la page, il ne pourra pas voler les cookies
+ini_set('session.cookie_secure', 1); // secure = force le HTTPS car si un attaquant arrive à intercepter les données entre le client et le serveur, il ne pourra pas voler permet de sécuriser la session 
+ini_set('session.cookie_samesite', 'Strict'); // samesite = permet de sécuriser la session (ne pas envoyer le cookie à la moindre requête provenant d'un autre site)
 session_start();
 header("Content-Type: application/json");
 require_once "config.php";
@@ -44,7 +44,7 @@ foreach ($groupes as &$groupe) {
     // Nombre de membres dans ce groupe
     $req = $pdo->prepare("SELECT COUNT(*) FROM group_users WHERE group_id = :group_id");
     $req->execute([":group_id" => $idGroupe]);
-    $nbMembres = (int) $req->fetchColumn(); 
+    $nbMembres = (int) $req->fetchColumn();
 
     // Ce que moi j'ai payé dans ce groupe
     $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id AND payer_id = :user_id");
@@ -54,7 +54,7 @@ foreach ($groupes as &$groupe) {
     // Total de toutes les dépenses du groupe
     $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id"); // COALESCE est utilisé pour renvoyer 0 si aucune dépense n'est trouvée pour éviter une erreur
     $req->execute([":group_id" => $idGroupe]);
-    $totalGroupe = (float) $req->fetchColumn();  
+    $totalGroupe = (float) $req->fetchColumn();
 
     // --- ÉTAPE 3 : CALCUL DE LA PART ÉGALE ---
     $maPartEgale = $nbMembres > 0 ? $totalGroupe / $nbMembres : 0;
@@ -63,4 +63,4 @@ foreach ($groupes as &$groupe) {
     $groupe["solde"] = round($jaiPaye - $maPartEgale, 2); // On arrondit le solde à 2 décimales 
 }
 
-echo json_encode($groupes); 
+echo json_encode($groupes);

@@ -7,9 +7,9 @@
 // ============================================================
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_httponly', 1); // httponly = cookie non accessible par les scripts cotés client (car si un attaquant arrive à injecter du code JS sur la page, il ne pourra pas voler les cookies
+ini_set('session.cookie_secure', 1); // secure = force le HTTPS car si un attaquant arrive à intercepter les données entre le client et le serveur, il ne pourra pas voler permet de sécuriser la session 
+ini_set('session.cookie_samesite', 'Strict'); // samesite = permet de sécuriser la session (ne pas envoyer le cookie à la moindre requête provenant d'un autre site)
 session_start();
 header("Content-Type: application/json");
 require_once "config.php";
@@ -45,7 +45,7 @@ $requeteDepenses = $pdo->prepare("
     ORDER BY expenses.expense_date DESC, expenses.id DESC
 ");
 $requeteDepenses->execute([":group_id" => $idGroupe]);
-$listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC); 
+$listeDepenses = $requeteDepenses->fetchAll(PDO::FETCH_ASSOC);
 //"Avec fetchAll, on récupère TOUTES les dépenses d'un coup"
 // "sous forme de tableau associatif PHP, et on stocke le tout"
 // "dans $listeDepenses pour pouvoir les lister ou faire une boucle."

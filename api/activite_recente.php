@@ -7,7 +7,7 @@
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
 ini_set('session.cookie_httponly', 1); // ini_set = permet de modifier les paramètres de la session // http_only = permet de sécuriser la session 
-ini_set('session.cookie_secure', 1); // secure = permet de sécuriser la session 
+ini_set('session.cookie_secure', 1); // secure = force le HTTPS car si un attaquant arrive à intercepter les données entre le client et le serveur, il ne pourra pas voler permet de sécuriser la session 
 ini_set('session.cookie_samesite', 'Strict'); // samesite = permet de sécuriser la session (ne pas envoyer le cookie à la moindre requête provenant d'un autre site)
 session_start(); // J'ouvre la mémoire du serveur (la session) pour reconnaître l'utilisateur. C'est ce qui permet au serveur de se souvenir de qui est connecté entre chaque clic.
 
@@ -36,7 +36,7 @@ $requete = $pdo->prepare("
     JOIN group_users ON group_users.group_id = expenses.group_id AND group_users.user_id = :user_id
     ORDER BY expenses.expense_date DESC, expenses.id DESC
     LIMIT 5
-"); 
+");
 // Là, on prépare notre requête SQL avec PDO pour éviter les injections SQL. --> une interface intégrée à PHP qui sert de pont entre ton code et ta base de données.
 // "Ça dit à la base de données : 'Prépare-toi à exécuter ce SELECT, 
 // "je t'enverrai les variables à sécuriser juste après, au moment du execute(
