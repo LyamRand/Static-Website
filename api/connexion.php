@@ -47,7 +47,7 @@ if (!$utilisateur || !password_verify($donnees["mot_de_passe"], $utilisateur["pw
 // --- 6. ENREGISTRER L'UTILISATEUR EN SESSION ---
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
 // On crée le cookie UNIQUEMENT maintenant que l'utilisateur est validé
-ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_httponly', 1); //ini_set() permet de modifier les paramètres de PHP.
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_samesite', 'Strict');
 session_start();
