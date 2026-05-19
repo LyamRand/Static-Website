@@ -14,6 +14,7 @@ session_start();
 header("Content-Type: application/json");
 require_once "config.php";
 
+// Vérification que l'utilisateur est connecté
 if (!isset($_SESSION["id_utilisateur"])) {
     http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
     echo json_encode(["succes" => false, "message" => "Non connecté."]);
@@ -41,6 +42,7 @@ if ($montant <= 0) {
 }
 
 // --- ENREGISTREMENT DANS LA BD ---
+// On prépare la requête SQL d'insertion.
 $insertion = $pdo->prepare("
         INSERT INTO expenses (group_id, payer_id, amount, description, expense_date)
         VALUES (:group_id, :payer_id, :amount, :description, :date)

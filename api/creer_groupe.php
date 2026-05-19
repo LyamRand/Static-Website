@@ -59,6 +59,7 @@ try {
     ]);
 
     $idNouveauGroupe = $pdo->lastInsertId();
+// lastInsertId() : permet de récupérer l'ID qui vient d'être généré par la précédente requête SQL
 
     // Ajouter le créateur comme premier membre
     $ajoutMembre = $pdo->prepare("
