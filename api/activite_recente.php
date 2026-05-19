@@ -51,4 +51,4 @@ foreach ($activites as &$activite) {
     $activite["id"] = (int) $activite["id"]; //int : permet de stocker un nombre entier uniquement
 } //COMMENTAIRE EXAM
 
-echo json_encode($activites);
+echo json_encode($activites); // On renvoie les données au format JSON
