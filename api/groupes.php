@@ -49,12 +49,12 @@ foreach ($groupes as &$groupe) {
     // Ce que moi j'ai payé dans ce groupe
     $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id AND payer_id = :user_id");
     $req->execute([":group_id" => $idGroupe, ":user_id" => $idUtilisateur]);
-    $jaiPaye = (float) $req->fetchColumn();
+    $jaiPaye = (float) $req->fetchColumn(); //COALESCE est utilisé pour renvoyer 0 si aucune dépense n'est trouvée pour éviter une erreur
 
     // Total de toutes les dépenses du groupe
     $req = $pdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE group_id = :group_id");
     $req->execute([":group_id" => $idGroupe]);
-    $totalGroupe = (float) $req->fetchColumn();
+    $totalGroupe = (float) $req->fetchColumn();  // COALESCE est utilisé pour renvoyer 0 si aucune dépense n'est trouvée pour éviter une erreur
 
     // --- ÉTAPE 3 : CALCUL DE LA PART ÉGALE ---
     $maPartEgale = $nbMembres > 0 ? $totalGroupe / $nbMembres : 0;
