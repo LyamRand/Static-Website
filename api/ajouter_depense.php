@@ -7,12 +7,12 @@
 // ============================================================
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1); 
+ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_samesite', 'Strict');
 session_start();
-header("Content-Type: application/json"); 
-require_once "config.php"; 
+header("Content-Type: application/json");
+require_once "config.php";
 
 if (!isset($_SESSION["id_utilisateur"])) {
     http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
@@ -30,7 +30,7 @@ if (empty($donnees["groupe_id"]) || empty($donnees["payeur_id"]) || empty($donne
 }
 
 $idGroupe = (int) $donnees["groupe_id"]; //int : permet de stocker un nombre entier uniquement
-$idPayeur = (int) $donnees["payeur_id"]; 
+$idPayeur = (int) $donnees["payeur_id"];
 $montant = (float) $donnees["montant"]; // float : permet de stocker des valeurs décimales
 $description = trim($donnees["description"]); // "trim" permet de supprimer les espaces inutiles au début et à la fin du texte
 $date = date("Y-m-d");
@@ -41,19 +41,19 @@ if ($montant <= 0) {
 }
 
 // --- ENREGISTREMENT DANS LA BD ---
-$insertion = $pdo->prepare(" 
+$insertion = $pdo->prepare("
         INSERT INTO expenses (group_id, payer_id, amount, description, expense_date)
         VALUES (:group_id, :payer_id, :amount, :description, :date)
-    "); //
+    ");
 
 // Remplacer les étiquettes (" : ") par les vraies valeurs des variables
 $insertion->execute([
-    ":group_id" => $idGroupe,
+    ":group_id" => $idGroupe, //faire la requette pour aller chercher le nom du groupe et le mettre dans la base de donnee//
     ":payer_id" => $idPayeur,
     ":amount" => $montant,
     ":description" => $description,
     ":date" => $date
-]); // 
+]);
 
 // --- RÉPONSE AU FRONT-END ---
-echo json_encode(["succes" => true, "message" => "Dépense ajoutée !"]); // on renvoie un message de succès au front-end     
+echo json_encode(["succes" => true, "message" => "Dépense ajoutée !"]);
