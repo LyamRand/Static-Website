@@ -139,6 +139,12 @@ createApp({
         }
 
         function sInscrire() {
+            if (champPassword.value.length < 6) {
+                afficherMessage("Le mot de passe doit contenir au moins 6 caractères.", true);
+                return;
+            }
+
+
             fetch('api/inscription.php', { // On envoie les informations d'inscription à l'API.
                 method: 'POST', // On envoie les données en POST.
                 headers: { 'Content-Type': 'application/json' }, // On spécifie que les données sont au format JSON.

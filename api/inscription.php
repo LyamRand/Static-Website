@@ -21,6 +21,11 @@ if (empty($donnees["nom"]) || empty($donnees["email"]) || empty($donnees["mot_de
     exit;
 }
 
+if (strlen($donnees["mot_de_passe"]) < 6) {
+    echo json_encode(["succes" => false, "message" => "Le mot de passe doit contenir au moins 6 caractères."]);
+    exit;
+}
+
 // Nettoyer l'email en supprimant les espaces en trop
 $email = trim($donnees["email"]);
 
