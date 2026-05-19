@@ -12,9 +12,6 @@
     <!-- Vue.js 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    <!-- jsPDF : génération PDF côté navigateur -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <!-- Google Fonts : Pacifico logo, Fira Sans texte -->
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fira+Sans:wght@400;600;700;800&display=swap"
         rel="stylesheet">
@@ -781,17 +778,6 @@
                             <button @click="afficherMessage('Préférences sauvegardées !', false)"
                                 class="flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-2xl hover:bg-indigo-600 transition">
                                 💾 Sauvegarder
-                            </button>
-                        </div>
-
-                        <!-- Export PDF -->
-                        <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm max-w-2xl mt-6">
-                            <h2 class="text-xl font-extrabold mb-1">Export PDF</h2>
-                            <p class="text-gray-400 text-sm mb-6">Téléchargez un récapitulatif de tous vos groupes et
-                                soldes au format PDF.</p>
-                            <button @click="exporterPDF"
-                                class="flex items-center gap-2 bg-green-50 text-green-600 font-bold px-8 py-3 rounded-2xl hover:bg-green-100 transition">
-                                📄 Exporter mes données en PDF
                             </button>
                         </div>
 
