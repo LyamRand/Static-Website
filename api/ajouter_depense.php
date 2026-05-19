@@ -7,7 +7,7 @@
 // ============================================================
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
-ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_httponly', 1); 
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_samesite', 'Strict');
 session_start();
@@ -37,9 +37,9 @@ $description = trim($donnees["description"]); // "trim" permet de supprimer les 
 $date = date("Y-m-d");
 
 if ($montant <= 0) {
-    echo json_encode(["succes" => false, "message" => "Le montant doit être supérieur à 0."]);
+    echo json_encode(["succes" => false, "message" => "Le montant doit être supérieur à 0."]); // Si le montant est inférieur ou égal à 0, on affiche un message d'erreur et on arrête le script.
     exit;
-}
+} 
 
 // --- ENREGISTREMENT DANS LA BD ---
 // On prépare la requête SQL d'insertion.

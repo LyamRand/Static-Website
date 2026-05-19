@@ -22,7 +22,7 @@ ini_set('session.cookie_samesite', 'Strict');
 session_start();
 
 // header JSON.
-header("Content-Type: application/json");
+header("Content-Type: application/json"); // Je préviens le navigateur : attention, je ne vais pas te renvoyer une page web classique, mais des données brutes au format JSON pour que mon JavaScript puisse les exploiter
 
 // session_destroy() supprime toutes les données de la session côté serveur et l'utilisateur n'est plus connecté
 session_destroy();
