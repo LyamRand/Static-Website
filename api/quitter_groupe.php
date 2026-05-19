@@ -20,6 +20,8 @@ if (!isset($_SESSION["id_utilisateur"])) {
     echo json_encode(["succes" => false, "message" => "Non connecté."]);
     exit;
 } // si l'utilisateur n'est pas connecté, on affiche un message d'erreur
+// isset = vérifie si la variable existe 
+// !isset = vérifie si la variable n'existe pas 
 
 $idUtilisateur = $_SESSION["id_utilisateur"];
 $donnees = json_decode(file_get_contents("php://input"), true); 

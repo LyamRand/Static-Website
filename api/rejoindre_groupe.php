@@ -18,7 +18,8 @@ if (!isset($_SESSION["id_utilisateur"])) {
     http_response_code(401); // 401 = authentification requise mais identifiants manquants ou incorrects
     echo json_encode(["succes" => false, "message" => "Non connecté."]);
     exit;
-}
+} // isset = vérifie si la variable existe 
+// !isset = vérifie si la variable n'existe pas 
 
 $idUtilisateur = $_SESSION["id_utilisateur"];
 $donnees = json_decode(file_get_contents("php://input"), true);
@@ -39,9 +40,9 @@ $groupe = $rechercheGroupe->fetch(PDO::FETCH_ASSOC);
 if (!$groupe) {
     echo json_encode(["succes" => false, "message" => "Code de groupe invalide."]);
     exit;
-}
+} 
 
-$idGroupe = $groupe["id"];
+$idGroupe = $groupe["id"]; 
 
 // --- 2. VÉRIFICATION QUE L'UTILISATEUR N'EST PAS DÉJÀ MEMBRE DU GROUPE ---
 // Astuce de "SELECT 1" : au lieu de demander "SELECT id" (qui charge des données), on demande à MySQL de juste répondre "1" (Vrai) s'il trouve la ligne (plus rapide)

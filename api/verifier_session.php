@@ -12,6 +12,8 @@ if (!isset($_COOKIE[session_name()])) {
     echo json_encode(["connecte" => false]);
     exit;
 }
+// isset = vérifie si la variable existe 
+// !isset = vérifie si la variable n'existe pas 
 
 // SECURITE : Paramètres de sécurité de la session (HttpOnly, Secure, SameSite)
 ini_set('session.cookie_httponly', 1); // ini_set=permet de modifier les paramètres de la session // http_only=permet de sécuriser la session 
