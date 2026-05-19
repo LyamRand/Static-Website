@@ -348,6 +348,106 @@ createApp({
         }
 
 
+
+        // ================================================================
+        // EXPORT PDF
+        // Génère un récapitulatif de tous les groupes et soldes de l'utilisateur.
+        // On construit un document HTML en mémoire à partir des données Vue,
+        // puis html2pdf.js le convertit en PDF téléchargeable.
+        // ================================================================
+        function exporterPDF() {
+            var nom = utilisateur.value ? utilisateur.value.name : 'Utilisateur';
+            var date = new Date().toLocaleDateString('fr-BE', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Construction des lignes de groupes
+            var lignesGroupes = '';
+            groupes.value.forEach(function (g) {
+                var couleur = g.solde > 0 ? '#16a34a' : g.solde < 0 ? '#dc2626' : '#6b7280';
+                var signe = g.solde > 0 ? '+' : '';
+                lignesGroupes += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+                    '<td style="padding:12px 8px;">' + g.icone + ' ' + g.nom + '</td>' +
+                    '<td style="padding:12px 8px;text-align:center;color:#64748b;">' + g.participants + ' membre(s)</td>' +
+                    '<td style="padding:12px 8px;text-align:right;font-weight:700;color:' + couleur + ';">' +
+                        signe + formaterSomme(g.solde) +
+                    '</td>' +
+                '</tr>';
+            });
+
+            if (lignesGroupes === '') {
+                lignesGroupes = '<tr><td colspan="3" style="padding:20px;text-align:center;color:#94a3b8;">Aucun groupe</td></tr>';
+            }
+
+            // Document HTML du PDF
+            var html = '<div style="font-family:Arial,sans-serif;color:#1e293b;max-width:700px;margin:auto;padding:40px 32px;">' +
+
+                // En-tête
+                '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;">' +
+                    '<div>' +
+                        '<h1 style="font-size:32px;font-weight:900;margin:0;color:#6155F5;">Splitz</h1>' +
+                        '<p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Récapitulatif de compte</p>' +
+                    '</div>' +
+                    '<div style="text-align:right;">' +
+                        '<p style="margin:0;font-weight:700;">' + nom + '</p>' +
+                        '<p style="margin:2px 0 0;font-size:12px;color:#94a3b8;">' + date + '</p>' +
+                    '</div>' +
+                '</div>' +
+
+                // Carte solde global
+                '<div style="background:#6155F5;border-radius:16px;padding:24px 28px;margin-bottom:32px;color:white;">' +
+                    '<p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;opacity:0.7;letter-spacing:1px;">Bilan global</p>' +
+                    '<div style="display:flex;gap:32px;flex-wrap:wrap;">' +
+                        '<div>' +
+                            '<p style="margin:0;font-size:11px;opacity:0.7;">Solde net</p>' +
+                            '<p style="margin:4px 0 0;font-size:24px;font-weight:900;">' + (soldeTotal.value >= 0 ? '+' : '') + formaterSomme(soldeTotal.value) + '</p>' +
+                        '</div>' +
+                        '<div>' +
+                            '<p style="margin:0;font-size:11px;opacity:0.7;">On te doit</p>' +
+                            '<p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#86efac;">' + formaterSomme(montantDu.value) + '</p>' +
+                        '</div>' +
+                        '<div>' +
+                            '<p style="margin:0;font-size:11px;opacity:0.7;">Tu dois</p>' +
+                            '<p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#fde047;">' + formaterSomme(montantDette.value) + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                // Tableau des groupes
+                '<h2 style="font-size:16px;font-weight:800;margin:0 0 12px;">Mes groupes</h2>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:14px;">' +
+                    '<thead>' +
+                        '<tr style="background:#f8fafc;">' +
+                            '<th style="padding:10px 8px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:700;">Groupe</th>' +
+                            '<th style="padding:10px 8px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:700;">Membres</th>' +
+                            '<th style="padding:10px 8px;text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:700;">Solde</th>' +
+                        '</tr>' +
+                    '</thead>' +
+                    '<tbody>' + lignesGroupes + '</tbody>' +
+                '</table>' +
+
+                // Pied de page
+                '<p style="margin-top:48px;font-size:11px;color:#cbd5e1;text-align:center;">Généré par Splitz &mdash; ' + date + '</p>' +
+            '</div>';
+
+            // Options html2pdf
+            var options = {
+                margin: 0,
+                filename: 'splitz_recapitulatif_' + new Date().toISOString().slice(0, 10) + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Créer un élément temporaire invisible pour html2pdf
+            var element = document.createElement('div');
+            element.innerHTML = html;
+            document.body.appendChild(element);
+
+            html2pdf().set(options).from(element).save().then(function () {
+                document.body.removeChild(element); // Nettoyer après téléchargement
+            });
+        }
+
+
         // ================================================================
         // DÉMARRAGE : vérifier la session PHP au chargement de la page
         // Si l'utilisateur avait déjà une session (F5, retour sur l'onglet),
@@ -392,7 +492,8 @@ createApp({
             seConnecter, sInscrire, seDeconnecter,
             allerAuDashboard, allerAuxGroupes, voirGroupe,
             creerGroupe, rejoindreGroupe, quitterGroupe,
-            ouvrirModalDepense, ajouterDepense, supprimerDepense
+            ouvrirModalDepense, ajouterDepense, supprimerDepense,
+            exporterPDF
         };
     }
 }).mount('#app');

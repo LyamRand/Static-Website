@@ -618,11 +618,6 @@
                                     class="bg-red-50 text-red-500 px-6 py-3 rounded-2xl font-bold hover:bg-red-100 transition">
                                     ⬅︎ Quitter le groupe
                                 </button>
-                                <!-- Bouton exporter PDF -->
-                                <button @click="exporterPDF"
-                                    class="bg-green-50 text-green-600 px-6 py-3 rounded-2xl font-bold hover:bg-green-100 transition">
-                                    📄 Exporter PDF
-                                </button>
                                 <!-- Bouton ajouter dépense -->
                                 <button @click="ouvrirModalDepense"
                                     class="bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-600 transition shadow-lg shadow-primary/30">
@@ -631,8 +626,8 @@
                             </div>
                         </div>
 
-                        <!-- Disposition en deux colonnes (zone exportable) -->
-                        <div id="contenu-a-exporter" class="flex flex-col lg:flex-row gap-8 bg-gray-50 p-4 rounded-3xl">
+                        <!-- Disposition en deux colonnes -->
+                        <div class="flex flex-col lg:flex-row gap-8">
 
                             <!-- Colonne gauche (liste des dépenses - 3/4) -->
                             <div class="lg:w-3/4">
@@ -786,6 +781,17 @@
                             <button @click="afficherMessage('Préférences sauvegardées !', false)"
                                 class="flex items-center gap-2 bg-primary text-white font-bold px-8 py-3 rounded-2xl hover:bg-indigo-600 transition">
                                 💾 Sauvegarder
+                            </button>
+                        </div>
+
+                        <!-- Export PDF -->
+                        <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm max-w-2xl mt-6">
+                            <h2 class="text-xl font-extrabold mb-1">Export PDF</h2>
+                            <p class="text-gray-400 text-sm mb-6">Téléchargez un récapitulatif de tous vos groupes et
+                                soldes au format PDF.</p>
+                            <button @click="exporterPDF"
+                                class="flex items-center gap-2 bg-green-50 text-green-600 font-bold px-8 py-3 rounded-2xl hover:bg-green-100 transition">
+                                📄 Exporter mes données en PDF
                             </button>
                         </div>
 
