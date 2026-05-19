@@ -351,101 +351,143 @@ createApp({
 
         // ================================================================
         // EXPORT PDF
-        // Génère un récapitulatif de tous les groupes et soldes de l'utilisateur.
-        // On construit un document HTML en mémoire à partir des données Vue,
-        // puis html2pdf.js le convertit en PDF téléchargeable.
+        // Génère un récapitulatif PDF directement avec jsPDF (pas de capture d'écran).
+        // jsPDF dessine le document en code (texte, rectangles, lignes), puis doc.save() déclenche le téléchargement immédiatement.
         // ================================================================
         function exporterPDF() {
+            var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+            var PAGE_W = 210;
+            var MARGIN = 16;
+            var CONTENT_W = PAGE_W - MARGIN * 2;
+            var y = 20;
+
             var nom = utilisateur.value ? utilisateur.value.name : 'Utilisateur';
             var date = new Date().toLocaleDateString('fr-BE', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // Construction des lignes de groupes
-            var lignesGroupes = '';
-            groupes.value.forEach(function (g) {
-                var couleur = g.solde > 0 ? '#16a34a' : g.solde < 0 ? '#dc2626' : '#6b7280';
-                var signe = g.solde > 0 ? '+' : '';
-                lignesGroupes += '<tr style="border-bottom:1px solid #f1f5f9;">' +
-                    '<td style="padding:12px 8px;">' + g.icone + ' ' + g.nom + '</td>' +
-                    '<td style="padding:12px 8px;text-align:center;color:#64748b;">' + g.participants + ' membre(s)</td>' +
-                    '<td style="padding:12px 8px;text-align:right;font-weight:700;color:' + couleur + ';">' +
-                        signe + formaterSomme(g.solde) +
-                    '</td>' +
-                '</tr>';
-            });
+            // --- EN-TETE ---
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(26);
+            doc.setTextColor(97, 85, 245);
+            doc.text('Splitz', MARGIN, y);
 
-            if (lignesGroupes === '') {
-                lignesGroupes = '<tr><td colspan="3" style="padding:20px;text-align:center;color:#94a3b8;">Aucun groupe</td></tr>';
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(148, 163, 184);
+            doc.text('Recapitulatif de compte', MARGIN, y + 6);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(30, 41, 59);
+            doc.text(nom, PAGE_W - MARGIN, y, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(148, 163, 184);
+            doc.text(date, PAGE_W - MARGIN, y + 5, { align: 'right' });
+
+            y += 18;
+            doc.setDrawColor(226, 232, 240);
+            doc.line(MARGIN, y, PAGE_W - MARGIN, y);
+            y += 10;
+
+            // --- CARTE BILAN GLOBAL ---
+            doc.setFillColor(97, 85, 245);
+            doc.roundedRect(MARGIN, y, CONTENT_W, 38, 4, 4, 'F');
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(255, 255, 255);
+            doc.text('BILAN GLOBAL', MARGIN + 8, y + 8);
+
+            var col = CONTENT_W / 3;
+            var labels = ['Solde net', 'On te doit', 'Tu dois'];
+            var vals = [
+                (soldeTotal.value >= 0 ? '+' : '') + formaterSomme(soldeTotal.value),
+                formaterSomme(montantDu.value),
+                formaterSomme(montantDette.value)
+            ];
+            var valColors = [[255, 255, 255], [134, 239, 172], [253, 224, 71]];
+
+            for (var i = 0; i < 3; i++) {
+                var cx = MARGIN + 8 + i * col;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(255, 255, 255);
+                doc.text(labels[i], cx, y + 18);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(valColors[i][0], valColors[i][1], valColors[i][2]);
+                doc.text(vals[i], cx, y + 27);
             }
 
-            // Document HTML du PDF
-            var html = '<div style="font-family:Arial,sans-serif;color:#1e293b;max-width:700px;margin:auto;padding:40px 32px;">' +
+            y += 48;
 
-                // En-tête
-                '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;">' +
-                    '<div>' +
-                        '<h1 style="font-size:32px;font-weight:900;margin:0;color:#6155F5;">Splitz</h1>' +
-                        '<p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Récapitulatif de compte</p>' +
-                    '</div>' +
-                    '<div style="text-align:right;">' +
-                        '<p style="margin:0;font-weight:700;">' + nom + '</p>' +
-                        '<p style="margin:2px 0 0;font-size:12px;color:#94a3b8;">' + date + '</p>' +
-                    '</div>' +
-                '</div>' +
+            // --- TABLEAU DES GROUPES ---
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Mes groupes', MARGIN, y);
+            y += 7;
 
-                // Carte solde global
-                '<div style="background:#6155F5;border-radius:16px;padding:24px 28px;margin-bottom:32px;color:white;">' +
-                    '<p style="margin:0 0 16px;font-size:11px;font-weight:700;text-transform:uppercase;opacity:0.7;letter-spacing:1px;">Bilan global</p>' +
-                    '<div style="display:flex;gap:32px;flex-wrap:wrap;">' +
-                        '<div>' +
-                            '<p style="margin:0;font-size:11px;opacity:0.7;">Solde net</p>' +
-                            '<p style="margin:4px 0 0;font-size:24px;font-weight:900;">' + (soldeTotal.value >= 0 ? '+' : '') + formaterSomme(soldeTotal.value) + '</p>' +
-                        '</div>' +
-                        '<div>' +
-                            '<p style="margin:0;font-size:11px;opacity:0.7;">On te doit</p>' +
-                            '<p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#86efac;">' + formaterSomme(montantDu.value) + '</p>' +
-                        '</div>' +
-                        '<div>' +
-                            '<p style="margin:0;font-size:11px;opacity:0.7;">Tu dois</p>' +
-                            '<p style="margin:4px 0 0;font-size:20px;font-weight:700;color:#fde047;">' + formaterSomme(montantDette.value) + '</p>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
+            // En-têtes
+            doc.setFillColor(248, 250, 252);
+            doc.rect(MARGIN, y, CONTENT_W, 8, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text('GROUPE', MARGIN + 4, y + 5.5);
+            doc.text('MEMBRES', MARGIN + CONTENT_W * 0.60, y + 5.5, { align: 'center' });
+            doc.text('SOLDE', MARGIN + CONTENT_W - 4, y + 5.5, { align: 'right' });
+            y += 10;
 
-                // Tableau des groupes
-                '<h2 style="font-size:16px;font-weight:800;margin:0 0 12px;">Mes groupes</h2>' +
-                '<table style="width:100%;border-collapse:collapse;font-size:14px;">' +
-                    '<thead>' +
-                        '<tr style="background:#f8fafc;">' +
-                            '<th style="padding:10px 8px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:700;">Groupe</th>' +
-                            '<th style="padding:10px 8px;text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:700;">Membres</th>' +
-                            '<th style="padding:10px 8px;text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;font-weight:700;">Solde</th>' +
-                        '</tr>' +
-                    '</thead>' +
-                    '<tbody>' + lignesGroupes + '</tbody>' +
-                '</table>' +
+            if (groupes.value.length === 0) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(148, 163, 184);
+                doc.text('Aucun groupe', PAGE_W / 2, y + 6, { align: 'center' });
+                y += 14;
+            } else {
+                groupes.value.forEach(function (g) {
+                    doc.setFillColor(250, 250, 252);
+                    doc.rect(MARGIN, y, CONTENT_W, 9, 'F');
 
-                // Pied de page
-                '<p style="margin-top:48px;font-size:11px;color:#cbd5e1;text-align:center;">Généré par Splitz &mdash; ' + date + '</p>' +
-            '</div>';
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(30, 41, 59);
+                    doc.text(g.nom, MARGIN + 4, y + 6.2);
 
-            // Options html2pdf
-            var options = {
-                margin: 0,
-                filename: 'splitz_recapitulatif_' + new Date().toISOString().slice(0, 10) + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(g.participants + ' membre(s)', MARGIN + CONTENT_W * 0.60, y + 6.2, { align: 'center' });
 
-            // Créer un élément temporaire invisible pour html2pdf
-            var element = document.createElement('div');
-            element.innerHTML = html;
-            document.body.appendChild(element);
+                    var r, gv, b;
+                    if (g.solde > 0) { r = 22; gv = 163; b = 74; }
+                    else if (g.solde < 0) { r = 220; gv = 38; b = 38; }
+                    else { r = 107; gv = 114; b = 128; }
+                    doc.setTextColor(r, gv, b);
+                    doc.setFont('helvetica', 'bold');
+                    var signe = g.solde > 0 ? '+' : '';
+                    doc.text(signe + formaterSomme(g.solde), MARGIN + CONTENT_W - 4, y + 6.2, { align: 'right' });
 
-            html2pdf().set(options).from(element).save().then(function () {
-                document.body.removeChild(element); // Nettoyer après téléchargement
-            });
+                    doc.setDrawColor(241, 245, 249);
+                    doc.line(MARGIN, y + 9, MARGIN + CONTENT_W, y + 9);
+                    y += 11;
+                });
+            }
+
+            y += 16;
+
+            // --- PIED DE PAGE ---
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(203, 213, 225);
+            doc.text('Genere par Splitz - ' + date, PAGE_W / 2, y, { align: 'center' });
+
+            // Telechargement immediat
+            doc.save('splitz_recapitulatif_' + new Date().toISOString().slice(0, 10) + '.pdf');
         }
+
+
+
+
 
 
         // ================================================================
